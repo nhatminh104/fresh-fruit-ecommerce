@@ -1,0 +1,1 @@
+export default function CartItem({ item }) { return <div className="flex items-center justify-between border-b border-slate-100 py-4"><span>{item?.name || 'Sản phẩm'}</span><span>{item?.quantity || 1}</span></div>; }

@@ -1,0 +1,1 @@
+import { Router } from 'express'; import { requireAuth } from '../../middlewares/authMiddleware.js'; import { getCartController } from './cart.controller.js'; const router = Router(); router.get('/', requireAuth, getCartController); export default router;

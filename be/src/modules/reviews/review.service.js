@@ -1,0 +1,1 @@
+import Review from './review.model.js'; export const listReviews = (productId) => Review.find({ product: productId }).populate('user', 'name').lean(); export const createReview = (data) => Review.create(data);

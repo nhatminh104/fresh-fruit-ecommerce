@@ -1,0 +1,6 @@
+{
+  "name": "fresh-fruit-ecommerce",
+  "private": true,
+  "scripts": { "dev": "concurrently \"npm --prefix fe run dev\" \"npm --prefix be run dev\"", "build": "npm --prefix fe run build", "server": "npm --prefix be run dev", "seed": "npm --prefix be run seed" },
+  "devDependencies": { "concurrently": "^9.1.2" }
+}

@@ -1,0 +1,18 @@
+import { Router } from 'express';
+import productRoutes from '../modules/products/product.routes.js';
+import categoryRoutes from '../modules/categories/category.routes.js';
+import authRoutes from '../modules/auth/auth.routes.js';
+import userRoutes from '../modules/users/user.routes.js';
+import cartRoutes from '../modules/carts/cart.routes.js';
+import orderRoutes from '../modules/orders/order.routes.js';
+import paymentRoutes from '../modules/payments/payment.routes.js';
+import voucherRoutes from '../modules/vouchers/voucher.routes.js';
+import wishlistRoutes from '../modules/wishlists/wishlist.routes.js';
+import reviewRoutes from '../modules/reviews/review.routes.js';
+import addressRoutes from '../modules/addresses/address.routes.js';
+import inventoryRoutes from '../modules/inventory/inventory.routes.js';
+import { databaseHealth } from '../config/database.js';
+const router = Router();
+router.get('/health', (req, res) => { const database = databaseHealth(); const healthy = database.status === 'connected'; res.status(healthy ? 200 : 503).json({ success: healthy, service: 'fresh-fruit-api', status: healthy ? 'ok' : 'degraded', database, timestamp: new Date().toISOString() }); });
+router.use('/auth', authRoutes); router.use('/users', userRoutes); router.use('/products', productRoutes); router.use('/categories', categoryRoutes); router.use('/carts', cartRoutes); router.use('/orders', orderRoutes); router.use('/payments', paymentRoutes); router.use('/vouchers', voucherRoutes); router.use('/wishlists', wishlistRoutes); router.use('/reviews', reviewRoutes); router.use('/addresses', addressRoutes); router.use('/inventory', inventoryRoutes);
+export default router;

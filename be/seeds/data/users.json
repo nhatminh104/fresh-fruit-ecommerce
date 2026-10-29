@@ -1,0 +1,4 @@
+[
+  { "fullName": "Fresh Fruit Admin", "email": "admin@freshfruit.local", "passwordEnv": "SEED_ADMIN_PASSWORD", "role": "admin" },
+  { "fullName": "Demo Customer", "email": "customer@freshfruit.local", "passwordEnv": "SEED_CUSTOMER_PASSWORD", "role": "customer" }
+]

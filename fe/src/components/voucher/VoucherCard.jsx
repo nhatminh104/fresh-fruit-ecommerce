@@ -1,0 +1,1 @@
+export default function VoucherCard({ code = 'WELCOME' }) { return <div className="rounded-2xl border border-dashed border-leaf bg-white p-5"><strong>{code}</strong><p className="mt-2 text-sm text-slate-500">Voucher sẽ được tích hợp trong Task 09.</p></div>; }

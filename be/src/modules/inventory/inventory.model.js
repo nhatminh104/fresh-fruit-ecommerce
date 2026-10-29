@@ -1,0 +1,1 @@
+import mongoose from 'mongoose'; const schema = new mongoose.Schema({ product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', unique: true }, quantity: { type: Number, default: 0 }, lowStockAt: { type: Number, default: 5 } }, { timestamps: true }); export default mongoose.model('Inventory', schema);

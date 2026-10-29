@@ -1,0 +1,1 @@
+export function requireAuth(req, res, next) { const token = req.headers.authorization?.replace('Bearer ', ''); if (!token) return res.status(401).json({ success: false, message: 'Authentication required' }); req.user = { token }; next(); }

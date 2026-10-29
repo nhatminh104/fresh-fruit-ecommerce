@@ -1,0 +1,1 @@
+import { Router } from 'express'; import { requireAuth } from '../../middlewares/authMiddleware.js'; import { profileController } from './user.controller.js'; const router = Router(); router.get('/me', requireAuth, profileController); export default router;

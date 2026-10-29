@@ -1,0 +1,1 @@
+export const orderValidator = (req, res, next) => { if (!Array.isArray(req.body?.items) || !req.body.items.length) return res.status(400).json({ success: false, message: 'Order items are required' }); next(); };

@@ -1,0 +1,5 @@
+[
+  { "name": "Vietnamese fruits", "slug": "trai-cay-viet-nam", "description": "Seasonal fruit grown in Vietnam", "image": "https://images.unsplash.com/photo-1619566636858-adf3ef46400b" },
+  { "name": "Imported fruits", "slug": "trai-cay-nhap-khau", "description": "Imported fruit for the demo catalogue", "image": "https://images.unsplash.com/photo-1610832958506-aa56368176cf" },
+  { "name": "Fruit combos", "slug": "combo-trai-cay", "description": "Prepared fruit selections", "image": "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea" }
+]

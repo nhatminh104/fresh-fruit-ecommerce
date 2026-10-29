@@ -1,0 +1,1 @@
+export default function PaymentMethodSelector() { return <div className="rounded-2xl bg-white p-5"><h3 className="font-bold text-forest">Phương thức thanh toán</h3><p className="mt-2 text-sm text-slate-500">Thanh toán mô phỏng sẽ được triển khai trong Task 08.</p></div>; }

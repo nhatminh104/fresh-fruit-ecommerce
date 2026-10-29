@@ -1,0 +1,1 @@
+import { listAddresses, createAddress } from './address.service.js'; export async function listController(req, res) { res.json({ success: true, data: await listAddresses(req.user.id) }); } export async function createController(req, res) { res.status(201).json({ success: true, data: await createAddress({ ...req.body, user: req.user.id }) }); }

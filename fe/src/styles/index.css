@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap');
+@tailwind base; @tailwind components; @tailwind utilities;
+@layer base { * { @apply box-border; } body { @apply m-0 bg-cream font-sans text-slate-700 antialiased; } button, a { @apply outline-none; } button:focus-visible, a:focus-visible, input:focus-visible { @apply ring-2 ring-leaf ring-offset-2 ring-offset-cream; } }
+@layer components { .icon-button { @apply grid h-10 w-10 place-items-center rounded-full text-slate-600 transition hover:bg-white hover:text-forest; } .header-search { @apply hidden h-11 w-64 items-center gap-2 rounded-full border border-forest/10 bg-white/70 px-4 text-sm text-slate-500 transition focus-within:border-leaf focus-within:bg-white lg:flex; } .header-search input { @apply min-w-0 flex-1 bg-transparent outline-none placeholder:text-slate-400; } .hero-wrap { @apply overflow-hidden bg-cream; background-image: radial-gradient(#d9e4d5 1px, transparent 1px); background-size: 28px 28px; background-position: 0 15px; } .hero-image { @apply relative aspect-[1.08] w-full rounded-[2rem] object-cover shadow-2xl shadow-forest/10; } .eyebrow { @apply flex items-center text-xs font-bold uppercase tracking-[.18em] text-leaf; } .section-heading { @apply flex items-end justify-between gap-4; } .section-title { @apply mt-2 font-display text-4xl text-forest sm:text-5xl; } .btn-primary { @apply inline-flex items-center gap-2 rounded-full bg-forest px-5 py-3.5 text-sm font-bold text-white transition hover:bg-leaf; } .btn-secondary { @apply inline-flex items-center rounded-full border border-forest/20 px-5 py-3.5 text-sm font-bold text-forest transition hover:bg-white; } .category-card { @apply relative overflow-hidden rounded-2xl bg-slate-100; } .category-card img { @apply aspect-[.95] w-full object-cover transition duration-500; } .category-card:hover img { @apply scale-105; } .category-card div { @apply absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-12 text-white; } .category-card h3 { @apply text-sm font-bold sm:text-base; } .category-card p { @apply mt-1 text-xs text-white/70; } .season-banner { @apply relative flex min-h-[340px] items-center overflow-hidden rounded-[2rem] bg-forest p-8 sm:p-14; } .season-banner img { @apply absolute right-0 top-0 h-full w-1/2 object-cover opacity-85; mask-image: linear-gradient(to right, transparent, black 30%); } .footer-title { @apply mb-4 text-sm font-bold text-orange; } .footer-link { @apply block py-1.5 text-sm text-white/60 transition hover:text-white; } .social { @apply grid h-9 w-9 place-items-center rounded-full border border-white/20 text-white/70 transition hover:border-orange hover:text-orange; } }
+@layer components {
+  .announcement-bar { @apply flex min-h-[32px] items-center justify-center gap-2 bg-forest px-4 py-2 text-center text-[11px] font-semibold tracking-wide text-white; }
+  .brand-mark { @apply flex items-center gap-2 font-display text-2xl leading-none text-forest; }
+  .brand-icon { @apply grid h-10 w-10 place-items-center rounded-full bg-forest text-white; }
+  .nav-link { @apply text-sm font-semibold text-slate-500 transition hover:text-forest; }
+  .cart-badge { @apply absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-orange px-1 text-[10px] font-bold text-white; }
+  .mobile-nav { @apply border-t border-forest/10 px-5 pb-4; }
+  .mobile-nav a { @apply block border-b border-forest/10 py-3 text-sm font-semibold text-slate-600; }
+  .section-shell { @apply mx-auto max-w-7xl px-5 py-20 lg:px-8; }
+  .section-link { @apply text-sm font-bold text-forest transition hover:text-leaf; }
+  .hero-orbit { @apply absolute -right-4 -top-5 h-24 w-24 rounded-full border border-orange/40 lg:right-8; }
+  .hero-note { @apply absolute -bottom-5 left-3 flex items-center gap-3 rounded-2xl bg-white p-3 pr-5 shadow-lg shadow-forest/10 sm:left-8; }
+  .product-card { @apply min-w-0; }
+  .product-image-wrap { @apply relative block overflow-hidden rounded-2xl bg-[#f2f0e8]; }
+  .product-image { @apply aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105; }
+  .product-tag { @apply absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-forest; }
+  .add-button { @apply absolute bottom-3 right-3 grid h-10 w-10 translate-y-2 place-items-center rounded-full bg-white text-forest opacity-0 shadow-sm transition group-hover:translate-y-0 group-hover:opacity-100 hover:bg-forest hover:text-white; }
+  .product-name { @apply font-semibold text-slate-800 transition hover:text-forest; }
+  .toast-message { @apply fixed right-5 top-24 z-50 rounded-xl bg-forest px-4 py-3 text-sm font-semibold text-white shadow-xl; }
+  .season-image { @apply absolute right-0 top-0 h-full w-1/2 object-cover opacity-85; mask-image: linear-gradient(to right, transparent, black 30%); }
+  .origin-panel { @apply grid overflow-hidden rounded-[2rem] bg-white shadow-sm lg:grid-cols-2; }
+  .origin-image { @apply min-h-[320px] bg-[url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1000&q=85')] bg-cover bg-center; }
+}
+@media (max-width: 639px) { .season-image { @apply h-1/2 w-full opacity-30; mask-image: linear-gradient(to bottom, transparent, black 25%); } .season-banner { @apply min-h-[420px] items-end; } .add-button { @apply translate-y-0 opacity-100; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; } }

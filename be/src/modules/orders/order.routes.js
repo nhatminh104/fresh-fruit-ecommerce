@@ -1,0 +1,1 @@
+import { Router } from 'express'; import { requireAuth } from '../../middlewares/authMiddleware.js'; import { listController, createController } from './order.controller.js'; const router = Router(); router.use(requireAuth); router.get('/', listController); router.post('/', createController); export default router;

@@ -1,0 +1,1 @@
+import { listReviews, createReview } from './review.service.js'; export async function listController(req, res) { res.json({ success: true, data: await listReviews(req.params.productId) }); } export async function createController(req, res) { res.status(201).json({ success: true, data: await createReview(req.body) }); }

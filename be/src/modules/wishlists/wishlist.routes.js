@@ -1,0 +1,1 @@
+import { Router } from 'express'; import { requireAuth } from '../../middlewares/authMiddleware.js'; import { listController } from './wishlist.controller.js'; const router = Router(); router.get('/', requireAuth, listController); export default router;

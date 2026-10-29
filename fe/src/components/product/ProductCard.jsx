@@ -1,0 +1,1 @@
+export default function ProductCard({ product }) { return <article className="rounded-2xl bg-white p-4"><img className="aspect-[4/3] w-full rounded-xl object-cover" src={product.image} alt={product.name}/><h3 className="mt-3 font-bold text-forest">{product.name}</h3><p className="mt-1 text-sm text-slate-500">{product.price}</p></article>; }

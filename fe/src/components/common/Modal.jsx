@@ -1,0 +1,1 @@
+export default function Modal({ open, onClose, children }) { if (!open) return null; return <div className="fixed inset-0 z-50 grid place-items-center bg-forest/30 p-5" onClick={onClose}><div className="rounded-2xl bg-white p-6" onClick={(event) => event.stopPropagation()}>{children}</div></div>; }

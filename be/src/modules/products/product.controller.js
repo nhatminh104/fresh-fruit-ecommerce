@@ -1,0 +1,1 @@
+import { listProducts, findProduct } from './product.service.js'; export async function listController(req, res) { res.json({ success: true, data: await listProducts(req.query) }); } export async function detailController(req, res) { res.json({ success: true, data: await findProduct(req.params.id) }); }

@@ -1,0 +1,1 @@
+export default function CartSummary() { return <aside className="rounded-2xl bg-white p-6"><h2 className="font-bold text-forest">Tóm tắt đơn hàng</h2><p className="mt-4 text-sm text-slate-500">Thanh toán sẽ được hoàn thiện trong Task 06–08.</p></aside>; }
