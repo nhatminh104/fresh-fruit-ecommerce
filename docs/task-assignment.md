@@ -186,3 +186,87 @@ feature/* -> develop -> main
 - Branch cá nhân: `feature/minh-auth-account`, `feature/quan-catalog-review`, `feature/thuan-commerce-admin`.
 - Luồng merge: `feature/* -> develop -> main`; mỗi PR phải ghi page FE, endpoint BE, test đã chạy và cần một người khác review.
 - Không code trực tiếp hoặc force-push `develop`/`main`. Chỉ merge `develop` vào `main` sau khi cả ba vertical slice, build và smoke test đều pass.
+
+## 7. Phân công cân bằng theo khối lượng — áp dụng chính thức
+
+> Mục này thay thế mục 6. Phân chia theo độ khó và luồng nghiệp vụ, không chia đơn giản theo số lượng file. Mỗi người đều có phần FE + BE + validation + test + tài liệu.
+
+### Minh — Nền tảng tài khoản + catalog sản phẩm
+
+**FE:**
+
+- Auth: `fe/src/pages/auth/**`, `fe/src/contexts/AuthContext.jsx`, `fe/src/hooks/useAuth.js`.
+- Tài khoản: `fe/src/pages/user/Profile.jsx`, `Addresses.jsx`.
+- Catalog: `fe/src/pages/user/Home.jsx`, `Products.jsx`, `Categories.jsx`, `ProductDetail.jsx`, `SearchResults.jsx`.
+- Dùng chung: `fe/src/components/product/**`, `fe/src/services/authService.js`, `userService.js`, `addressService.js`, `productService.js`, `categoryService.js`.
+
+**BE:**
+
+- `be/src/modules/auth/**`, `users/**`, `addresses/**`.
+- `be/src/modules/products/**`, `categories/**`.
+- `be/src/middlewares/authMiddleware.js`, validation liên quan và seed products/categories.
+
+**Phải hoàn thành:**
+
+1. Register/login/JWT/me/forgot-password, profile, address và route guard.
+2. Product list/detail, category, search/filter/sort/pagination.
+3. API validation, ownership, response/error format, loading/error/empty state ở FE.
+4. Test auth/profile/address và product/category; cập nhật API docs cho các endpoint này.
+
+**Độ nặng:** nền tảng bảo mật + dữ liệu catalog được nhiều slice khác sử dụng; phải chốt API contract sớm cho cả nhóm.
+
+### Quân — Luồng mua hàng end-to-end
+
+**FE:**
+
+- `fe/src/pages/user/Cart.jsx`, `Checkout.jsx`, `PaymentResult.jsx`, `Orders.jsx`, `OrderDetail.jsx`.
+- `fe/src/components/cart/**`, `order/**`, `payment/**`.
+- `fe/src/contexts/CartContext.jsx`, `cartService.js`, `orderService.js`, `paymentService.js`.
+
+**BE:**
+
+- `be/src/modules/carts/**`, `orders/**`, `payments/**`.
+- `be/src/modules/inventory/**` chỉ phần kiểm tra và cập nhật tồn kho phục vụ tạo đơn.
+- Order validator, transaction/cơ chế chống trừ kho sai và route wiring liên quan.
+
+**Phải hoàn thành:**
+
+1. Cart add/update/remove, tính tạm tính và đồng bộ cart theo user.
+2. Checkout với địa chỉ, phương thức thanh toán và tạo payment/order.
+3. Server tự tính giá/subtotal/total, kiểm tra stock và quantity; không tin total từ FE.
+4. Danh sách/chi tiết order, trạng thái payment/order và xử lý lỗi rõ ràng.
+5. Test cart/order/payment/stock và smoke test đầy đủ product → cart → checkout → order.
+
+**Độ nặng:** đây là luồng nhiều bước và có rủi ro dữ liệu tiền/tồn kho; cần phối hợp contract user/catalog với Minh.
+
+### Thuận — Admin + hậu mãi và tương tác sản phẩm
+
+**FE:**
+
+- Toàn bộ `fe/src/pages/admin/**`, `fe/src/components/admin/**`, `fe/src/layouts/AdminLayout.jsx`.
+- `fe/src/pages/user/Wishlist.jsx`, `Vouchers.jsx`, `Reviews.jsx`.
+- `fe/src/components/review/**`, `voucher/**`, `fe/src/services/wishlistService.js`, `voucherService.js`, `reviewService.js`.
+
+**BE:**
+
+- `be/src/modules/reviews/**`, `vouchers/**`, `wishlists/**`, `inventory/**` phần quản trị.
+- Endpoint admin cho product/category/voucher/inventory/order/user/review; không sửa logic catalog cốt lõi của Minh.
+- Seed vouchers/users và contract admin cần thiết.
+
+**Phải hoàn thành:**
+
+1. Admin dashboard, CRUD sản phẩm/category/voucher/inventory, quản lý order/user/review.
+2. Phân quyền admin ở BE, confirm thao tác nguy hiểm, pagination, validation và empty/error state ở FE.
+3. Wishlist, voucher áp dụng/hiển thị, review xem/tạo/duyệt/ẩn theo quyền.
+4. Test role admin, voucher, wishlist, review, inventory và smoke test toàn bộ admin route.
+5. Hoàn thiện README, development plan, API docs tổng hợp và checklist QA/release.
+
+**Độ nặng:** nhiều màn hình admin + quyền hạn + CRUD; đồng thời có các tính năng hậu mãi độc lập, không bị phụ thuộc toàn bộ vào tiến độ checkout.
+
+### Ranh giới để tránh lệch tải và conflict
+
+- Minh sở hữu model/controller/service của auth, user, address, product, category; Quân dùng contract đó nhưng không sửa trực tiếp nếu chưa trao đổi.
+- Quân sở hữu cart/order/payment và phần inventory phục vụ đặt hàng; Thuận sở hữu màn hình/API quản trị inventory.
+- Thuận sở hữu voucher/wishlist/review và admin; Quân chỉ gọi voucher khi checkout theo contract đã chốt.
+- Mỗi người phải có ít nhất một PR backend, một PR frontend và test tương ứng; không tính tài liệu đơn thuần là task chính.
+- Nếu một slice hoàn thành sớm, người đó hỗ trợ review/test slice khác, không tự nhận thêm module làm phát sinh conflict.
