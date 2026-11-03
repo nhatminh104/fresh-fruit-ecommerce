@@ -1,89 +1,125 @@
 # Phân công task Fresh Fruit
 
-Nhóm gồm Minh, Quân, Thuận. Mỗi người làm trọn phần FE + BE + validation + test của chức năng được giao.
+Mỗi người phụ trách trọn chức năng của mình: giao diện FE, API/BE, validation, phân quyền, test và tài liệu liên quan.
 
 ## Minh — Auth, tài khoản và Admin
 
-### Frontend
+### FE Minh code
 
-- Auth: `fe/src/pages/auth/**`
-- Tài khoản: `fe/src/pages/user/Profile.jsx`, `Addresses.jsx`
-- Toàn bộ admin: `fe/src/pages/admin/**`, `fe/src/components/admin/**`, `fe/src/layouts/AdminLayout.jsx`
-- `AuthContext`, `useAuth`, route guard và service auth/user/address.
+- `fe/src/pages/auth/Login.jsx`
+- `fe/src/pages/auth/Register.jsx`
+- `fe/src/pages/auth/ForgotPassword.jsx`
+- `fe/src/pages/user/Profile.jsx`
+- `fe/src/pages/user/Addresses.jsx`
+- Toàn bộ `fe/src/pages/admin/**`
+- Toàn bộ `fe/src/components/admin/**`
+- `fe/src/layouts/AdminLayout.jsx`
+- `fe/src/contexts/AuthContext.jsx`
+- `fe/src/hooks/useAuth.js`
+- `fe/src/services/authService.js`
+- `fe/src/services/userService.js`
+- `fe/src/services/addressService.js`
+- Route guard user/admin trong `fe/src/routes/index.jsx`.
 
-### Backend
+### BE Minh code
 
 - `be/src/modules/auth/**`
 - `be/src/modules/users/**`
 - `be/src/modules/addresses/**`
 - `be/src/middlewares/authMiddleware.js`
 - API admin cho sản phẩm, danh mục, voucher, inventory, order, user và review.
+- Phần permission/role admin và các route admin liên quan.
 
-### Kết quả cần đạt
+### Minh phải hoàn thành
 
-- Đăng ký, đăng nhập, JWT, profile, địa chỉ và phân quyền user/admin.
-- Admin dashboard và CRUD quản trị có validation, pagination, loading/error/empty state.
-- User thường không truy cập được admin API.
+- Register, login, JWT, lấy user hiện tại, profile, địa chỉ và logout/session.
+- Admin dashboard, CRUD và quản lý các màn hình trong `fe/src/pages/admin/**`.
+- Validation form, loading/error/empty state, pagination và confirm thao tác xóa/cập nhật.
+- User thường không thể truy cập trang hoặc API admin.
 - Test auth, permission và các luồng admin chính.
 
 ## Quân — Cart, Checkout, Payment và Order
 
-### Frontend
+### FE Quân code
 
 - `fe/src/pages/user/Cart.jsx`
 - `fe/src/pages/user/Checkout.jsx`
 - `fe/src/pages/user/PaymentResult.jsx`
-- `fe/src/pages/user/Orders.jsx`, `OrderDetail.jsx`
-- `fe/src/components/cart/**`, `order/**`, `payment/**`
-- `CartContext`, cart/order/payment service.
+- `fe/src/pages/user/Orders.jsx`
+- `fe/src/pages/user/OrderDetail.jsx`
+- `fe/src/components/cart/**`
+- `fe/src/components/order/**`
+- `fe/src/components/payment/**`
+- `fe/src/contexts/CartContext.jsx`
+- `fe/src/services/cartService.js`
+- `fe/src/services/orderService.js`
+- `fe/src/services/paymentService.js`
 
-### Backend
+### BE Quân code
 
 - `be/src/modules/carts/**`
 - `be/src/modules/orders/**`
 - `be/src/modules/payments/**`
-- Order validator và phần kiểm tra/trừ tồn kho khi tạo đơn.
+- `be/src/modules/orders/order.validator.js`
+- Phần kiểm tra và cập nhật tồn kho khi tạo đơn.
 
-### Kết quả cần đạt
+### Quân phải hoàn thành
 
-- Luồng hoàn chỉnh: sản phẩm → cart → checkout → payment → order.
-- Backend tự tính tiền, kiểm tra quantity/stock/ownership; không tin total từ FE.
-- Xử lý đúng trạng thái order/payment và lỗi.
+- Luồng hoàn chỉnh: xem sản phẩm → thêm cart → checkout → payment → order.
+- Backend tự tính giá, subtotal, discount, shipping và total.
+- Kiểm tra user, quantity, product, stock và trạng thái payment/order.
+- Không tin giá hoặc total do frontend gửi lên.
 - Test cart, order, payment, stock và smoke test checkout.
 
-## Thuận — Catalog và tính năng hậu mãi
+## Thuận — Catalog và các chức năng sản phẩm
 
-### Frontend
+### FE Thuận code
 
-- Catalog: `Home.jsx`, `Products.jsx`, `Categories.jsx`, `ProductDetail.jsx`, `SearchResults.jsx`
+- `fe/src/pages/user/Home.jsx`
+- `fe/src/pages/user/Products.jsx`
+- `fe/src/pages/user/Categories.jsx`
+- `fe/src/pages/user/ProductDetail.jsx`
+- `fe/src/pages/user/SearchResults.jsx`
+- `fe/src/pages/user/Wishlist.jsx`
+- `fe/src/pages/user/Vouchers.jsx`
+- `fe/src/pages/user/Reviews.jsx`
 - `fe/src/components/product/**`
-- Hậu mãi: `Wishlist.jsx`, `Vouchers.jsx`, `Reviews.jsx`
-- `fe/src/components/review/**`, `voucher/**`
-- Product/category/review/voucher/wishlist service.
+- `fe/src/components/review/**`
+- `fe/src/components/voucher/**`
+- `fe/src/services/productService.js`
+- `fe/src/services/categoryService.js`
+- `fe/src/services/wishlistService.js`
+- `fe/src/services/voucherService.js`
+- `fe/src/services/reviewService.js`
 
-### Backend
+### BE Thuận code
 
-- Catalog: `be/src/modules/products/**`, `categories/**`
-- Hậu mãi: `be/src/modules/reviews/**`, `vouchers/**`, `wishlists/**`
-- Seed products, categories và vouchers.
+- `be/src/modules/products/**`
+- `be/src/modules/categories/**`
+- `be/src/modules/wishlists/**`
+- `be/src/modules/vouchers/**`
+- `be/src/modules/reviews/**`
+- `be/seeds/data/products.json`
+- `be/seeds/data/categories.json`
+- `be/seeds/data/vouchers.json`
 
-### Kết quả cần đạt
+### Thuận phải hoàn thành
 
-- Catalog có list/detail/category/search/filter/sort/pagination.
-- Wishlist, voucher và review hoạt động đúng theo user/business rule.
-- Có loading/error/empty state và giữ query khi chuyển trang.
-- Test product, category, review, voucher, wishlist.
+- Product list/detail, category, search, filter, sort và pagination.
+- Wishlist thêm/xóa/xem theo user.
+- Voucher list/chi tiết/kiểm tra điều kiện sử dụng theo contract của Quân.
+- Review xem/tạo và giới hạn quyền theo user/business rule.
+- Loading/error/empty state, giữ query khi chuyển trang.
+- Test product, category, wishlist, voucher và review.
 
-## Quy tắc phối hợp và merge
+## Quy tắc làm việc
 
-- Branch cá nhân tạo từ `develop`:
-
+- Branch cá nhân:
   - `feature/minh-auth-admin`
-  - `feature/quan-commerce-flow`
-  - `feature/thuan-catalog-engagement`
-
+  - `feature/quan-commerce`
+  - `feature/thuan-catalog`
 - Luồng merge: `feature/*` → `develop` → `main`.
-- Mỗi người phải có cả thay đổi FE, BE và test tương ứng.
-- Minh chốt contract auth/permission/admin; Quân chốt cart/order/payment; Thuận chốt catalog/hậu mãi.
-- PR phải được người khác review, build/test pass và không còn conflict mới merge vào `develop`.
-- Chỉ merge `develop` vào `main` khi cả ba phần hoàn thành và smoke test toàn bộ hệ thống pass.
+- Mỗi task phải có cả FE, BE và test; không chỉ làm giao diện giả hoặc API riêng lẻ.
+- Minh chốt permission/admin, Quân chốt cart/order/payment, Thuận chốt catalog/wishlist/voucher/review.
+- Trước khi merge vào `develop`: build pass, test pass, có người khác review và không còn conflict.
+- Chỉ merge `develop` vào `main` khi cả ba nhóm hoàn tất và smoke test toàn bộ hệ thống pass.
