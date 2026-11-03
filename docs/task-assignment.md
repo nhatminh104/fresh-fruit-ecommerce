@@ -270,3 +270,67 @@ feature/* -> develop -> main
 - Thuận sở hữu voucher/wishlist/review và admin; Quân chỉ gọi voucher khi checkout theo contract đã chốt.
 - Mỗi người phải có ít nhất một PR backend, một PR frontend và test tương ứng; không tính tài liệu đơn thuần là task chính.
 - Nếu một slice hoàn thành sớm, người đó hỗ trợ review/test slice khác, không tự nhận thêm module làm phát sinh conflict.
+
+## 8. Phân công điều chỉnh theo yêu cầu của Minh — áp dụng chính thức
+
+> Mục này thay thế mục 7. Minh nhận phần **Admin**; phần **Catalog** được chuyển sang Thuận để tải công việc giữa ba người cân bằng hơn.
+
+### Minh — Auth, tài khoản và toàn bộ Admin
+
+**FE:**
+
+- Auth/tài khoản: `fe/src/pages/auth/**`, `Profile.jsx`, `Addresses.jsx`, `AuthContext.jsx`, `useAuth.js`.
+- Admin: toàn bộ `fe/src/pages/admin/**`, `fe/src/components/admin/**`, `fe/src/layouts/AdminLayout.jsx`.
+- Services/route guard: auth, user, address services và route bảo vệ admin.
+
+**BE:**
+
+- Auth/tài khoản: `be/src/modules/auth/**`, `users/**`, `addresses/**`, `authMiddleware.js`.
+- Admin: endpoint quản trị sản phẩm, danh mục, voucher, inventory, order, user và review; kiểm tra role admin ở backend.
+- Không nhận phần catalog user-facing và không nhận logic checkout/order core của Quân.
+
+**Nghiệm thu:**
+
+- Đăng ký/đăng nhập/JWT/profile/address/route guard hoạt động.
+- Admin dashboard và CRUD quản trị có validation, pagination, loading/error/empty state, confirm thao tác nguy hiểm.
+- User thường không gọi được admin API dù tự sửa request.
+- Có test auth, permission và các luồng admin chính.
+
+### Quân — Cart, checkout, payment và order end-to-end
+
+**FE:** `Cart.jsx`, `Checkout.jsx`, `PaymentResult.jsx`, `Orders.jsx`, `OrderDetail.jsx`, `components/cart/**`, `order/**`, `payment/**`, `CartContext.jsx` và các service cart/order/payment.
+
+**BE:** `be/src/modules/carts/**`, `orders/**`, `payments/**`, order validation và phần kiểm tra/trừ tồn kho khi tạo đơn.
+
+**Nghiệm thu:**
+
+- Chạy được product → cart → checkout → payment → order.
+- Server tự tính tiền, kiểm tra quantity/stock và ownership; không tin total từ FE.
+- Có test cart/order/payment/stock và xử lý trạng thái lỗi rõ ràng.
+
+### Thuận — Catalog + tính năng hậu mãi
+
+**FE:**
+
+- Catalog: `Home.jsx`, `Products.jsx`, `Categories.jsx`, `ProductDetail.jsx`, `SearchResults.jsx`, `components/product/**`.
+- Hậu mãi: `Wishlist.jsx`, `Vouchers.jsx`, `Reviews.jsx`, `components/review/**`, `components/voucher/**`.
+- Services product/category/review/voucher/wishlist.
+
+**BE:**
+
+- Catalog: `be/src/modules/products/**`, `categories/**`, seed products/categories.
+- Hậu mãi: `reviews/**`, `vouchers/**`, `wishlists/**`, seed vouchers và review/wishlist contract.
+- Không nhận admin CRUD; chỉ cung cấp API catalog user-facing và API hậu mãi theo quyền.
+
+**Nghiệm thu:**
+
+- Catalog có list/detail/category/search/filter/sort/pagination, giữ query khi chuyển trang.
+- Wishlist, voucher, review hoạt động theo user và business rule.
+- Có test product/category/review/voucher/wishlist và smoke test các trang user.
+
+### Ranh giới sau khi điều chỉnh
+
+- Minh sở hữu admin API và permission; Thuận không sửa admin CRUD nếu không review cùng Minh.
+- Thuận sở hữu product/category API user-facing; Minh dùng chung contract đó cho các màn hình admin.
+- Quân sở hữu cart/order/payment; phần inventory trong luồng đặt hàng thuộc Quân, còn màn hình quản trị inventory thuộc Minh.
+- Luồng merge vẫn là `feature/* -> develop -> main`; mỗi người phải có cả PR FE, PR BE và test tương ứng.
