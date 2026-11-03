@@ -150,3 +150,39 @@ feature/* -> develop -> main
 - [ ] Không commit `.env`, secret hoặc dữ liệu nhạy cảm.
 - [ ] API docs và README được cập nhật.
 - [ ] Đã review diff của từng PR và xử lý conflict trên `develop`.
+
+## 6. Phân công mới theo vertical slice FE + BE
+
+> **Mục này thay thế toàn bộ mục 2–5 ở phía trên.** Mỗi thành viên làm cả giao diện FE, API/module BE, validation, seed/test và tài liệu cho cùng một nhóm chức năng.
+
+### Minh — Auth, tài khoản và hồ sơ người dùng
+
+**FE:** `fe/src/pages/auth/**`, `fe/src/pages/user/Profile.jsx`, `fe/src/pages/user/Addresses.jsx`, `fe/src/contexts/AuthContext.jsx`, `fe/src/hooks/useAuth.js`, `fe/src/services/authService.js`, `userService.js`, `addressService.js`, route guard.
+
+**BE:** `be/src/modules/auth/**`, `users/**`, `addresses/**`, `be/src/middlewares/authMiddleware.js`, `errorHandler.js`.
+
+**Đầu việc:** hoàn thiện register/login/JWT/me/forgot-password, profile, địa chỉ, phân quyền user/admin, khôi phục session, interceptor token/401 dùng chung; viết test cho auth/profile/address. User chỉ được truy cập dữ liệu của mình.
+
+### Quân — Catalog, tìm kiếm và đánh giá sản phẩm
+
+**FE:** `fe/src/pages/user/Home.jsx`, `Products.jsx`, `Categories.jsx`, `ProductDetail.jsx`, `SearchResults.jsx`, `Reviews.jsx`, `fe/src/components/product/**`, `review/**`, các service product/category/review.
+
+**BE:** `be/src/modules/products/**`, `categories/**`, `reviews/**`, seed `be/seeds/data/products.json` và `categories.json`.
+
+**Đầu việc:** hoàn thiện list/detail/category/search/filter/sort/pagination, review theo quyền, response/query validation, loading/error/empty state, seed và test product/category/review. Query filter phải được giữ khi chuyển trang.
+
+### Thuận — Giỏ hàng, checkout, đơn hàng, thanh toán và quản trị
+
+**FE:** `fe/src/pages/user/Cart.jsx`, `Checkout.jsx`, `PaymentResult.jsx`, `Orders.jsx`, `OrderDetail.jsx`, `Wishlist.jsx`, `Vouchers.jsx`, toàn bộ `fe/src/pages/admin/**`, `components/cart/**`, `order/**`, `payment/**`, `admin/**`, `CartContext.jsx`, cart/order/payment/voucher/wishlist services.
+
+**BE:** `be/src/modules/carts/**`, `orders/**`, `payments/**`, `vouchers/**`, `wishlists/**`, `inventory/**`, endpoint admin và seed liên quan.
+
+**Đầu việc:** hoàn thiện cart/wishlist/voucher/checkout/payment/order, server tự tính tiền và kiểm tra stock, admin CRUD sản phẩm/category/voucher/inventory và quản lý order/user/review, role admin, test cart/order/voucher/inventory và smoke test product → cart → checkout → order.
+
+### Quy tắc phối hợp và merge
+
+- Minh chốt contract auth/user/address trước khi Quân và Thuận tích hợp API protected.
+- Quân chốt contract product/category/review; Thuận chốt contract cart/order/payment/voucher/inventory.
+- Branch cá nhân: `feature/minh-auth-account`, `feature/quan-catalog-review`, `feature/thuan-commerce-admin`.
+- Luồng merge: `feature/* -> develop -> main`; mỗi PR phải ghi page FE, endpoint BE, test đã chạy và cần một người khác review.
+- Không code trực tiếp hoặc force-push `develop`/`main`. Chỉ merge `develop` vào `main` sau khi cả ba vertical slice, build và smoke test đều pass.
