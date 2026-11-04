@@ -19,6 +19,8 @@ import Vouchers from '../pages/user/Vouchers';
 import Reviews from '../pages/user/Reviews';
 import Profile from '../pages/user/Profile';
 import Addresses from '../pages/user/Addresses';
+import AccountProfile from '../pages/user/AccountProfile';
+import AccountAddresses from '../pages/user/AccountAddresses';
 import About from '../pages/user/About';
 import Contact from '../pages/user/Contact';
 import FAQ from '../pages/user/FAQ';
@@ -77,8 +79,8 @@ export const protectedRoutes = [
   ['/orders', Orders],
   ['/orders/:id', OrderDetail],
   ['/wishlist', Wishlist],
-  ['/profile', Profile],
-  ['/addresses', Addresses]
+  ['/profile', AccountProfile],
+  ['/addresses', AccountAddresses]
 ];
 
 export const authRoutes = [
