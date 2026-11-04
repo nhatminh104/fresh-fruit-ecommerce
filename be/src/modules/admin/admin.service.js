@@ -1,0 +1,93 @@
+import mongoose from 'mongoose';
+import Category from '../categories/category.model.js';
+import Inventory from '../inventory/inventory.model.js';
+import Order from '../orders/order.model.js';
+import Product from '../products/product.model.js';
+import Review from '../reviews/review.model.js';
+import User from '../users/user.model.js';
+import Voucher from '../vouchers/voucher.model.js';
+import { ApiError } from '../../utils/ApiError.js';
+
+const id = (value, label = 'Id') => {
+  if (!mongoose.isValidObjectId(value)) throw new ApiError(400, `${label} is invalid`);
+  return value;
+};
+
+const pick = (source, fields) => Object.fromEntries(fields.filter((field) => source[field] !== undefined).map((field) => [field, source[field]]));
+
+export async function dashboard() {
+  const [users, products, orders, revenue] = await Promise.all([
+    User.countDocuments(),
+    Product.countDocuments({ isActive: true }),
+    Order.countDocuments(),
+    Order.aggregate([{ $match: { status: { $ne: 'cancelled' } } }, { $group: { _id: null, total: { $sum: '$totalAmount' } } }])
+  ]);
+  return { users, products, orders, revenue: revenue[0]?.total || 0 };
+}
+
+export const listProducts = () => Product.find().populate('category', 'name slug').sort({ createdAt: -1 }).lean();
+export async function createProduct(payload) {
+  return Product.create(pick(payload, ['name', 'slug', 'description', 'category', 'price', 'originalPrice', 'unit', 'origin', 'images', 'stock', 'soldCount', 'isFeatured', 'isActive']));
+}
+export async function updateProduct(productId, payload) {
+  const product = await Product.findByIdAndUpdate(id(productId, 'Product id'), { $set: pick(payload, ['name', 'slug', 'description', 'category', 'price', 'originalPrice', 'unit', 'origin', 'images', 'stock', 'isFeatured', 'isActive']) }, { new: true, runValidators: true });
+  if (!product) throw new ApiError(404, 'Product not found');
+  return product;
+}
+export async function archiveProduct(productId) {
+  return updateProduct(productId, { isActive: false });
+}
+
+export const listCategories = () => Category.find().sort({ name: 1 }).lean();
+export async function createCategory(payload) { return Category.create(pick(payload, ['name', 'slug', 'description', 'image', 'isActive'])); }
+export async function updateCategory(categoryId, payload) {
+  const category = await Category.findByIdAndUpdate(id(categoryId, 'Category id'), { $set: pick(payload, ['name', 'slug', 'description', 'image', 'isActive']) }, { new: true, runValidators: true });
+  if (!category) throw new ApiError(404, 'Category not found');
+  return category;
+}
+export async function archiveCategory(categoryId) { return updateCategory(categoryId, { isActive: false }); }
+
+export const listOrders = () => Order.find().populate('user', 'fullName email').sort({ createdAt: -1 }).lean();
+export async function getOrder(orderId) { const order = await Order.findById(id(orderId, 'Order id')).populate('user', 'fullName email').lean(); if (!order) throw new ApiError(404, 'Order not found'); return order; }
+export async function updateOrder(orderId, status) {
+  const order = await Order.findById(id(orderId, 'Order id'));
+  if (!order) throw new ApiError(404, 'Order not found');
+  if (!Object.keys(Order.allowedTransitions).includes(status) || !Order.allowedTransitions[order.status].includes(status)) throw new ApiError(400, 'Invalid order status transition');
+  order.status = status;
+  await order.save();
+  return order;
+}
+
+export const listUsers = () => User.find().sort({ createdAt: -1 }).lean();
+export async function getUser(userId) { const user = await User.findById(id(userId, 'User id')).lean(); if (!user) throw new ApiError(404, 'User not found'); return user; }
+export async function updateUser(userId, payload) {
+  const user = await User.findByIdAndUpdate(id(userId, 'User id'), { $set: pick(payload, ['fullName', 'phone', 'role', 'status']) }, { new: true, runValidators: true });
+  if (!user) throw new ApiError(404, 'User not found');
+  return user;
+}
+
+export const listReviews = () => Review.find().populate('user', 'fullName email').populate('product', 'name').sort({ createdAt: -1 }).lean();
+export async function updateReview(reviewId, isApproved) {
+  const review = await Review.findByIdAndUpdate(id(reviewId, 'Review id'), { $set: { isApproved: Boolean(isApproved) } }, { new: true });
+  if (!review) throw new ApiError(404, 'Review not found');
+  return review;
+}
+export async function deleteReview(reviewId) { const result = await Review.findByIdAndDelete(id(reviewId, 'Review id')); if (!result) throw new ApiError(404, 'Review not found'); return { deleted: true }; }
+
+export const listVouchers = () => Voucher.find().sort({ createdAt: -1 }).lean();
+export async function createVoucher(payload) { return Voucher.create(pick(payload, ['code', 'description', 'discountType', 'discountValue', 'minOrderValue', 'maxDiscount', 'startDate', 'endDate', 'usageLimit', 'isActive'])); }
+export async function updateVoucher(voucherId, payload) {
+  const voucher = await Voucher.findByIdAndUpdate(id(voucherId, 'Voucher id'), { $set: pick(payload, ['code', 'description', 'discountType', 'discountValue', 'minOrderValue', 'maxDiscount', 'startDate', 'endDate', 'usageLimit', 'isActive']) }, { new: true, runValidators: true });
+  if (!voucher) throw new ApiError(404, 'Voucher not found');
+  return voucher;
+}
+export async function archiveVoucher(voucherId) { return updateVoucher(voucherId, { isActive: false }); }
+
+export const listInventory = () => Inventory.find().populate('product', 'name stock unit').sort({ quantity: 1 }).lean();
+export async function updateInventory(productId, quantity, lowStockAt) {
+  id(productId, 'Product id');
+  if (!Number.isInteger(Number(quantity)) || Number(quantity) < 0) throw new ApiError(400, 'Inventory quantity must be a non-negative integer');
+  const product = await Product.findByIdAndUpdate(productId, { $set: { stock: Number(quantity) } }, { new: true });
+  if (!product) throw new ApiError(404, 'Product not found');
+  return Inventory.findOneAndUpdate({ product: productId }, { $set: { quantity: Number(quantity), lowStockAt: Number(lowStockAt) || 5 } }, { upsert: true, new: true }).populate('product', 'name stock unit');
+}

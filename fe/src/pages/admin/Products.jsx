@@ -1,1 +1,2 @@
-import PageShell from '../PageShell'; export default function Products() { return <PageShell title="Quản lý sản phẩm" />; }
+import AdminDataPage from '../../components/admin/AdminDataPage';
+export default function Products() { return <AdminDataPage title="Quản lý sản phẩm" resource="products" columns={[{ key: 'name', label: 'Tên' }, { key: 'slug', label: 'Slug' }, { key: 'price', label: 'Giá' }, { key: 'stock', label: 'Tồn kho' }, { key: 'isActive', label: 'Trạng thái' }]} actions={[{ label: 'Ẩn sản phẩm', run: (item, service) => service.updateAdmin('products', item._id, { isActive: false }) }]} />; }

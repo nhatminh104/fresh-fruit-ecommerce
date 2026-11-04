@@ -1,1 +1,2 @@
-import PageShell from '../PageShell'; export default function Vouchers() { return <PageShell title="Quản lý voucher" />; }
+import AdminDataPage from '../../components/admin/AdminDataPage';
+export default function Vouchers() { return <AdminDataPage title="Quản lý voucher" resource="vouchers" columns={[{ key: 'code', label: 'Mã' }, { key: 'discountType', label: 'Loại' }, { key: 'discountValue', label: 'Giá trị' }, { key: 'isActive', label: 'Trạng thái' }]} actions={[{ label: 'Tắt voucher', run: (item, service) => service.updateAdmin('vouchers', item._id, { isActive: false }) }]} />; }

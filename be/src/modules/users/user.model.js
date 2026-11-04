@@ -7,9 +7,19 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, trim: true },
   avatar: String,
   role: { type: String, enum: ['customer', 'admin'], default: 'customer', index: true },
-  status: { type: String, enum: ['active', 'inactive', 'blocked'], default: 'active', index: true }
+  status: { type: String, enum: ['active', 'inactive', 'blocked'], default: 'active', index: true },
+  passwordResetTokenHash: { type: String, select: false },
+  passwordResetExpiresAt: { type: Date, select: false }
 }, { timestamps: true, collection: 'users' });
 
 userSchema.virtual('name').get(function () { return this.fullName; });
-userSchema.set('toJSON', { virtuals: true, transform: (_, ret) => { delete ret.password; return ret; } });
+userSchema.set('toJSON', {
+  virtuals: true,
+  transform: (_, ret) => {
+    delete ret.password;
+    delete ret.passwordResetTokenHash;
+    delete ret.passwordResetExpiresAt;
+    return ret;
+  }
+});
 export default mongoose.model('User', userSchema);

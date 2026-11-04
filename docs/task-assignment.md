@@ -115,7 +115,7 @@ Mỗi người phụ trách trọn chức năng của mình: giao diện FE, API
 ## Quy tắc làm việc
 
 - Branch cá nhân:
-  - `feature/minh-auth-admin`
+  - Minh tách nhánh theo từng chức năng: `feature/minh-auth`, `feature/minh-account`, `feature/minh-admin-*`.
   - `feature/quan-commerce`
   - `feature/thuan-catalog`
 - Luồng merge: `feature/*` → `develop` → `main`.

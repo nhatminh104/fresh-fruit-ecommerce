@@ -1,1 +1,2 @@
-import PageShell from '../PageShell'; export default function OrderDetail() { return <PageShell title="Chi tiết đơn hàng" />; }
+import AdminDetailPage from '../../components/admin/AdminDetailPage';
+export default function OrderDetail() { return <AdminDetailPage title="Chi tiết đơn hàng" resource="orders" />; }

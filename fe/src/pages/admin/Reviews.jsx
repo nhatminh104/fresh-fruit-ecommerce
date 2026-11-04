@@ -1,1 +1,2 @@
-import PageShell from '../PageShell'; export default function Reviews() { return <PageShell title="Quản lý đánh giá" />; }
+import AdminDataPage from '../../components/admin/AdminDataPage';
+export default function Reviews() { return <AdminDataPage title="Quản lý đánh giá" resource="reviews" columns={[{ key: 'product', label: 'Sản phẩm' }, { key: 'user', label: 'Người dùng' }, { key: 'rating', label: 'Điểm' }, { key: 'isApproved', label: 'Đã duyệt' }]} actions={[{ label: 'Duyệt', run: (item, service) => service.updateAdmin('reviews', item._id, { isApproved: true }) }, { label: 'Xóa', run: (item, service) => service.deleteAdmin('reviews', item._id) }]} />; }

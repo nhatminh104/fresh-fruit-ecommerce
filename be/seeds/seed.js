@@ -1,18 +1,17 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import crypto from 'node:crypto';
 import { connectDatabase, closeDatabase } from '../src/config/database.js';
 import User from '../src/modules/users/user.model.js';
 import Category from '../src/modules/categories/category.model.js';
 import Product from '../src/modules/products/product.model.js';
 import Voucher from '../src/modules/vouchers/voucher.model.js';
+import { hashPassword } from '../src/utils/password.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(here, '../.env') });
 const readJson = (name) => fs.readFile(path.join(here, 'data', name), 'utf8').then(JSON.parse);
-const hashPassword = (password) => new Promise((resolve, reject) => crypto.scrypt(password, process.env.SEED_PASSWORD_SALT || 'fresh-fruit-demo-salt', 64, (error, key) => error ? reject(error) : resolve(`scrypt:${key.toString('hex')}`)));
-
 async function upsert(Model, filter, document) {
   const result = await Model.findOneAndUpdate(filter, { $set: document }, { upsert: true, new: true, setDefaultsOnInsert: true, includeResultMetadata: true });
   return result.lastErrorObject?.updatedExisting ? 'updated' : 'created';

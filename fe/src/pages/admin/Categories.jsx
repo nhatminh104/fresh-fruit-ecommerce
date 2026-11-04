@@ -1,1 +1,2 @@
-import PageShell from '../PageShell'; export default function Categories() { return <PageShell title="Quản lý danh mục" />; }
+import AdminDataPage from '../../components/admin/AdminDataPage';
+export default function Categories() { return <AdminDataPage title="Quản lý danh mục" resource="categories" columns={[{ key: 'name', label: 'Tên' }, { key: 'slug', label: 'Slug' }, { key: 'isActive', label: 'Trạng thái' }]} actions={[{ label: 'Ẩn danh mục', run: (item, service) => service.updateAdmin('categories', item._id, { isActive: false }) }]} />; }

@@ -1,4 +1,14 @@
 import api from './api';
-export const login = (payload) => api.post('/auth/login', payload);
-export const register = (payload) => api.post('/auth/register', payload);
-export const forgotPassword = (email) => api.post('/auth/forgot-password', { email });
+
+const unwrap = (request) => request.then((response) => response.data.data);
+
+export const login = (payload) => unwrap(api.post('/auth/login', payload));
+export const register = (payload) => unwrap(api.post('/auth/register', payload));
+export const refresh = (refreshToken) =>
+  unwrap(api.post('/auth/refresh', { refreshToken }, { skipAuth: true, skipAuthRefresh: true }));
+export const logout = (refreshToken) =>
+  api.post('/auth/logout', { refreshToken }, { skipAuthRefresh: true }).then((response) => response.data);
+export const getCurrentUser = () => unwrap(api.get('/auth/me'));
+export const forgotPassword = (email) => unwrap(api.post('/auth/forgot-password', { email }));
+export const resetPassword = (payload) =>
+  api.post('/auth/reset-password', payload).then((response) => response.data);

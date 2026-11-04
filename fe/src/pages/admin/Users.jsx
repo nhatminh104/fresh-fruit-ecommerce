@@ -1,1 +1,2 @@
-import PageShell from '../PageShell'; export default function Users() { return <PageShell title="Quản lý người dùng" />; }
+import AdminDataPage from '../../components/admin/AdminDataPage';
+export default function Users() { return <AdminDataPage title="Quản lý người dùng" resource="users" columns={[{ key: 'fullName', label: 'Họ tên' }, { key: 'email', label: 'Email' }, { key: 'role', label: 'Role' }, { key: 'status', label: 'Trạng thái' }]} actions={[{ label: 'Khóa tài khoản', run: (item, service) => service.updateAdmin('users', item._id, { status: 'blocked' }) }]} />; }

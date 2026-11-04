@@ -1,0 +1,52 @@
+import crypto from 'node:crypto';
+import { ApiError } from './ApiError.js';
+
+function getSecret() {
+  const secret = process.env.JWT_SECRET?.trim();
+  if (!secret) throw new ApiError(500, 'JWT_SECRET is not configured');
+  return secret;
+}
+
+function encode(value) {
+  return Buffer.from(JSON.stringify(value)).toString('base64url');
+}
+
+function decode(value) {
+  return JSON.parse(Buffer.from(value, 'base64url').toString('utf8'));
+}
+
+export function signToken(payload, expiresInSeconds = 900) {
+  const now = Math.floor(Date.now() / 1000);
+  const header = encode({ alg: 'HS256', typ: 'JWT' });
+  const body = encode({ ...payload, iat: now, exp: now + Number(expiresInSeconds) });
+  const signature = crypto.createHmac('sha256', getSecret()).update(`${header}.${body}`).digest('base64url');
+  return `${header}.${body}.${signature}`;
+}
+
+export function verifyToken(token) {
+  if (typeof token !== 'string') throw new ApiError(401, 'Authentication token is required');
+  const parts = token.split('.');
+  if (parts.length !== 3) throw new ApiError(401, 'Invalid authentication token');
+
+  const [header, body, signature] = parts;
+  const expected = crypto.createHmac('sha256', getSecret()).update(`${header}.${body}`).digest('base64url');
+  const provided = Buffer.from(signature);
+  const expectedBytes = Buffer.from(expected);
+  if (provided.length !== expectedBytes.length || !crypto.timingSafeEqual(provided, expectedBytes)) {
+    throw new ApiError(401, 'Invalid authentication token signature');
+  }
+
+  let headerData;
+  let payload;
+  try {
+    headerData = decode(header);
+    payload = decode(body);
+  } catch {
+    throw new ApiError(401, 'Invalid authentication token');
+  }
+  if (headerData.alg !== 'HS256') throw new ApiError(401, 'Unsupported authentication token');
+  if (typeof payload.exp !== 'number' || payload.exp <= Math.floor(Date.now() / 1000)) {
+    throw new ApiError(401, 'Authentication token has expired');
+  }
+  return payload;
+}

@@ -1,3 +1,6 @@
 import api from './api';
-export const getProfile = () => api.get('/users/me');
-export const updateProfile = (payload) => api.patch('/users/me', payload);
+
+const unwrap = (request) => request.then((response) => response.data.data);
+
+export const getProfile = () => unwrap(api.get('/users/me'));
+export const updateProfile = (payload) => unwrap(api.patch('/users/me', payload));

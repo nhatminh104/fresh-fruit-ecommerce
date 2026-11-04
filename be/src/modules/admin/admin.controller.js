@@ -1,0 +1,28 @@
+import { asyncHandler } from '../../utils/asyncHandler.js';
+import * as service from './admin.service.js';
+
+const send = (res, data) => res.json({ success: true, data });
+export const dashboard = asyncHandler(async (req, res) => send(res, await service.dashboard()));
+export const products = asyncHandler(async (req, res) => send(res, await service.listProducts()));
+export const createProduct = asyncHandler(async (req, res) => res.status(201).json({ success: true, data: await service.createProduct(req.body) }));
+export const updateProduct = asyncHandler(async (req, res) => send(res, await service.updateProduct(req.params.id, req.body)));
+export const deleteProduct = asyncHandler(async (req, res) => send(res, await service.archiveProduct(req.params.id)));
+export const categories = asyncHandler(async (req, res) => send(res, await service.listCategories()));
+export const createCategory = asyncHandler(async (req, res) => res.status(201).json({ success: true, data: await service.createCategory(req.body) }));
+export const updateCategory = asyncHandler(async (req, res) => send(res, await service.updateCategory(req.params.id, req.body)));
+export const deleteCategory = asyncHandler(async (req, res) => send(res, await service.archiveCategory(req.params.id)));
+export const orders = asyncHandler(async (req, res) => send(res, await service.listOrders()));
+export const orderDetail = asyncHandler(async (req, res) => send(res, await service.getOrder(req.params.id)));
+export const updateOrder = asyncHandler(async (req, res) => send(res, await service.updateOrder(req.params.id, req.body.status)));
+export const users = asyncHandler(async (req, res) => send(res, await service.listUsers()));
+export const userDetail = asyncHandler(async (req, res) => send(res, await service.getUser(req.params.id)));
+export const updateUser = asyncHandler(async (req, res) => send(res, await service.updateUser(req.params.id, req.body)));
+export const reviews = asyncHandler(async (req, res) => send(res, await service.listReviews()));
+export const updateReview = asyncHandler(async (req, res) => send(res, await service.updateReview(req.params.id, req.body.isApproved)));
+export const deleteReview = asyncHandler(async (req, res) => send(res, await service.deleteReview(req.params.id)));
+export const vouchers = asyncHandler(async (req, res) => send(res, await service.listVouchers()));
+export const createVoucher = asyncHandler(async (req, res) => res.status(201).json({ success: true, data: await service.createVoucher(req.body) }));
+export const updateVoucher = asyncHandler(async (req, res) => send(res, await service.updateVoucher(req.params.id, req.body)));
+export const deleteVoucher = asyncHandler(async (req, res) => send(res, await service.archiveVoucher(req.params.id)));
+export const inventory = asyncHandler(async (req, res) => send(res, await service.listInventory()));
+export const updateInventory = asyncHandler(async (req, res) => send(res, await service.updateInventory(req.params.productId, req.body.quantity, req.body.lowStockAt)));

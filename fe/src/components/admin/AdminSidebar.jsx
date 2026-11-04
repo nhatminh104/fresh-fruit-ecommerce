@@ -1,2 +1,3 @@
-import { Link } from 'react-router-dom';
-export default function AdminSidebar() { return <aside className="w-56 shrink-0 bg-forest p-5 text-white"><Link to="/admin">Dashboard</Link></aside>; }
+import { NavLink } from 'react-router-dom';
+const links = [['/admin', 'Dashboard'], ['/admin/products', 'Sản phẩm'], ['/admin/categories', 'Danh mục'], ['/admin/orders', 'Đơn hàng'], ['/admin/users', 'Người dùng'], ['/admin/reviews', 'Đánh giá'], ['/admin/vouchers', 'Voucher'], ['/admin/inventory', 'Kho hàng']];
+export default function AdminSidebar() { return <aside className="w-56 shrink-0 bg-forest p-5 text-white"><nav className="space-y-2">{links.map(([to, label]) => <NavLink className={({ isActive }) => `block rounded-lg px-3 py-2 text-sm ${isActive ? 'bg-white/20' : 'text-white/75 hover:bg-white/10'}`} end={to === '/admin'} key={to} to={to}>{label}</NavLink>)}</nav></aside>; }
