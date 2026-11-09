@@ -22,3 +22,5 @@ npm --prefix fe run build
 ```
 
 MongoDB standalone được hỗ trợ cho phát triển. Production nên chạy MongoDB replica set để transaction tạo/hủy đơn, tồn kho và voucher có tính nguyên tử đầy đủ.
+
+Tài liệu và quy tắc project được gom tại [PROJECT_GUIDELINES.md](PROJECT_GUIDELINES.md).
