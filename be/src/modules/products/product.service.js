@@ -1,8 +1,9 @@
 import Product from './product.model.js';
+import Category from '../categories/category.model.js';
 export async function listProducts(query = {}) {
   const { search, category, minPrice, maxPrice, page = 1, limit = 12 } = query;
   const filter = { isActive: true };
-  if (category) filter.category = category;
+  if (category) { const categoryDoc = await Category.findOne({ $or: [{ slug: category }, ...(category.match?.(/^[a-f\d]{24}$/i) ? [{ _id: category }] : [])], isActive: true }).select('_id').lean(); if (!categoryDoc) return { items: [], pagination: { page: Math.max(Number(page) || 1, 1), limit: Math.min(Math.max(Number(limit) || 12, 1), 50), total: 0, totalPages: 0 } }; filter.category = categoryDoc._id; }
   if (search) filter.$text = { $search: search };
   if (minPrice !== undefined || maxPrice !== undefined) { filter.price = {}; if (minPrice !== undefined) filter.price.$gte = Number(minPrice); if (maxPrice !== undefined) filter.price.$lte = Number(maxPrice); }
   const safeLimit = Math.min(Math.max(Number(limit) || 12, 1), 50);

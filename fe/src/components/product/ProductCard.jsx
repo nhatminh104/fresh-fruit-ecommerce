@@ -1,1 +1,3 @@
-export default function ProductCard({ product }) { return <article className="rounded-2xl bg-white p-4"><img className="aspect-[4/3] w-full rounded-xl object-cover" src={product.image} alt={product.name}/><h3 className="mt-3 font-bold text-forest">{product.name}</h3><p className="mt-1 text-sm text-slate-500">{product.price}</p></article>; }
+import { Link } from 'react-router-dom';
+import { formatCurrency } from '../../utils/formatCurrency';
+export default function ProductCard({ product }) { return <Link to={`/products/${product._id}`} className="block rounded-2xl bg-white p-4 transition hover:-translate-y-1"><img className="aspect-[4/3] w-full rounded-xl object-cover" src={product.images?.[0] || product.image} alt={product.name}/><h3 className="mt-3 font-bold text-forest">{product.name}</h3><p className="mt-1 text-sm text-orange">{formatCurrency(product.price)} <span className="text-slate-500">/ {product.unit}</span></p></Link>; }
