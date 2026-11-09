@@ -1,1 +1,6 @@
-import Wishlist from './wishlist.model.js'; export const getWishlist = (userId) => Wishlist.findOne({ user: userId }).populate('products').lean();
+import mongoose from 'mongoose';
+import Wishlist from './wishlist.model.js';
+import Product from '../products/product.model.js';
+export const getWishlist = async (userId) => (await Wishlist.findOne({ user: userId }).populate('products').lean()) || { user: userId, products: [] };
+export async function addProduct(userId, productId) { if (!mongoose.isValidObjectId(productId)) { const error = new Error('A valid product is required'); error.status = 400; throw error; } const product = await Product.findOne({ _id: productId, isActive: true }).select('_id').lean(); if (!product) { const error = new Error('Product is unavailable'); error.status = 404; throw error; } const wishlist = await Wishlist.findOneAndUpdate({ user: userId }, { $setOnInsert: { user: userId } }, { upsert: true, new: true }); if (!wishlist.products.some((item) => String(item) === String(productId))) { wishlist.products.push(productId); await wishlist.save(); } return getWishlist(userId); }
+export async function removeProduct(userId, productId) { const wishlist = await Wishlist.findOne({ user: userId }); if (!wishlist) return getWishlist(userId); wishlist.products = wishlist.products.filter((item) => String(item) !== String(productId)); await wishlist.save(); return getWishlist(userId); }
