@@ -1,1 +1,11 @@
-import { Router } from 'express'; import { requireAuth } from '../../middlewares/authMiddleware.js'; import { getCartController } from './cart.controller.js'; const router = Router(); router.get('/', requireAuth, getCartController); export default router;
+import { Router } from 'express';
+import { requireAuth } from '../../middlewares/authMiddleware.js';
+import { addItemController, clearCartController, getCartController, removeItemController, updateItemController } from './cart.controller.js';
+const router = Router();
+router.use(requireAuth);
+router.get('/', getCartController);
+router.post('/items', addItemController);
+router.patch('/items', updateItemController);
+router.delete('/items/:productId', removeItemController);
+router.delete('/', clearCartController);
+export default router;

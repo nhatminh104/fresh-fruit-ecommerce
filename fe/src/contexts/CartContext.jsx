@@ -1,10 +1,16 @@
 import React from 'react';
-export const CartContext = React.createContext({ items: [], addItem: () => {}, removeItem: () => {}, updateQuantity: () => {} });
+import { addCartItem, clearCart as clearRemoteCart, getCart, removeCartItem, updateCartItem } from '../services/cartService';
+import { getAccessToken } from '../utils/authStorage';
+export const CartContext = React.createContext({ items: [], loading: false, addItem: () => {}, removeItem: () => {}, updateQuantity: () => {}, clear: () => {} });
 export function CartProvider({ children }) {
   const [items, setItems] = React.useState(() => { try { return JSON.parse(localStorage.getItem('fresh-cart') || '[]'); } catch { return []; } });
-  React.useEffect(() => localStorage.setItem('fresh-cart', JSON.stringify(items)), [items]);
-  const addItem = (item) => setItems((current) => { const found = current.find((entry) => entry.id === item.id); return found ? current.map((entry) => entry.id === item.id ? { ...entry, quantity: entry.quantity + (item.quantity || 1) } : entry) : [...current, { ...item, quantity: item.quantity || 1 }]; });
-  const removeItem = (id) => setItems((current) => current.filter((item) => item.id !== id));
-  const updateQuantity = (id, quantity) => setItems((current) => quantity > 0 ? current.map((item) => item.id === id ? { ...item, quantity } : item) : current.filter((item) => item.id !== id));
-  return <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity }}>{children}</CartContext.Provider>;
+  const [loading, setLoading] = React.useState(false);
+  const sync = React.useCallback((cart) => { const next = (cart?.items || []).map(({ product, quantity }) => ({ ...product, id: product._id, quantity })); setItems(next); return next; }, []);
+  React.useEffect(() => { localStorage.setItem('fresh-cart', JSON.stringify(items)); }, [items]);
+  React.useEffect(() => { if (!getAccessToken()) return undefined; let active = true; setLoading(true); getCart().then(({ data }) => { if (active) sync(data.data); }).catch(() => {}).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, [sync]);
+  const addItem = async (item) => { setLoading(true); try { const { data } = await addCartItem({ product: item.id || item._id, quantity: item.quantity || 1 }); sync(data.data); } finally { setLoading(false); } };
+  const removeItem = async (id) => { setLoading(true); try { const { data } = await removeCartItem(id); sync(data.data); } finally { setLoading(false); } };
+  const updateQuantity = async (id, quantity) => { if (quantity < 1) return removeItem(id); setLoading(true); try { const { data } = await updateCartItem({ product: id, quantity }); sync(data.data); } finally { setLoading(false); } };
+  const clear = async () => { setLoading(true); try { const { data } = await clearRemoteCart(); sync(data.data); } finally { setLoading(false); } };
+  return <CartContext.Provider value={{ items, loading, addItem, removeItem, updateQuantity, clear }}>{children}</CartContext.Provider>;
 }
