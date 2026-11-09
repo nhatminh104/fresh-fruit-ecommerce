@@ -3,6 +3,7 @@ import crypto from 'node:crypto';
 import Order from './order.model.js';
 import Product from '../products/product.model.js';
 import Voucher from '../vouchers/voucher.model.js';
+import Cart from '../carts/cart.model.js';
 
 export const listOrders = (userId) => Order.find({ user: userId }).sort({ createdAt: -1 }).lean();
 export async function createOrder({ user, items, shippingAddress, voucherCode, paymentMethod = 'cod', note }) {
@@ -19,5 +20,6 @@ export async function createOrder({ user, items, shippingAddress, voucherCode, p
   const order = await Order.create({ orderCode: `FF-${Date.now()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`, user, items: orderItems, shippingAddress, subtotal, discountAmount, shippingFee, totalAmount: Math.max(0, subtotal - discountAmount + shippingFee), voucher: voucher?._id, paymentMethod, note });
   for (const item of orderItems) await Product.updateOne({ _id: item.product, stock: { $gte: item.quantity } }, { $inc: { stock: -item.quantity, soldCount: item.quantity } });
   if (voucher) await Voucher.updateOne({ _id: voucher._id }, { $inc: { usedCount: 1 } });
+  await Cart.updateOne({ user }, { $set: { items: [] } });
   return order;
 }
