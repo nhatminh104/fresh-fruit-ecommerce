@@ -10,6 +10,7 @@ import Voucher from '../src/modules/vouchers/voucher.model.js';
 import { hashPassword } from '../src/utils/password.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(here, '../../.env') });
 dotenv.config({ path: path.resolve(here, '../.env') });
 const readJson = (name) => fs.readFile(path.join(here, 'data', name), 'utf8').then(JSON.parse);
 async function upsert(Model, filter, document) {

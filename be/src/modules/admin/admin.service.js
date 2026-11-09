@@ -6,7 +6,9 @@ import Product from '../products/product.model.js';
 import Review from '../reviews/review.model.js';
 import User from '../users/user.model.js';
 import Voucher from '../vouchers/voucher.model.js';
+import Payment from '../payments/payment.model.js';
 import { ApiError } from '../../utils/ApiError.js';
+import { cancelOrder } from '../orders/order.service.js';
 
 const id = (value, label = 'Id') => {
   if (!mongoose.isValidObjectId(value)) throw new ApiError(400, `${label} is invalid`);
@@ -20,7 +22,7 @@ export async function dashboard() {
     User.countDocuments(),
     Product.countDocuments({ isActive: true }),
     Order.countDocuments(),
-    Order.aggregate([{ $match: { status: { $ne: 'cancelled' } } }, { $group: { _id: null, total: { $sum: '$totalAmount' } } }])
+    Order.aggregate([{ $match: { status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' }, $or: [{ status: 'delivered' }, { paymentStatus: 'paid' }] } }, { $group: { _id: null, total: { $sum: '$totalAmount' } } }])
   ]);
   return { users, products, orders, revenue: revenue[0]?.total || 0 };
 }
@@ -50,11 +52,14 @@ export async function archiveCategory(categoryId) { return updateCategory(catego
 export const listOrders = () => Order.find().populate('user', 'fullName email').sort({ createdAt: -1 }).lean();
 export async function getOrder(orderId) { const order = await Order.findById(id(orderId, 'Order id')).populate('user', 'fullName email').lean(); if (!order) throw new ApiError(404, 'Order not found'); return order; }
 export async function updateOrder(orderId, status) {
+  if (status === 'cancelled') return cancelOrder({ orderId });
   const order = await Order.findById(id(orderId, 'Order id'));
   if (!order) throw new ApiError(404, 'Order not found');
   if (!Object.keys(Order.allowedTransitions).includes(status) || !Order.allowedTransitions[order.status].includes(status)) throw new ApiError(400, 'Invalid order status transition');
   order.status = status;
+  if (status === 'delivered' && order.paymentMethod === 'cod') order.paymentStatus = 'paid';
   await order.save();
+  if (status === 'delivered' && order.paymentMethod === 'cod') await Payment.updateOne({ order: order._id }, { $set: { status: 'paid' } });
   return order;
 }
 
@@ -83,11 +88,27 @@ export async function updateVoucher(voucherId, payload) {
 }
 export async function archiveVoucher(voucherId) { return updateVoucher(voucherId, { isActive: false }); }
 
-export const listInventory = () => Inventory.find().populate('product', 'name stock unit').sort({ quantity: 1 }).lean();
+export async function listInventory() {
+  const [products, settings] = await Promise.all([
+    Product.find().select('name stock unit isActive').sort({ stock: 1 }).lean(),
+    Inventory.find().select('product lowStockAt').lean()
+  ]);
+  const thresholds = new Map(settings.map((item) => [String(item.product), item.lowStockAt]));
+  return products.map((product) => ({ product, quantity: product.stock, lowStockAt: thresholds.get(String(product._id)) || 5 }));
+}
 export async function updateInventory(productId, quantity, lowStockAt) {
   id(productId, 'Product id');
   if (!Number.isInteger(Number(quantity)) || Number(quantity) < 0) throw new ApiError(400, 'Inventory quantity must be a non-negative integer');
-  const product = await Product.findByIdAndUpdate(productId, { $set: { stock: Number(quantity) } }, { new: true });
+  const productBefore = await Product.findById(productId).select('stock');
+  if (!productBefore) throw new ApiError(404, 'Product not found');
+  const threshold = lowStockAt === undefined ? 5 : Number(lowStockAt);
+  if (!Number.isInteger(threshold) || threshold < 0) throw new ApiError(400, 'Low-stock threshold must be a non-negative integer');
+  const product = await Product.findByIdAndUpdate(productId, { $set: { stock: Number(quantity) } }, { new: true, runValidators: true });
   if (!product) throw new ApiError(404, 'Product not found');
-  return Inventory.findOneAndUpdate({ product: productId }, { $set: { quantity: Number(quantity), lowStockAt: Number(lowStockAt) || 5 } }, { upsert: true, new: true }).populate('product', 'name stock unit');
+  try {
+    return await Inventory.findOneAndUpdate({ product: productId }, { $set: { quantity: Number(quantity), lowStockAt: threshold } }, { upsert: true, new: true, runValidators: true }).populate('product', 'name stock unit');
+  } catch (error) {
+    await Product.updateOne({ _id: productId }, { $set: { stock: productBefore.stock } });
+    throw error;
+  }
 }

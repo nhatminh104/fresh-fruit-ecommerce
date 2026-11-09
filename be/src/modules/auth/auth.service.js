@@ -107,11 +107,14 @@ export async function refreshSession(refreshToken, meta = {}) {
     { sub: String(user._id), sid: String(session._id), type: 'refresh' },
     Math.max(remainingSeconds, 1)
   );
-  session.refreshTokenHash = hashToken(nextRefreshToken);
-  Object.assign(session, requestMeta(meta));
-  await session.save();
+  const rotatedSession = await AuthSession.findOneAndUpdate(
+    { _id: session._id, revokedAt: null, refreshTokenHash: hashToken(refreshToken), expiresAt: { $gt: new Date() } },
+    { $set: { refreshTokenHash: hashToken(nextRefreshToken), ...requestMeta(meta) } },
+    { new: true }
+  );
+  if (!rotatedSession) throw new ApiError(401, 'Phiên đăng nhập đã được làm mới hoặc đã hết hạn');
 
-  return authPayload(user, session, nextRefreshToken);
+  return authPayload(user, rotatedSession, nextRefreshToken);
 }
 
 export async function logout(refreshToken) {

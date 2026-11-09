@@ -53,3 +53,11 @@ Yêu cầu header `Authorization: Bearer <accessToken>`. Trả về hồ sơ use
 
 `PATCH /api/users/me` yêu cầu header `Authorization: Bearer <accessToken>`.
 Body cho phép `fullName` và/hoặc `phone`; email, role và status không được cập nhật qua endpoint này.
+
+## Đơn hàng và thanh toán
+
+`POST /api/orders` nhận thêm `idempotencyKey` tùy chọn (8–120 ký tự). Với cùng một tài khoản và key, backend trả lại đơn hàng ban đầu thay vì tạo đơn thứ hai. Stock, lượt dùng voucher và việc làm trống giỏ được chạy trong transaction khi MongoDB là replica set; MongoDB standalone dùng cơ chế rollback bù trừ cho môi trường phát triển.
+
+`POST /api/orders/:id/cancel` chỉ cho chủ đơn hủy khi đơn ở trạng thái `pending` hoặc `confirmed`. Backend hoàn kho đúng một lần, hoàn lượt dùng voucher và đồng bộ trạng thái thanh toán.
+
+`POST /api/payments` nhận `orderId` và `method` (`cod` hoặc `mock`). Payment được chống tạo trùng theo đơn hàng và chỉ chủ đơn mới được gọi. `mock` chỉ là mô phỏng phục vụ phát triển, không phải cổng thanh toán thật.
