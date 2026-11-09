@@ -5,4 +5,5 @@ import App from './App';
 import './styles/index.css';
 import { CartProvider } from './contexts/CartContext';
 import { AuthProvider } from './contexts/AuthContext';
-createRoot(document.getElementById('root')).render(<BrowserRouter><AuthProvider><CartProvider><App /></CartProvider></AuthProvider></BrowserRouter>);
+import { ToastProvider } from './contexts/ToastContext';
+createRoot(document.getElementById('root')).render(<BrowserRouter><ToastProvider><AuthProvider><CartProvider><App /></CartProvider></AuthProvider></ToastProvider></BrowserRouter>);

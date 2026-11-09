@@ -1,1 +1,1 @@
-import { listInventory } from './inventory.service.js'; export async function listController(req, res) { res.json({ success: true, data: await listInventory() }); }
+import { listInventory } from './inventory.service.js'; import { asyncHandler } from '../../utils/asyncHandler.js'; export const listController = asyncHandler(async (req, res) => res.json({ success: true, data: await listInventory() }));

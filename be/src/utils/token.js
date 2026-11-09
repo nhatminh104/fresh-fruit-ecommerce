@@ -3,7 +3,7 @@ import { ApiError } from './ApiError.js';
 
 function getSecret() {
   const secret = process.env.JWT_SECRET?.trim();
-  if (!secret) throw new ApiError(500, 'JWT_SECRET is not configured');
+  if (!secret) throw new ApiError(500, 'Máy chủ chưa cấu hình khóa bảo mật');
   return secret;
 }
 
@@ -24,16 +24,16 @@ export function signToken(payload, expiresInSeconds = 900) {
 }
 
 export function verifyToken(token) {
-  if (typeof token !== 'string') throw new ApiError(401, 'Authentication token is required');
+  if (typeof token !== 'string') throw new ApiError(401, 'Thiếu mã xác thực');
   const parts = token.split('.');
-  if (parts.length !== 3) throw new ApiError(401, 'Invalid authentication token');
+  if (parts.length !== 3) throw new ApiError(401, 'Mã xác thực không hợp lệ');
 
   const [header, body, signature] = parts;
   const expected = crypto.createHmac('sha256', getSecret()).update(`${header}.${body}`).digest('base64url');
   const provided = Buffer.from(signature);
   const expectedBytes = Buffer.from(expected);
   if (provided.length !== expectedBytes.length || !crypto.timingSafeEqual(provided, expectedBytes)) {
-    throw new ApiError(401, 'Invalid authentication token signature');
+    throw new ApiError(401, 'Chữ ký mã xác thực không hợp lệ');
   }
 
   let headerData;
@@ -42,11 +42,11 @@ export function verifyToken(token) {
     headerData = decode(header);
     payload = decode(body);
   } catch {
-    throw new ApiError(401, 'Invalid authentication token');
+    throw new ApiError(401, 'Mã xác thực không hợp lệ');
   }
-  if (headerData.alg !== 'HS256') throw new ApiError(401, 'Unsupported authentication token');
+  if (headerData.alg !== 'HS256') throw new ApiError(401, 'Loại mã xác thực không được hỗ trợ');
   if (typeof payload.exp !== 'number' || payload.exp <= Math.floor(Date.now() / 1000)) {
-    throw new ApiError(401, 'Authentication token has expired');
+    throw new ApiError(401, 'Mã xác thực đã hết hạn');
   }
   return payload;
 }

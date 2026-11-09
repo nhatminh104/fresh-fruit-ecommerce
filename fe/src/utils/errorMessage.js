@@ -1,3 +1,2 @@
-export function getErrorMessage(error, fallback = 'Có lỗi xảy ra, vui lòng thử lại.') {
-  return error?.response?.data?.message || error?.message || fallback;
-}
+const translations = { 'Email is already registered': 'Email đã được đăng ký', 'Invalid email or password': 'Email hoặc mật khẩu không đúng', 'Order not found': 'Không tìm thấy đơn hàng', 'Product not found': 'Không tìm thấy sản phẩm', 'Category not found': 'Không tìm thấy danh mục', 'Review not found': 'Không tìm thấy đánh giá', 'Voucher not found': 'Không tìm thấy mã giảm giá', 'User not found': 'Không tìm thấy người dùng', 'Invalid order status transition': 'Chuyển trạng thái đơn hàng không hợp lệ', 'Inventory quantity must be a non-negative integer': 'Số lượng tồn kho phải là số nguyên không âm' };
+export function getErrorMessage(error, fallback = 'Có lỗi xảy ra, vui lòng thử lại.') { const message = error?.response?.data?.message || error?.message; return translations[message] || message || fallback; }

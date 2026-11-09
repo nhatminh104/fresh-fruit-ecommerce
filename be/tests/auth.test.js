@@ -13,6 +13,8 @@ import User from '../src/modules/users/user.model.js';
 import { toPublicUser } from '../src/modules/users/user.service.js';
 import { hashPassword, verifyPassword } from '../src/utils/password.js';
 import { signToken, verifyToken } from '../src/utils/token.js';
+import { orderValidator } from '../src/modules/orders/order.validator.js';
+import { errorHandler } from '../src/middlewares/errorHandler.js';
 
 test('password hashes round-trip and reject wrong values', async () => {
   const hash = await hashPassword('Secret123');
@@ -30,10 +32,10 @@ test('JWT signs, verifies and rejects tampered or expired tokens', () => {
 
   const lastCharacter = token.at(-1);
   const tampered = `${token.slice(0, -1)}${lastCharacter === 'A' ? 'B' : 'A'}`;
-  assert.throws(() => verifyToken(tampered), /Invalid authentication token/);
+  assert.throws(() => verifyToken(tampered), /không hợp lệ/);
 
   const expired = signToken({ sub: 'user-1', type: 'access' }, -1);
-  assert.throws(() => verifyToken(expired), /expired/);
+  assert.throws(() => verifyToken(expired), /hết hạn/);
 });
 
 test('register validator rejects invalid input', () => {
@@ -43,7 +45,7 @@ test('register validator rejects invalid input', () => {
   );
   assert.throws(
     () => registerValidator({ body: { fullName: 'Valid Name', email: 'user@example.com', password: 'weakpass' } }, {}, () => {}),
-    (error) => error.status === 400 && /letter and one number/.test(error.message)
+    (error) => error.status === 400 && /chữ cái và một chữ số/.test(error.message)
   );
 });
 
@@ -143,4 +145,18 @@ test('auth routes validate input and protect the current-user endpoint', async (
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }
+});
+
+test('order validator rejects an empty cart payload', () => {
+  const response = { statusCode: 0, body: null, status(code) { this.statusCode = code; return this; }, json(body) { this.body = body; } };
+  orderValidator({ body: { items: [] } }, response, () => { throw new Error('next should not be called'); });
+  assert.equal(response.statusCode, 400);
+  assert.equal(response.body.success, false);
+});
+
+test('error handler maps common mongoose errors to safe API responses', () => {
+  const response = { statusCode: 0, body: null, status(code) { this.statusCode = code; return this; }, json(body) { this.body = body; } };
+  errorHandler({ name: 'CastError', path: '_id', message: 'Cast failed' }, {}, response, () => {});
+  assert.equal(response.statusCode, 400);
+  assert.match(response.body.message, /Invalid/);
 });

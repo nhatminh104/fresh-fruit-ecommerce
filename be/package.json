@@ -7,6 +7,7 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "test": "node --test tests/auth.test.js",
+    "check": "node scripts/check-syntax.mjs",
     "seed": "node seeds/seed.js"
   },
   "dependencies": {

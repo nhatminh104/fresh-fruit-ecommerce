@@ -1,5 +1,6 @@
 import Product from './product.model.js';
 import Category from '../categories/category.model.js';
+import mongoose from 'mongoose';
 export async function listProducts(query = {}) {
   const { search, category, minPrice, maxPrice, page = 1, limit = 12 } = query;
   const filter = { isActive: true };
@@ -11,4 +12,4 @@ export async function listProducts(query = {}) {
   const [items, total] = await Promise.all([Product.find(filter).populate('category', 'name slug').sort({ createdAt: -1 }).skip((safePage - 1) * safeLimit).limit(safeLimit).lean(), Product.countDocuments(filter)]);
   return { items, pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) } };
 }
-export const findProduct = (id) => Product.findOne({ _id: id, isActive: true }).populate('category', 'name slug').lean();
+export async function findProduct(identifier) { const filter = { isActive: true }; if (mongoose.isValidObjectId(identifier)) filter._id = identifier; else filter.slug = String(identifier).toLowerCase(); return Product.findOne(filter).populate('category', 'name slug').lean(); }

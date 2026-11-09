@@ -1,1 +1,1 @@
-import { Router } from 'express'; import { createController } from './payment.controller.js'; const router = Router(); router.post('/', createController); export default router;
+import { Router } from 'express'; import { requireAuth } from '../../middlewares/authMiddleware.js'; import { createController } from './payment.controller.js'; const router = Router(); router.post('/', requireAuth, createController); export default router;

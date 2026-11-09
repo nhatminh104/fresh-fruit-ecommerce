@@ -1,1 +1,1 @@
-import { listCategories } from './category.service.js'; export async function listController(req, res) { res.json({ success: true, data: await listCategories() }); }
+import { listCategories } from './category.service.js'; import { asyncHandler } from '../../utils/asyncHandler.js'; export const listController = asyncHandler(async (req, res) => res.json({ success: true, data: await listCategories() }));

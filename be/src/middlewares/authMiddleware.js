@@ -7,7 +7,7 @@ import AuthSession from '../modules/auth/auth.model.js';
 
 export const requireAuth = asyncHandler(async (req, res, next) => {
   const match = /^Bearer\s+(.+)$/i.exec(String(req.headers.authorization || ''));
-  if (!match) throw new ApiError(401, 'Authentication required');
+  if (!match) throw new ApiError(401, 'Vui lòng đăng nhập');
 
   const payload = verifyToken(match[1]);
   if (
@@ -15,7 +15,7 @@ export const requireAuth = asyncHandler(async (req, res, next) => {
     !mongoose.isValidObjectId(payload.sub) ||
     !mongoose.isValidObjectId(payload.sid)
   ) {
-    throw new ApiError(401, 'Invalid access token');
+    throw new ApiError(401, 'Phiên đăng nhập không hợp lệ');
   }
 
   const [user, session] = await Promise.all([
@@ -28,8 +28,8 @@ export const requireAuth = asyncHandler(async (req, res, next) => {
     }).select('_id')
   ]);
 
-  if (!user || !session) throw new ApiError(401, 'Session is invalid or expired');
-  if (user.status !== 'active') throw new ApiError(403, 'Account is not active');
+  if (!user || !session) throw new ApiError(401, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn');
+  if (user.status !== 'active') throw new ApiError(403, 'Tài khoản chưa được kích hoạt');
 
   req.user = user;
   req.auth = { sessionId: String(session._id) };
@@ -38,9 +38,9 @@ export const requireAuth = asyncHandler(async (req, res, next) => {
 
 export function requireRole(...roles) {
   return (req, res, next) => {
-    if (!req.user) return next(new ApiError(401, 'Authentication required'));
+    if (!req.user) return next(new ApiError(401, 'Vui lòng đăng nhập'));
     if (!roles.includes(req.user.role)) {
-      return next(new ApiError(403, 'You do not have permission to perform this action'));
+      return next(new ApiError(403, 'Bạn không có quyền thực hiện thao tác này'));
     }
     next();
   };

@@ -8,28 +8,28 @@ const bodyOf = (req) => req.body || {};
 
 function requireEmail(email) {
   if (typeof email !== 'string' || !EMAIL_PATTERN.test(email.trim())) {
-    throw new ApiError(400, 'A valid email is required');
+    throw new ApiError(400, 'Email không hợp lệ');
   }
 }
 
 function requirePassword(password, { strict = true } = {}) {
   if (typeof password !== 'string' || password.length === 0) {
-    throw new ApiError(400, 'Password is required');
+    throw new ApiError(400, 'Mật khẩu là bắt buộc');
   }
   if (strict && !PASSWORD_PATTERN.test(password)) {
-    throw new ApiError(400, 'Password must be 8-128 characters and include at least one letter and one number');
+    throw new ApiError(400, 'Mật khẩu phải dài 8-128 ký tự, có ít nhất một chữ cái và một chữ số');
   }
 }
 
 export function registerValidator(req, res, next) {
   const { fullName, email, password, phone } = bodyOf(req);
   if (typeof fullName !== 'string' || fullName.trim().length < 2 || fullName.trim().length > 120) {
-    throw new ApiError(400, 'Full name must be between 2 and 120 characters');
+    throw new ApiError(400, 'Họ tên phải dài từ 2 đến 120 ký tự');
   }
   requireEmail(email);
   requirePassword(password);
   if (phone !== undefined && phone !== null && phone !== '' && !PHONE_PATTERN.test(String(phone).trim())) {
-    throw new ApiError(400, 'Phone number is not valid');
+    throw new ApiError(400, 'Số điện thoại không hợp lệ');
   }
   next();
 }
@@ -44,7 +44,7 @@ export function loginValidator(req, res, next) {
 export function refreshValidator(req, res, next) {
   const { refreshToken } = bodyOf(req);
   if (typeof refreshToken !== 'string' || refreshToken.trim().length === 0) {
-    throw new ApiError(400, 'Refresh token is required');
+    throw new ApiError(400, 'Mã phiên làm mới là bắt buộc');
   }
   next();
 }
@@ -57,11 +57,11 @@ export function forgotPasswordValidator(req, res, next) {
 export function resetPasswordValidator(req, res, next) {
   const { token, password, confirmPassword } = bodyOf(req);
   if (typeof token !== 'string' || token.trim().length === 0) {
-    throw new ApiError(400, 'Reset token is required');
+    throw new ApiError(400, 'Mã đặt lại mật khẩu là bắt buộc');
   }
   requirePassword(password);
   if (confirmPassword !== undefined && confirmPassword !== password) {
-    throw new ApiError(400, 'Password confirmation does not match');
+    throw new ApiError(400, 'Mật khẩu xác nhận không khớp');
   }
   next();
 }

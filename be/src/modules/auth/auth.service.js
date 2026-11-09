@@ -49,7 +49,7 @@ function authPayload(user, session, refreshToken) {
 export async function register(payload = {}, meta = {}) {
   const email = String(payload.email || '').trim().toLowerCase();
   const existing = await User.findOne({ email }).select('_id').lean();
-  if (existing) throw new ApiError(409, 'Email is already registered');
+  if (existing) throw new ApiError(409, 'Email đã được đăng ký');
 
   let user;
   try {
@@ -62,7 +62,7 @@ export async function register(payload = {}, meta = {}) {
       status: 'active'
     });
   } catch (error) {
-    if (error?.code === 11000) throw new ApiError(409, 'Email is already registered');
+    if (error?.code === 11000) throw new ApiError(409, 'Email đã được đăng ký');
     throw error;
   }
 
@@ -74,9 +74,9 @@ export async function login(payload = {}, meta = {}) {
   const email = String(payload.email || '').trim().toLowerCase();
   const user = await User.findOne({ email }).select('+password');
   if (!user || !(await verifyPassword(payload.password, user.password))) {
-    throw new ApiError(401, 'Invalid email or password');
+    throw new ApiError(401, 'Email hoặc mật khẩu không đúng');
   }
-  if (user.status !== 'active') throw new ApiError(403, 'Account is not active');
+  if (user.status !== 'active') throw new ApiError(403, 'Tài khoản chưa được kích hoạt');
 
   const { session, refreshToken } = await createSession(user, meta);
   return authPayload(user, session, refreshToken);
@@ -85,7 +85,7 @@ export async function login(payload = {}, meta = {}) {
 export async function refreshSession(refreshToken, meta = {}) {
   const payload = verifyToken(refreshToken);
   if (payload.type !== 'refresh' || !mongoose.isValidObjectId(payload.sid) || !mongoose.isValidObjectId(payload.sub)) {
-    throw new ApiError(401, 'Invalid refresh token');
+    throw new ApiError(401, 'Mã phiên làm mới không hợp lệ');
   }
 
   const session = await AuthSession.findOne({
@@ -95,12 +95,12 @@ export async function refreshSession(refreshToken, meta = {}) {
     expiresAt: { $gt: new Date() }
   });
   if (!session || !tokenMatches(session.refreshTokenHash, refreshToken)) {
-    throw new ApiError(401, 'Session is invalid or expired');
+    throw new ApiError(401, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn');
   }
 
   const user = await User.findById(payload.sub);
-  if (!user) throw new ApiError(401, 'Session is invalid or expired');
-  if (user.status !== 'active') throw new ApiError(403, 'Account is not active');
+  if (!user) throw new ApiError(401, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn');
+  if (user.status !== 'active') throw new ApiError(403, 'Tài khoản chưa được kích hoạt');
 
   const remainingSeconds = Math.floor((session.expiresAt.getTime() - Date.now()) / 1000);
   const nextRefreshToken = signToken(
@@ -161,7 +161,7 @@ export async function resetPassword(payload = {}) {
     passwordResetTokenHash: hashToken(token),
     passwordResetExpiresAt: { $gt: new Date() }
   });
-  if (!user) throw new ApiError(400, 'Reset token is invalid or has expired');
+  if (!user) throw new ApiError(400, 'Mã đặt lại mật khẩu không hợp lệ hoặc đã hết hạn');
 
   await User.updateOne(
     { _id: user._id },

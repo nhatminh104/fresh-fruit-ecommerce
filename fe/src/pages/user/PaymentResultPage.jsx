@@ -1,0 +1,3 @@
+import { Link, useSearchParams } from 'react-router-dom';
+import PageContainer from '../../components/layout/PageContainer';
+export default function PaymentResultPage() { const [params] = useSearchParams(); const success = params.get('status') !== 'failed'; return <PageContainer><div className="mx-auto max-w-xl rounded-3xl bg-white p-10 text-center"><p className="text-5xl">{success ? '✓' : '!'}</p><h1 className="mt-5 font-display text-4xl text-forest">{success ? 'Thanh toán thành công' : 'Thanh toán chưa hoàn tất'}</h1><p className="mt-4 text-slate-500">{success ? 'Đơn hàng của bạn đã được ghi nhận.' : 'Bạn có thể kiểm tra lại đơn hàng và thử lại.'}</p><Link className="btn-primary mt-7 inline-flex" to="/orders">Xem đơn hàng</Link></div></PageContainer>; }

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Check, ChevronRight, CircleHelp, Facebook, Leaf, Menu, PackageCheck, Search, ShoppingBag, Sparkles, UserRound, X } from 'lucide-react';
 import { homeData } from '../../data/homeData';
 import { CartContext } from '../../contexts/CartContext';
+import { Header as SiteHeader, Footer as SiteFooter } from '../../layouts/sharedUIHome';
 
 const formatPrice = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
 
@@ -12,7 +13,7 @@ function SafeImage({ src, alt, className, eager = false }) {
   return <img src={src} alt={alt} className={className} loading={eager ? 'eager' : 'lazy'} onError={() => setFailed(true)} />;
 }
 
-function SiteHeader({ cartCount }) {
+function LegacySiteHeader({ cartCount }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
   const navigate = useNavigate();
@@ -45,12 +46,12 @@ function ProductCard({ product, onAdd }) {
   </article>;
 }
 
-function SiteFooter() {
+function LegacySiteFooter() {
   return <footer className="bg-[#173d29] px-5 py-14 text-white lg:px-8"><div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
     <div><div className="brand-mark text-white"><span className="brand-icon bg-white text-forest"><Leaf size={21} /></span><span>fresh<span className="text-orange">.</span></span></div><p className="mt-5 max-w-sm text-sm leading-7 text-white/65">Những mùa quả ngon nhất đến căn bếp của bạn — tự nhiên, minh bạch và được chọn lựa bằng sự tử tế.</p><p className="mt-5 text-sm text-white/70">Hotline <strong className="text-white">1900 2025</strong><br />hello@fresh.vn · TP. Hồ Chí Minh</p><div className="mt-6 flex gap-3"><a className="social" href="https://www.facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={16} /></a><a className="social" href="https://www.instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><Sparkles size={16} /></a></div></div>
     <div><h3 className="footer-title">Khám phá</h3><Link className="footer-link" to="/products">Trái cây tươi</Link><Link className="footer-link" to="/categories">Danh mục</Link><Link className="footer-link" to="/about">Về Fresh</Link><Link className="footer-link" to="/faq">Câu hỏi thường gặp</Link></div>
     <div><h3 className="footer-title">Hỗ trợ</h3><Link className="footer-link" to="/shipping-policy">Chính sách giao hàng</Link><Link className="footer-link" to="/return-policy">Đổi trả & hoàn tiền</Link><Link className="footer-link" to="/terms">Điều khoản sử dụng</Link><Link className="footer-link" to="/contact">Liên hệ</Link></div>
-  </div><div className="mx-auto mt-12 flex max-w-7xl flex-col gap-2 border-t border-white/10 pt-5 text-xs text-white/45 sm:flex-row sm:justify-between"><span>© 2025 Fresh. All rights reserved.</span><span>Thanh toán an toàn · Giao hàng thuận tiện</span></div></footer>;
+  </div><div className="mx-auto mt-12 flex max-w-7xl flex-col gap-2 border-t border-white/10 pt-5 text-xs text-white/45 sm:flex-row sm:justify-between"><span>© 2025 Fresh. Bảo lưu mọi quyền.</span><span>Thanh toán an toàn · Giao hàng thuận tiện</span></div></footer>;
 }
 
 export default function Home() {

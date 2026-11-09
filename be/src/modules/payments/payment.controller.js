@@ -1,1 +1,1 @@
-import { createPayment } from './payment.service.js'; export async function createController(req, res) { res.status(201).json({ success: true, data: await createPayment(req.body) }); }
+import { createPayment } from './payment.service.js'; import { asyncHandler } from '../../utils/asyncHandler.js'; export const createController = asyncHandler(async (req, res) => res.status(201).json({ success: true, data: await createPayment({ ...req.body, userId: req.user.id }) }));

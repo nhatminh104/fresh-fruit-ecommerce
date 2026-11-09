@@ -1,0 +1,6 @@
+import { useEffect, useState } from 'react';
+import PageContainer from '../../components/layout/PageContainer';
+import Loading from '../../components/common/Loading';
+import EmptyState from '../../components/common/EmptyState';
+import { getMyReviews } from '../../services/reviewService';
+export default function ReviewsPage() { const [reviews, setReviews] = useState([]); const [loading, setLoading] = useState(true); useEffect(() => { getMyReviews().then(({ data }) => setReviews(data.data || [])).finally(() => setLoading(false)); }, []); return <PageContainer><p className="eyebrow">Tài khoản</p><h1 className="mt-3 font-display text-5xl text-forest">Đánh giá của tôi</h1>{loading ? <Loading /> : reviews.length ? <div className="mt-8 space-y-4">{reviews.map((review) => <article className="rounded-2xl bg-white p-6" key={review._id}><div className="flex justify-between gap-4"><strong className="text-forest">{review.product?.name || 'Sản phẩm'}</strong><span className="text-orange">{'★'.repeat(review.rating)}</span></div><p className="mt-3 text-slate-600">{review.comment || 'Không có nhận xét.'}</p></article>)}</div> : <div className="mt-8"><EmptyState title="Bạn chưa có đánh giá nào" /></div>}</PageContainer>; }
