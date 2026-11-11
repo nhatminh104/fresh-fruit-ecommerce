@@ -29,11 +29,33 @@ export async function dashboard() {
 
 export const listProducts = () => Product.find().populate('category', 'name slug').sort({ createdAt: -1 }).lean();
 export async function createProduct(payload) {
-  return Product.create(pick(payload, ['name', 'slug', 'description', 'category', 'price', 'originalPrice', 'unit', 'origin', 'images', 'stock', 'soldCount', 'isFeatured', 'isActive']));
+  if (payload.stock !== undefined) {
+    const stock = Number(payload.stock);
+    if (!Number.isInteger(stock) || stock < 0) throw new ApiError(400, 'Tồn kho phải là số nguyên không âm');
+  }
+  const product = await Product.create(pick(payload, ['name', 'slug', 'description', 'category', 'price', 'originalPrice', 'unit', 'origin', 'images', 'stock', 'soldCount', 'isFeatured', 'isActive']));
+  const lowStockAt = payload.lowStockAt !== undefined ? Number(payload.lowStockAt) : 5;
+  await Inventory.findOneAndUpdate(
+    { product: product._id },
+    { $set: { quantity: product.stock, lowStockAt: Number.isInteger(lowStockAt) && lowStockAt >= 0 ? lowStockAt : 5 } },
+    { upsert: true }
+  );
+  return product;
 }
 export async function updateProduct(productId, payload) {
+  if (payload.stock !== undefined) {
+    const stock = Number(payload.stock);
+    if (!Number.isInteger(stock) || stock < 0) throw new ApiError(400, 'Tồn kho phải là số nguyên không âm');
+  }
   const product = await Product.findByIdAndUpdate(id(productId, 'Product id'), { $set: pick(payload, ['name', 'slug', 'description', 'category', 'price', 'originalPrice', 'unit', 'origin', 'images', 'stock', 'isFeatured', 'isActive']) }, { new: true, runValidators: true });
   if (!product) throw new ApiError(404, 'Product not found');
+  if (payload.stock !== undefined) {
+    await Inventory.findOneAndUpdate(
+      { product: product._id },
+      { $set: { quantity: product.stock } },
+      { upsert: true }
+    );
+  }
   return product;
 }
 export async function archiveProduct(productId) {

@@ -1,1 +1,94 @@
-import Payment from './payment.model.js'; import Order from '../orders/order.model.js'; import { ApiError } from '../../utils/ApiError.js'; export async function createPayment({ userId, orderId, method }) { const order = await Order.findOne({ _id: orderId, user: userId }); if (!order) throw new ApiError(404, 'Không tìm thấy đơn hàng'); if (!['cod', 'mock'].includes(method)) throw new ApiError(400, 'Phương thức thanh toán không được hỗ trợ'); if (order.status === 'cancelled') throw new ApiError(409, 'Đơn hàng đã bị hủy'); const existing = await Payment.findOne({ order: order._id }).lean(); if (existing) return existing; const status = method === 'mock' ? 'paid' : 'pending'; try { const payment = await Payment.create({ order: order._id, method, status, amount: order.totalAmount }); await Order.updateOne({ _id: order._id, paymentStatus: { $ne: 'paid' } }, { $set: { paymentStatus: status, paymentMethod: method } }); return payment; } catch (error) { if (error?.code === 11000) { const duplicate = await Payment.findOne({ order: order._id }).lean(); if (duplicate) return duplicate; } throw error; } }
+import mongoose from 'mongoose';
+import Payment from './payment.model.js';
+import Order from '../orders/order.model.js';
+import { ApiError } from '../../utils/ApiError.js';
+
+const transactionUnsupported = (error) => error?.code === 20 || /replica set|transaction numbers|mongos/i.test(error?.message || '');
+
+export async function createPayment({ userId, orderId, method, amount }, options = {}) {
+  if (!mongoose.isValidObjectId(orderId)) throw new ApiError(400, 'Mã đơn hàng không hợp lệ');
+  if (!['cod', 'mock'].includes(method)) throw new ApiError(400, 'Phương thức thanh toán không được hỗ trợ');
+
+  if (!options.session && !options.fallback) {
+    const session = await mongoose.startSession();
+    try {
+      let result;
+      await session.withTransaction(async () => {
+        result = await createPayment({ userId, orderId, method, amount }, { session });
+      });
+      return result;
+    } catch (error) {
+      if (error?.code === 11000) {
+        throw new ApiError(409, 'Giao dịch thanh toán đang được xử lý hoặc đơn hàng đã được thanh toán');
+      }
+      if (!transactionUnsupported(error)) throw error;
+      return createPayment({ userId, orderId, method, amount }, { fallback: true });
+    } finally {
+      await session.endSession();
+    }
+  }
+
+  const session = options.session;
+  const orderQuery = Order.findById(orderId);
+  if (session) orderQuery.session(session);
+  const order = await orderQuery;
+
+  if (!order) throw new ApiError(404, 'Không tìm thấy đơn hàng');
+  if (userId && String(order.user) !== String(userId)) {
+    throw new ApiError(403, 'Bạn không có quyền thanh toán đơn hàng này');
+  }
+  if (order.status === 'cancelled') {
+    throw new ApiError(400, 'Đơn hàng đã bị hủy, không thể thanh toán');
+  }
+  if (order.paymentStatus === 'paid') {
+    throw new ApiError(400, 'Đơn hàng đã được thanh toán');
+  }
+  if (order.paymentMethod !== method) {
+    throw new ApiError(400, 'Phương thức thanh toán không khớp với đơn hàng');
+  }
+  if (amount !== undefined && Number(amount) !== order.totalAmount) {
+    throw new ApiError(400, 'Số tiền thanh toán không khớp với đơn hàng');
+  }
+
+  const existingQuery = Payment.findOne({ order: order._id });
+  if (session) existingQuery.session(session);
+  const existing = await existingQuery;
+  if (existing && existing.status === 'paid') {
+    throw new ApiError(400, 'Đơn hàng đã được thanh toán');
+  }
+  if (existing) {
+    throw new ApiError(409, 'Giao dịch thanh toán cho đơn hàng này đã tồn tại');
+  }
+
+  const status = method === 'mock' ? 'paid' : 'pending';
+
+  try {
+    const paymentData = {
+      order: order._id,
+      method,
+      status,
+      amount: order.totalAmount
+    };
+
+    let payment;
+    if (session) {
+      const created = await Payment.create([paymentData], { session });
+      payment = created[0];
+    } else {
+      payment = await Payment.create(paymentData);
+    }
+
+    const orderUpdate = { paymentStatus: status };
+    if (method === 'mock' && order.status === 'pending') {
+      orderUpdate.status = 'confirmed';
+    }
+    await Order.updateOne({ _id: order._id }, { $set: orderUpdate }, session ? { session } : undefined);
+
+    return payment;
+  } catch (error) {
+    if (error?.code === 11000) {
+      throw new ApiError(409, 'Giao dịch thanh toán đang được xử lý hoặc đơn hàng đã được thanh toán');
+    }
+    throw error;
+  }
+}

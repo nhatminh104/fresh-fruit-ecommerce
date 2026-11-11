@@ -1,87 +1,426 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Check, ChevronRight, CircleHelp, Facebook, Leaf, Menu, PackageCheck, Search, ShoppingBag, Sparkles, UserRound, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  ArrowRight,
+  Check,
+  ChevronRight,
+  Clock,
+  Heart,
+  Leaf,
+  PackageCheck,
+  Percent,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Tag,
+  Truck
+} from 'lucide-react';
+import Header from '../../components/layout/Header';
+import Footer from '../../components/layout/Footer';
+import ProductCard from '../../components/product/ProductCard';
 import { homeData } from '../../data/homeData';
-import { CartContext } from '../../contexts/CartContext';
-import { Header as SiteHeader, Footer as SiteFooter } from '../../layouts/sharedUIHome';
 import { getCategories } from '../../services/categoryService';
 import { getProducts } from '../../services/productService';
-
-const formatPrice = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
-
-function SafeImage({ src, alt, className, eager = false }) {
-  const [failed, setFailed] = React.useState(false);
-  if (failed) return <div aria-label={alt} className={`${className} grid place-items-center bg-[#e8eee4] text-leaf`}><Leaf size={30} aria-hidden="true" /></div>;
-  return <img src={src} alt={alt} className={className} loading={eager ? 'eager' : 'lazy'} onError={() => setFailed(true)} />;
-}
-
-function LegacySiteHeader({ cartCount }) {
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [query, setQuery] = React.useState('');
-  const navigate = useNavigate();
-  const links = [['Trang chủ', '/'], ['Trái cây', '/products'], ['Danh mục', '/categories'], ['Về Fresh', '/about']];
-  const submitSearch = (event) => { event.preventDefault(); const value = query.trim(); if (value) navigate(`/search?q=${encodeURIComponent(value)}`); };
-  return <>
-    <div className="announcement-bar"><span>Giao hàng miễn phí cho đơn từ 500.000đ</span><span className="hidden sm:inline" aria-hidden="true">•</span><span className="hidden sm:inline">Tươi ngon mỗi ngày</span></div>
-    <header className="sticky top-0 z-40 border-b border-forest/10 bg-cream/95 backdrop-blur">
-      <div className="mx-auto flex min-h-[72px] max-w-7xl items-center justify-between gap-3 px-5 lg:px-8">
-        <Link to="/" className="brand-mark shrink-0" aria-label="Fresh, trang chủ"><span className="brand-icon"><Leaf size={21} /></span><span>fresh<span className="text-leaf">.</span></span></Link>
-        <nav className="hidden items-center gap-7 md:flex" aria-label="Điều hướng chính">{links.map(([label, to]) => <Link key={to} to={to} className="nav-link">{label}</Link>)}</nav>
-        <div className="flex items-center gap-1 sm:gap-2">
-          <form className="header-search" onSubmit={submitSearch} role="search"><Search size={17} aria-hidden="true" /><input aria-label="Tìm kiếm sản phẩm" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm trái cây..." /></form>
-          <button className="icon-button hidden sm:grid" aria-label="Tài khoản" onClick={() => navigate('/login')}><UserRound size={19} /></button>
-          <button className="icon-button relative" aria-label={`Giỏ hàng, ${cartCount} sản phẩm`} onClick={() => navigate('/cart')}><ShoppingBag size={19} /><span className="cart-badge">{cartCount}</span></button>
-          <button className="icon-button md:hidden" aria-label={mobileOpen ? 'Đóng menu' : 'Mở menu'} aria-expanded={mobileOpen} onClick={() => setMobileOpen((value) => !value)}>{mobileOpen ? <X size={20} /> : <Menu size={20} />}</button>
-        </div>
-      </div>
-      {mobileOpen && <nav className="mobile-nav md:hidden" aria-label="Điều hướng di động">{links.map(([label, to]) => <Link key={to} to={to} onClick={() => setMobileOpen(false)}>{label}</Link>)}<Link to="/login" onClick={() => setMobileOpen(false)}>Tài khoản</Link></nav>}
-    </header>
-  </>;
-}
-
-function ProductCard({ product, onAdd }) {
-  const [adding, setAdding] = React.useState(false);
-  const add = async () => { setAdding(true); try { await onAdd(product); } catch { /* CartContext đã hiển thị thông báo lỗi. */ } finally { window.setTimeout(() => setAdding(false), 700); } };
-  return <article className="product-card group">
-    <Link to={`/products/${product.id}`} className="product-image-wrap"><SafeImage src={product.image} alt={product.name} className="product-image" /><span className="product-tag">{product.tag}</span><button type="button" aria-label={`Thêm ${product.name} vào giỏ`} onClick={(event) => { event.preventDefault(); add(); }} className="add-button">{adding ? <Check size={17} /> : <ShoppingBag size={17} />}</button></Link>
-    <div className="mt-4 flex min-h-[68px] items-start justify-between gap-3"><div><Link to={`/products/${product.id}`} className="product-name">{product.name}</Link><p className="mt-1 text-xs text-slate-400">{product.unit}</p></div><p className="shrink-0 font-bold text-forest">{formatPrice(product.price)}</p></div>
-  </article>;
-}
-
-function LegacySiteFooter() {
-  return <footer className="bg-[#173d29] px-5 py-14 text-white lg:px-8"><div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
-    <div><div className="brand-mark text-white"><span className="brand-icon bg-white text-forest"><Leaf size={21} /></span><span>fresh<span className="text-orange">.</span></span></div><p className="mt-5 max-w-sm text-sm leading-7 text-white/65">Những mùa quả ngon nhất đến căn bếp của bạn — tự nhiên, minh bạch và được chọn lựa bằng sự tử tế.</p><p className="mt-5 text-sm text-white/70">Hotline <strong className="text-white">1900 2025</strong><br />hello@fresh.vn · TP. Hồ Chí Minh</p><div className="mt-6 flex gap-3"><a className="social" href="https://www.facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={16} /></a><a className="social" href="https://www.instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><Sparkles size={16} /></a></div></div>
-    <div><h3 className="footer-title">Khám phá</h3><Link className="footer-link" to="/products">Trái cây tươi</Link><Link className="footer-link" to="/categories">Danh mục</Link><Link className="footer-link" to="/about">Về Fresh</Link><Link className="footer-link" to="/faq">Câu hỏi thường gặp</Link></div>
-    <div><h3 className="footer-title">Hỗ trợ</h3><Link className="footer-link" to="/shipping-policy">Chính sách giao hàng</Link><Link className="footer-link" to="/return-policy">Đổi trả & hoàn tiền</Link><Link className="footer-link" to="/terms">Điều khoản sử dụng</Link><Link className="footer-link" to="/contact">Liên hệ</Link></div>
-  </div><div className="mx-auto mt-12 flex max-w-7xl flex-col gap-2 border-t border-white/10 pt-5 text-xs text-white/45 sm:flex-row sm:justify-between"><span>© 2025 Fresh. Bảo lưu mọi quyền.</span><span>Thanh toán an toàn · Giao hàng thuận tiện</span></div></footer>;
-}
+import { getVouchers } from '../../services/voucherService';
+import { formatCurrency } from '../../utils/formatCurrency';
+import { useToast } from '../../contexts/ToastContext';
 
 export default function Home() {
-  const { items, addItem } = React.useContext(CartContext);
-  const [notice, setNotice] = React.useState('');
-  const [liveProducts, setLiveProducts] = React.useState([]);
-  const [liveCategories, setLiveCategories] = React.useState([]);
-  React.useEffect(() => {
+  const toast = useToast();
+  const [categories, setCategories] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [seasonalProducts, setSeasonalProducts] = useState([]);
+  const [vouchers, setVouchers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
     let active = true;
-    Promise.all([getProducts({ limit: 6 }), getCategories()]).then(([productResponse, categoryResponse]) => {
-      if (!active) return;
-      setLiveProducts(productResponse.data.data?.items || []);
-      setLiveCategories(categoryResponse.data.data || []);
-    }).catch(() => {
-      if (active) { setLiveProducts([]); setLiveCategories([]); }
-    });
-    return () => { active = false; };
+    Promise.all([
+      getCategories(),
+      getProducts({ limit: 8, featured: true }),
+      getProducts({ limit: 4, sort: 'popular' }),
+      getVouchers()
+    ])
+      .then(([catRes, prodRes, seasonRes, voucherRes]) => {
+        if (!active) return;
+        setCategories(catRes.data.data || []);
+        setFeaturedProducts(prodRes.data.data?.items || []);
+        setSeasonalProducts(seasonRes.data.data?.items || []);
+        setVouchers(voucherRes.data.data || []);
+      })
+      .catch(() => {
+        if (active) {
+          setCategories([]);
+          setFeaturedProducts([]);
+          setSeasonalProducts([]);
+          setVouchers([]);
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
-  const products = liveProducts.map((product) => ({ ...product, id: product._id, image: product.images?.[0], tag: product.isFeatured ? 'Nổi bật' : 'Tươi mỗi ngày' }));
-  const cartCount = items.reduce((total, item) => total + (item.quantity || 1), 0);
-  const addToCart = async (product) => { const result = await addItem({ ...product, quantity: 1 }); if (result?.requiresAuth) { setNotice('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng'); window.setTimeout(() => setNotice(''), 2600); return; } setNotice(`${product.name} đã được thêm vào giỏ hàng`); window.setTimeout(() => setNotice(''), 2600); };
-  return <div className="min-h-screen bg-cream"><SiteHeader cartCount={cartCount} />{notice && <div role="status" className="toast-message">{notice}</div>}<main>
-    <section className="hero-wrap"><div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 lg:grid-cols-[.88fr_1.12fr] lg:px-8 lg:py-16"><div className="relative z-10"><p className="eyebrow"><span className="mr-2 inline-block h-2 w-2 rounded-full bg-orange" /> Mùa ngon đang đến</p><h1 className="mt-5 max-w-xl font-display text-5xl leading-[1.04] text-forest sm:text-6xl lg:text-7xl">Tươi lành,<br /><em>tự nhiên</em> hơn.</h1><p className="mt-6 max-w-md text-base leading-7 text-slate-500">Trái cây được chọn từ những vườn trồng tử tế, giao đến bạn thuận tiện để giữ trọn vị ngon.</p><div className="mt-8 flex flex-wrap gap-3"><Link to="/products" className="btn-primary">Khám phá trái cây <ArrowRight size={17} /></Link><Link to="/about" className="btn-secondary">Câu chuyện Fresh</Link></div><div className="mt-10 flex gap-8 border-t border-forest/10 pt-5"><div><p className="font-display text-2xl text-forest">24h</p><p className="text-xs text-slate-500">từ vườn đến tay</p></div><div><p className="font-display text-2xl text-forest">Tận tâm</p><p className="text-xs text-slate-500">trong từng đơn hàng</p></div></div></div><div className="relative lg:pl-4"><div className="hero-orbit" /><SafeImage src={homeData.hero.image} alt={homeData.hero.alt} eager className="hero-image" /><div className="hero-note"><div className="grid h-10 w-10 place-items-center rounded-full bg-[#e9f2e5] text-leaf"><Check size={18} /></div><div><p className="text-xs font-bold text-forest">Chọn kỹ từng ngày</p><p className="text-[11px] text-slate-400">Tươi ngon, rõ nguồn gốc</p></div></div></div></div></section>
-    <section className="section-shell"><div className="section-heading"><div><p className="eyebrow">Chọn theo khẩu vị</p><h2 className="section-title">Có gì ngon hôm nay?</h2></div><Link className="section-link" to="/categories">Xem tất cả <ChevronRight className="ml-1 inline" size={15} /></Link></div><div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-5">{liveCategories.map((category) => <Link to={`/products?category=${category.slug}`} key={category._id} className="category-card"><SafeImage src={category.image} alt={category.name} className="aspect-[.95] w-full object-cover transition duration-500" /><div><h3>{category.name}</h3><p>{category.description || 'Sản phẩm tươi ngon mỗi ngày'}</p></div></Link>)}</div></section>
-    <section className="bg-white px-5 py-20 lg:px-8"><div className="mx-auto max-w-7xl"><div className="section-heading"><div><p className="eyebrow">Được yêu thích</p><h2 className="section-title">Món ngon trong tuần</h2></div><Link className="section-link" to="/products">Xem cửa hàng <ArrowRight className="ml-1 inline" size={15} /></Link></div><div className="mt-8 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{products.length ? products.map((product) => <ProductCard key={product.id} product={product} onAdd={addToCart} />) : <p className="rounded-2xl bg-cream p-8 text-slate-500">Chưa có sản phẩm đang kinh doanh.</p>}</div></div></section>
-    <section className="section-shell"><div className="season-banner"><div className="relative z-10 max-w-md"><p className="eyebrow text-orange">Gợi ý theo mùa</p><h2 className="mt-4 font-display text-4xl leading-tight text-white sm:text-5xl">Vị ngọt của<br /><em>mùa hè</em></h2><p className="mt-4 text-sm leading-6 text-white/70">Khám phá những loại quả mọng nước đang vào mùa và chọn món hợp khẩu vị.</p><Link to="/products?category=trai-cay-nhiet-doi" className="mt-7 inline-flex items-center gap-2 rounded-full bg-orange px-5 py-3 text-sm font-bold text-white transition hover:bg-[#e68f45]">Khám phá ngay <ArrowRight size={16} /></Link></div><SafeImage src={homeData.seasonal.image} alt={homeData.seasonal.alt} className="season-image" /></div></section>
-    <section className="border-y border-slate-100 bg-[#f4f6ef] px-5 py-16 lg:px-8"><div className="mx-auto max-w-7xl"><div className="text-center"><p className="eyebrow justify-center">Vì sao chọn Fresh?</p><h2 className="section-title">Tươi từ tâm, ngon từ vườn.</h2></div><div className="mt-10 grid gap-8 sm:grid-cols-3">{homeData.benefits.map((benefit) => <div className="text-center" key={benefit.title}><div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-white text-forest">{benefit.icon === 'origin' ? <Leaf size={21} /> : benefit.icon === 'package' ? <PackageCheck size={21} /> : <CircleHelp size={21} />}</div><h3 className="mt-4 font-bold text-forest">{benefit.title}</h3><p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-slate-500">{benefit.text}</p></div>)}</div></div></section>
-    <section className="section-shell"><div className="origin-panel"><div className="origin-image" role="img" aria-label="Vườn cây xanh mát" /><div className="flex flex-col justify-center p-8 sm:p-12"><p className="eyebrow">Từ nông trại đến bàn ăn</p><h2 className="mt-3 font-display text-4xl leading-tight text-forest sm:text-5xl">Biết rõ mình đang ăn gì.</h2><p className="mt-5 text-sm leading-7 text-slate-500">Fresh xây dựng trải nghiệm mua sắm minh bạch: thông tin sản phẩm rõ ràng, lựa chọn vừa đủ và chăm chút trong từng khâu giao hàng.</p><div className="mt-6 grid grid-cols-2 gap-4 text-sm font-bold text-forest"><span className="flex items-center gap-2"><Check size={16} className="text-leaf" /> Thông tin rõ ràng</span><span className="flex items-center gap-2"><Check size={16} className="text-leaf" /> Chọn lọc mỗi ngày</span><span className="flex items-center gap-2"><Check size={16} className="text-leaf" /> Đóng gói cẩn thận</span><span className="flex items-center gap-2"><Check size={16} className="text-leaf" /> Hỗ trợ tận tâm</span></div><Link to="/about" className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-forest">Tìm hiểu câu chuyện Fresh <ArrowRight size={16} /></Link></div></div></section>
-    <section className="bg-cream px-5 pb-16 pt-2 lg:px-8"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 rounded-3xl bg-[#e9f0e4] p-8 sm:flex-row sm:items-center sm:p-10"><div><p className="eyebrow">Sẵn sàng cho bữa ăn tươi hơn?</p><h2 className="mt-2 font-display text-3xl text-forest">Chọn món ngon cho hôm nay.</h2></div><Link to="/products" className="btn-primary shrink-0 self-start sm:self-auto">Đi đến cửa hàng <ArrowRight size={16} /></Link></div></section>
-  </main><SiteFooter /></div>;
+
+  const copyVoucher = (code) => {
+    navigator.clipboard.writeText(code);
+    toast.success(`Đã sao chép mã ưu đãi ${code}`);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-white text-ink">
+      <Header />
+
+      <main className="flex-1">
+        {/* 1. HERO BANNER */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-surface-subtle via-white to-white py-12 lg:py-20 border-b border-surface-border/50">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-8">
+              {/* Left Column */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3.5 py-1 text-xs font-bold text-brand-700 shadow-sm">
+                  <Sparkles size={14} className="text-accent" />
+                  <span>Nông sản sạch VietGAP 100% tự nhiên</span>
+                </div>
+
+                <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-ink leading-[1.08]">
+                  Trái cây tươi lành, <br />
+                  <span className="text-brand-500 italic">ngọt mát</span> mỗi ngày.
+                </h1>
+
+                <p className="max-w-xl text-base sm:text-lg leading-relaxed text-ink-muted">
+                  Được hái tận vườn từ các nông trại uy tín và bảo quản lạnh tiêu chuẩn. Đặt hàng tiện lợi, giao nhanh trong 2 giờ để giữ trọn vẹn vitamin và vị ngọt nguyên bản.
+                </p>
+
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <Link
+                    to="/products"
+                    className="btn-primary text-base px-7 py-3.5 shadow-card hover:shadow-elevated"
+                  >
+                    <span>Mua sắm ngay</span>
+                    <ArrowRight size={18} />
+                  </Link>
+                  <Link
+                    to="/categories"
+                    className="btn-secondary text-base px-6 py-3.5"
+                  >
+                    Xem danh mục
+                  </Link>
+                </div>
+
+                {/* Trust Badges */}
+                <div className="grid grid-cols-3 gap-4 pt-6 border-t border-surface-border">
+                  <div>
+                    <strong className="block font-display text-2xl font-bold text-brand-700">2 Giờ</strong>
+                    <span className="text-xs text-ink-muted">Giao siêu tốc nội thành</span>
+                  </div>
+                  <div>
+                    <strong className="block font-display text-2xl font-bold text-brand-700">100%</strong>
+                    <span className="text-xs text-ink-muted">Chuẩn tươi sạch VietGAP</span>
+                  </div>
+                  <div>
+                    <strong className="block font-display text-2xl font-bold text-brand-700">24h</strong>
+                    <span className="text-xs text-ink-muted">Đổi trả nếu dập nát</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column / Hero Image */}
+              <div className="lg:col-span-5 relative">
+                <div className="relative mx-auto max-w-md lg:max-w-none">
+                  {/* Decorative backdrop glow */}
+                  <div className="absolute -inset-4 rounded-3xl bg-brand-50/80 -z-10 blur-xl transform rotate-2" />
+                  
+                  <img
+                    src={homeData?.hero?.image || 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=900&q=80'}
+                    alt="Trái cây tươi ngon"
+                    className="w-full aspect-[4/3] sm:aspect-square object-cover rounded-3xl border border-surface-border shadow-elevated"
+                    loading="eager"
+                  />
+
+                  {/* Floating Highlight Card */}
+                  <div className="absolute -bottom-6 -left-4 sm:left-4 rounded-2xl border border-surface-border bg-white/95 p-4 shadow-card backdrop-blur-md flex items-center gap-3.5">
+                    <div className="grid h-12 w-12 place-items-center rounded-xl bg-brand-50 text-brand-700">
+                      <Check size={22} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-brand-700 uppercase tracking-wide">Tuyển chọn loại 1</p>
+                      <p className="text-sm font-bold text-ink">Ngọt đậm đà, an tâm sức khỏe</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 2. CATEGORIES SECTION */}
+        <section className="section-shell">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div>
+              <span className="eyebrow">
+                <Leaf size={14} /> Danh mục tuyển chọn
+              </span>
+              <h2 className="section-title mt-2">Khám phá theo khẩu vị</h2>
+            </div>
+            <Link to="/categories" className="section-link group">
+              <span>Xem tất cả danh mục</span>
+              <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            {categories.map((category) => (
+              <Link
+                key={category._id}
+                to={`/products?category=${category.slug}`}
+                className="category-card group"
+              >
+                <div className="aspect-square w-full overflow-hidden rounded-xl bg-surface-muted mb-3">
+                  <img
+                    src={category.image || 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=400&q=80'}
+                    alt={category.name}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                </div>
+                <h3 className="text-sm font-bold text-ink group-hover:text-brand-500 transition-colors line-clamp-1">
+                  {category.name}
+                </h3>
+                <span className="text-[11px] text-ink-muted mt-0.5 block">
+                  Xem ngay
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* 3. FEATURED PRODUCTS (MÓN NGON NỔI BẬT) */}
+        <section className="py-16 bg-surface-subtle border-y border-surface-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+              <div>
+                <span className="eyebrow">
+                  <Sparkles size={14} className="text-accent" /> Món ngon trong tuần
+                </span>
+                <h2 className="section-title mt-2">Trái cây nổi bật nhất</h2>
+              </div>
+              <Link to="/products" className="section-link group">
+                <span>Xem tất cả sản phẩm</span>
+                <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+
+            {loading ? (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="h-72 rounded-2xl bg-white border border-surface-border animate-pulse p-4" />
+                ))}
+              </div>
+            ) : featuredProducts.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {featuredProducts.map((product) => (
+                  <ProductCard key={product._id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-3xl border border-surface-border bg-white p-12 text-center text-ink-muted">
+                Hiện chưa có sản phẩm nổi bật.
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* 4. SEASONAL BANNER & HIGHLIGHT */}
+        <section className="section-shell">
+          <div className="relative overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-r from-brand-50 via-surface-subtle to-brand-100/50 p-8 sm:p-12 lg:p-16 shadow-subtle">
+            <div className="relative z-10 max-w-xl">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 text-xs font-bold text-amber-800">
+                <Tag size={13} /> Hương vị theo mùa
+              </span>
+              <h2 className="mt-4 font-display text-3xl sm:text-5xl font-bold tracking-tight text-ink leading-tight">
+                Mùa trái cây ngọt mát, <br />
+                <span className="text-brand-700 italic">tươi ngon đỉnh điểm</span>
+              </h2>
+              <p className="mt-4 text-sm sm:text-base leading-relaxed text-ink-muted">
+                Thưởng thức xoài cát Hòa Lộc thơm lừng, thanh long đỏ Bình Thuận mọng nước và cam sành Tiền Giang giàu vitamin C với mức giá ưu đãi tận vườn.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  to="/products?sort=popular"
+                  className="btn-primary text-sm px-6 py-3 shadow-card"
+                >
+                  <span>Khám phá ngay</span>
+                  <ArrowRight size={16} />
+                </Link>
+                <Link
+                  to="/vouchers"
+                  className="btn-secondary text-sm px-6 py-3"
+                >
+                  Nhận mã giảm giá
+                </Link>
+              </div>
+            </div>
+
+            {/* Right seasonal fruit thumbnails */}
+            <div className="hidden lg:grid absolute right-12 top-1/2 -translate-y-1/2 grid-cols-2 gap-4 w-96">
+              {seasonalProducts.slice(0, 2).map((item) => (
+                <div key={item._id} className="rounded-2xl bg-white/95 p-3.5 shadow-card border border-surface-border">
+                  <img
+                    src={item.images?.[0] || item.image}
+                    alt={item.name}
+                    className="aspect-square w-full rounded-xl object-cover"
+                  />
+                  <h4 className="mt-2 text-xs font-bold text-ink truncate">{item.name}</h4>
+                  <p className="text-xs font-bold text-brand-700 mt-1">{formatCurrency(item.price)}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 5. VOUCHERS / PROMOTIONS */}
+        {vouchers.length > 0 && (
+          <section className="py-14 bg-surface-subtle border-t border-surface-border">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+                <div>
+                  <span className="eyebrow">
+                    <Percent size={14} className="text-accent" /> Tiết kiệm mỗi ngày
+                  </span>
+                  <h2 className="section-title mt-2">Mã giảm giá dành cho bạn</h2>
+                </div>
+                <Link to="/vouchers" className="section-link">
+                  <span>Xem tất cả voucher</span>
+                  <ChevronRight size={16} />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {vouchers.slice(0, 3).map((voucher) => (
+                  <div
+                    key={voucher._id}
+                    className="relative flex items-center justify-between rounded-2xl border border-dashed border-amber-300 bg-white p-5 shadow-subtle hover:border-accent transition-all"
+                  >
+                    <div className="flex-1 pr-3">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-md bg-amber-50 px-2 py-0.5 text-xs font-extrabold text-amber-800">
+                          {voucher.code}
+                        </span>
+                        <span className="text-xs text-ink-muted">
+                          {voucher.discountType === 'percent'
+                            ? `Giảm ${voucher.discountValue}%`
+                            : `Giảm ${formatCurrency(voucher.discountValue)}`}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs text-ink-muted line-clamp-1">
+                        {voucher.description || `Đơn tối thiểu ${formatCurrency(voucher.minOrderValue || 0)}`}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => copyVoucher(voucher.code)}
+                      className="shrink-0 rounded-full border border-surface-border bg-surface-subtle px-3.5 py-1.5 text-xs font-bold text-ink hover:bg-brand-50 hover:text-brand-700 transition-colors"
+                    >
+                      Lưu mã
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* 6. CUSTOMER REVIEWS & TESTIMONIALS */}
+        <section className="section-shell">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="eyebrow justify-center">
+              <Star size={14} className="text-accent fill-accent" /> Khách hàng nói gì
+            </span>
+            <h2 className="section-title mt-2">Hơn 10.000+ bữa ăn ngon</h2>
+            <p className="mt-3 text-sm text-ink-muted">
+              Sự hài lòng của bạn là động lực để Fresh mỗi ngày tìm kiếm những mùa quả ngọt lành nhất.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {[
+              {
+                name: 'Chị Mai Lan',
+                role: 'Quận 1, TP.HCM',
+                comment: 'Trái cây ở Fresh tươi và ngọt đậm tự nhiên, không bị ngâm hóa chất. Dâu tây và xoài cát giao đến đóng gói rất kỹ, nguyên vẹn không bị dập.',
+                rating: 5
+              },
+              {
+                name: 'Anh Minh Trí',
+                role: 'Bình Thạnh, TP.HCM',
+                comment: 'Giao hàng cực kỳ nhanh, đúng 1 tiếng là có trái cây cho cả văn phòng ăn xế. Giá cả minh bạch và nhiều mã giảm giá hấp dẫn.',
+                rating: 5
+              },
+              {
+                name: 'Cô Thu Cúc',
+                role: 'Quận 3, TP.HCM',
+                comment: 'Thích nhất là chính sách đổi trả nhanh gọn. Có lần quả bơ bị chín quá một chút, báo hotline là nhân viên mang quả mới đổi tận nhà ngay.',
+                rating: 5
+              }
+            ].map((review, idx) => (
+              <div
+                key={idx}
+                className="rounded-3xl border border-surface-border bg-white p-6 shadow-card flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex gap-1 text-accent mb-3">
+                    {[...Array(review.rating)].map((_, i) => (
+                      <Star key={i} size={16} className="fill-accent text-accent" />
+                    ))}
+                  </div>
+                  <p className="text-sm leading-relaxed text-ink-muted italic">
+                    "{review.comment}"
+                  </p>
+                </div>
+                <div className="mt-6 flex items-center gap-3 border-t border-surface-border pt-4">
+                  <div className="grid h-9 w-9 place-items-center rounded-full bg-brand-50 text-brand-700 font-bold text-xs">
+                    {review.name[0]}
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-ink">{review.name}</h4>
+                    <p className="text-xs text-ink-light">{review.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 7. CALL TO ACTION */}
+        <section className="bg-surface-subtle py-16 border-t border-surface-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="rounded-3xl border border-brand-200 bg-white p-8 sm:p-12 shadow-card flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+              <div>
+                <span className="eyebrow">Sẵn sàng bổ sung vitamin?</span>
+                <h3 className="font-display text-2xl sm:text-4xl font-bold text-ink mt-2">
+                  Đặt trái cây tươi ngon hôm nay
+                </h3>
+                <p className="mt-2 text-sm text-ink-muted max-w-md">
+                  Nhập mã ưu đãi tại giỏ hàng để nhận miễn phí vận chuyển cho đơn hàng đầu tiên của bạn.
+                </p>
+              </div>
+              <Link
+                to="/products"
+                className="btn-primary text-base px-8 py-4 shadow-card hover:shadow-elevated shrink-0"
+              >
+                <span>Xem cửa hàng</span>
+                <ArrowRight size={18} />
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
 }

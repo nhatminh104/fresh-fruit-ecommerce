@@ -1,1 +1,19 @@
-import { cancelOrder, createOrder, findOrder, listOrders } from './order.service.js'; import { asyncHandler } from '../../utils/asyncHandler.js'; export const listController = asyncHandler(async (req, res) => res.json({ success: true, data: await listOrders(req.user.id) })); export const detailController = asyncHandler(async (req, res) => { const order = await findOrder(req.user.id, req.params.id); if (!order) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' }); return res.json({ success: true, data: order }); }); export const createController = asyncHandler(async (req, res) => res.status(201).json({ success: true, data: await createOrder({ ...req.body, user: req.user.id }) })); export const cancelController = asyncHandler(async (req, res) => res.json({ success: true, data: await cancelOrder({ userId: req.user.id, orderId: req.params.id }) }));
+import { cancelOrder, createOrder, findOrder, listOrders } from './order.service.js';
+import { asyncHandler } from '../../utils/asyncHandler.js';
+
+export const listController = asyncHandler(async (req, res) => {
+  res.json({ success: true, data: await listOrders(req.user.id) });
+});
+
+export const detailController = asyncHandler(async (req, res) => {
+  const order = await findOrder(req.user.id, req.params.id);
+  res.json({ success: true, data: order });
+});
+
+export const createController = asyncHandler(async (req, res) => {
+  res.status(201).json({ success: true, data: await createOrder({ ...req.body, user: req.user.id }) });
+});
+
+export const cancelController = asyncHandler(async (req, res) => {
+  res.json({ success: true, data: await cancelOrder({ userId: req.user.id, orderId: req.params.id }) });
+});

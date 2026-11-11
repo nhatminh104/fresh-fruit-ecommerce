@@ -38,4 +38,10 @@ test('order, payment and review schemas enforce the business invariants', () => 
   assert.equal(Order.schema.path('idempotencyKey').options.maxlength, 120);
   assert.equal(Payment.schema.path('order').options.unique, true);
   assert.equal(Review.schema.path('isApproved').defaultValue, false);
+  const userOrderIndex = Order.schema.indexes().find(
+    ([fields]) => fields.user === 1 && fields.idempotencyKey === 1
+  );
+  assert.ok(userOrderIndex);
+  assert.equal(userOrderIndex[1].unique, true);
+  assert.deepEqual(userOrderIndex[1].partialFilterExpression, { idempotencyKey: { $type: 'string' } });
 });

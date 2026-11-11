@@ -1,3 +1,16 @@
+import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { Header, Footer } from './sharedUIHome';
-export default function MainLayout() { return <><Header /><Outlet /><Footer /></>; }
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
+
+export default function MainLayout() {
+  return (
+    <div className="flex min-h-screen flex-col bg-white text-ink">
+      <Header />
+      <div className="flex-1">
+        <Outlet />
+      </div>
+      <Footer />
+    </div>
+  );
+}

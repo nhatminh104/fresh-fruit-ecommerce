@@ -14,6 +14,6 @@ const schema = new mongoose.Schema({
 schema.virtual('total').get(function () { return this.totalAmount; });
 schema.set('toJSON', { virtuals: true });
 schema.index({ user: 1, createdAt: -1 });
-schema.index({ user: 1, idempotencyKey: 1 }, { unique: true, sparse: true });
+schema.index({ user: 1, idempotencyKey: 1 }, { unique: true, partialFilterExpression: { idempotencyKey: { $type: 'string' } } });
 schema.statics.allowedTransitions = { pending: ['confirmed', 'cancelled'], confirmed: ['shipping', 'cancelled'], shipping: ['delivered'], delivered: [], cancelled: [] };
 export default mongoose.model('Order', schema);
