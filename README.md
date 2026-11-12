@@ -42,10 +42,10 @@ Nền tảng mua sắm trái cây tươi MERN stack: React/Vite/Tailwind ở fro
 npm install
 npm --prefix fe install
 npm --prefix be install
-cp .env.example .env     # điền MONGODB_URI, JWT_SECRET, SEED_*_PASSWORD
-npm run seed             # nạp danh mục/sản phẩm/voucher/tài khoản demo lõi
-npm --prefix be run seed:demo  # (tùy chọn) nạp thêm ~20 users, orders, reviews, địa chỉ, giỏ hàng... vào DB hiện có
-npm run dev              # fe: http://localhost:5173 — be: http://localhost:5001
+cp .env.example .env     
+npm run seed            
+npm --prefix be run seed:demo  
+npm run dev              
 ```
 
 ## Kiểm tra & kiểm thử
