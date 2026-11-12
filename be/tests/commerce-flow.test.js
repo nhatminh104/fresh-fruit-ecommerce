@@ -21,6 +21,7 @@ import { createReview } from '../src/modules/reviews/review.service.js';
 import { addItem, getCart, updateItem, removeItem } from '../src/modules/carts/cart.service.js';
 import { listAddresses, createAddress, updateAddress, deleteAddress } from '../src/modules/addresses/address.service.js';
 import { updateOrder, updateUser } from '../src/modules/admin/admin.service.js';
+import { createPayment } from '../src/modules/payments/payment.service.js';
 import { updateProfile } from '../src/modules/users/user.service.js';
 
 // Dùng database riêng để tránh xung đột khi node --test chạy song song nhiều file test.
@@ -280,4 +281,43 @@ test('admin cannot change own role or status via updateUser', async () => {
   const other = await createUser('customer');
   const updated = await updateUser(other._id, { status: 'blocked' }, admin._id);
   assert.equal(updated.status, 'blocked');
+});
+
+// Payment retry: failed có thể thử lại, pending idempotent, paid không thể trả lại
+test('payment failed can be retried and pending same-method is idempotent', async () => {
+  const user = await createUser();
+  const { product } = await setupCatalog(20);
+  const order = await makeOrder(user, product, 1, { paymentMethod: 'mock' });
+
+  // Giả lập payment failed tồn tại -> retry phải ghi đè thành paid
+  await Payment.create({ order: order._id, method: 'mock', status: 'failed', amount: order.totalAmount });
+  const retried = await createPayment({ userId: user._id, orderId: order._id, method: 'mock' });
+  assert.equal(retried.status, 'paid');
+  assert.equal(await Payment.countDocuments({ order: order._id }), 1);
+  const freshOrder = await Order.findById(order._id);
+  assert.equal(freshOrder.paymentStatus, 'paid');
+  assert.equal(freshOrder.status, 'confirmed'); // mock auto-confirm từ pending
+
+  // Paid -> gọi lại phải bị chặn
+  await assert.rejects(
+    () => createPayment({ userId: user._id, orderId: order._id, method: 'mock' }),
+    (error) => error.status === 400
+  );
+});
+
+test('payment pending same method returns existing (idempotent), different method rejected', async () => {
+  const user = await createUser();
+  const { product } = await setupCatalog(20);
+  const order = await makeOrder(user, product, 1, { paymentMethod: 'cod' });
+
+  const first = await createPayment({ userId: user._id, orderId: order._id, method: 'cod' });
+  assert.equal(first.status, 'pending');
+  const second = await createPayment({ userId: user._id, orderId: order._id, method: 'cod' });
+  assert.equal(String(second._id), String(first._id)); // cùng document, không tạo mới
+  assert.equal(await Payment.countDocuments({ order: order._id }), 1);
+
+  await assert.rejects(
+    () => createPayment({ userId: user._id, orderId: order._id, method: 'mock' }),
+    (error) => error.status === 400 // method không khớp order.paymentMethod
+  );
 });

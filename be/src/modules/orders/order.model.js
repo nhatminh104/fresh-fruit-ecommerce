@@ -6,7 +6,7 @@ const itemSchema = new mongoose.Schema({
   unit: { type: String, required: true }, price: { type: Number, required: true, min: 0 }, quantity: { type: Number, required: true, min: 1, validate: Number.isInteger }, subtotal: { type: Number, required: true, min: 0 }
 }, { _id: false });
 const schema = new mongoose.Schema({
-  orderCode: { type: String, required: true, unique: true, index: true }, user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true }, idempotencyKey: { type: String, trim: true, maxlength: 120 }, items: { type: [itemSchema], required: true, validate: (v) => v.length > 0 },
+  orderCode: { type: String, required: true, unique: true }, user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, idempotencyKey: { type: String, trim: true, maxlength: 120 }, items: { type: [itemSchema], required: true, validate: (v) => v.length > 0 },
   shippingAddress: { type: addressSchema, required: true }, subtotal: { type: Number, required: true, min: 0 }, discountAmount: { type: Number, min: 0, default: 0 }, shippingFee: { type: Number, min: 0, default: 0 }, totalAmount: { type: Number, required: true, min: 0 },
   voucher: { type: mongoose.Schema.Types.ObjectId, ref: 'Voucher' }, paymentMethod: { type: String, enum: ['cod', 'mock'], default: 'cod' }, paymentStatus: { type: String, enum: ['pending', 'paid', 'failed', 'refunded'], default: 'pending' },
   status: { type: String, enum: ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'], default: 'pending', index: true }, note: { type: String, trim: true, maxlength: 500 }, cancelledAt: Date, stockRestoredAt: Date

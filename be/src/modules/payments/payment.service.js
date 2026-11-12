@@ -56,26 +56,39 @@ export async function createPayment({ userId, orderId, method, amount }, options
   if (existing && existing.status === 'paid') {
     throw new ApiError(400, 'Đơn hàng đã được thanh toán');
   }
-  if (existing) {
+  // Retry an toàn: payment failed -> thử lại; payment pending cùng method -> idempotent.
+  if (existing && existing.status === 'pending') {
+    if (existing.method === method) return existing;
     throw new ApiError(409, 'Giao dịch thanh toán cho đơn hàng này đã tồn tại');
+  }
+  if (existing && existing.status === 'refunded') {
+    throw new ApiError(409, 'Giao dịch thanh toán đã được hoàn tiền, không thể thanh toán lại');
   }
 
   const status = method === 'mock' ? 'paid' : 'pending';
 
   try {
-    const paymentData = {
-      order: order._id,
-      method,
-      status,
-      amount: order.totalAmount
-    };
-
     let payment;
-    if (session) {
-      const created = await Payment.create([paymentData], { session });
-      payment = created[0];
+    if (existing) {
+      // existing.status === 'failed' -> ghi đè thành lần thử mới
+      payment = await Payment.findByIdAndUpdate(
+        existing._id,
+        { $set: { method, status, amount: order.totalAmount } },
+        { new: true, ...(session ? { session } : {}) }
+      );
     } else {
-      payment = await Payment.create(paymentData);
+      const paymentData = {
+        order: order._id,
+        method,
+        status,
+        amount: order.totalAmount
+      };
+      if (session) {
+        const created = await Payment.create([paymentData], { session });
+        payment = created[0];
+      } else {
+        payment = await Payment.create(paymentData);
+      }
     }
 
     const orderUpdate = { paymentStatus: status };

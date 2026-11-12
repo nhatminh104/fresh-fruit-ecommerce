@@ -91,7 +91,7 @@ export default function CheckoutPage() {
     if (voucher.isActive === false) return false;
     if (voucher.startDate && new Date(voucher.startDate).getTime() > now) return false;
     if (voucher.endDate && new Date(voucher.endDate).getTime() < now) return false;
-    if (voucher.usageLimit && (voucher.usageCount || 0) >= voucher.usageLimit) return false;
+    if (voucher.usageLimit && (voucher.usedCount || 0) >= voucher.usageLimit) return false;
     if (subtotal < (voucher.minOrderValue || 0)) return false;
     return true;
   };
@@ -143,12 +143,18 @@ export default function CheckoutPage() {
         voucherCode: appliedVoucher?.code || undefined,
         idempotencyKey: idempotencyKey.current,
       });
+      const order = response.data.data;
       if (paymentMethod === 'mock') {
-        await createPayment({ orderId: response.data.data._id, method: paymentMethod });
+        try {
+          await createPayment({ orderId: order._id, method: paymentMethod });
+          navigate(`/payment-result?status=success&orderId=${order._id}`);
+        } catch {
+          // Đơn đã tạo thành công — chuyển đến chi tiết đơn để thanh toán lại
+          navigate(`/orders/${order._id}?payment=failed`);
+        }
+      } else {
+        navigate(`/payment-result?status=pending&orderId=${order._id}`);
       }
-      navigate(
-        `/payment-result?status=${paymentMethod === 'mock' ? 'success' : 'pending'}&orderId=${response.data.data._id}`
-      );
     } catch (err) {
       setError(getErrorMessage(err, 'Không thể tạo đơn hàng.'));
     } finally {

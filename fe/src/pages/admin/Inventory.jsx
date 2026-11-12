@@ -14,6 +14,8 @@ export default function Inventory() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const [stockFilter, setStockFilter] = useState('');
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ quantity: '', lowStockAt: '' });
   const [saving, setSaving] = useState(false);
@@ -58,6 +60,15 @@ export default function Inventory() {
     }
   };
 
+  const filtered = items.filter((item) => {
+    const q = search.trim().toLowerCase();
+    if (q && !(item.product?.name || '').toLowerCase().includes(q)) return false;
+    const low = item.quantity <= (item.lowStockAt ?? 5);
+    if (stockFilter === 'low' && !low) return false;
+    if (stockFilter === 'ok' && low) return false;
+    return true;
+  });
+
   return (
     <PageContainer>
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -69,6 +80,24 @@ export default function Inventory() {
           Làm mới
         </Button>
       </div>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Tìm theo tên sản phẩm..."
+          className="w-full max-w-xs rounded-xl border border-surface-border bg-white px-4 py-2.5 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-50"
+        />
+        <select
+          value={stockFilter}
+          onChange={(e) => setStockFilter(e.target.value)}
+          className="rounded-xl border border-surface-border bg-white px-4 py-2.5 text-sm outline-none focus:border-brand-500"
+        >
+          <option value="">Tất cả tồn kho</option>
+          <option value="low">Sắp hết hàng</option>
+          <option value="ok">Đủ hàng</option>
+        </select>
+      </div>
       {error && (
         <div className="mt-6">
           <ErrorMessage message={error} />
@@ -76,12 +105,14 @@ export default function Inventory() {
       )}
       {loading ? (
         <Loading />
-      ) : items.length === 0 ? (
-        <p className="mt-8 rounded-2xl bg-white p-6 text-slate-500">Chưa có sản phẩm nào.</p>
+      ) : filtered.length === 0 ? (
+        <p className="mt-8 rounded-2xl border border-surface-border bg-white p-6 text-slate-500 shadow-subtle">
+          {items.length === 0 ? 'Chưa có sản phẩm nào.' : 'Không có sản phẩm phù hợp bộ lọc.'}
+        </p>
       ) : (
-        <div className="mt-8 overflow-x-auto rounded-2xl bg-white shadow-sm">
+        <div className="mt-8 overflow-x-auto rounded-2xl border border-surface-border bg-white shadow-subtle">
           <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="border-b bg-cream text-xs uppercase text-slate-500">
+            <thead className="border-b border-surface-border bg-cream-alt text-xs uppercase tracking-wide text-ink-muted">
               <tr>
                 <th className="px-5 py-4">Sản phẩm</th>
                 <th className="px-5 py-4">Tồn kho</th>
@@ -91,7 +122,7 @@ export default function Inventory() {
               </tr>
             </thead>
             <tbody>
-              {items.map((item) => {
+              {filtered.map((item) => {
                 const low = item.quantity <= (item.lowStockAt ?? 5);
                 return (
                   <tr className="border-b last:border-0" key={item.product?._id || item.product}>

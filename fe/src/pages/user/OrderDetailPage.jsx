@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { Ban } from 'lucide-react';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Ban, CreditCard } from 'lucide-react';
 import PageContainer from '../../components/layout/PageContainer';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
@@ -9,6 +9,7 @@ import ProductImage from '../../components/common/ProductImage';
 import Button from '../../components/common/Button';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { cancelOrder, getOrder } from '../../services/orderService';
+import { createPayment } from '../../services/paymentService';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { getErrorMessage } from '../../utils/errorMessage';
 import { useToast } from '../../contexts/ToastContext';
@@ -17,12 +18,21 @@ const CANCELLABLE = ['pending', 'confirmed'];
 
 export default function OrderDetailPage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const toast = useToast();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
+  const [paying, setPaying] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (searchParams.get('payment') === 'failed') {
+      toast.error('Thanh toán chưa hoàn tất. Bạn có thể thử thanh toán lại.');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     getOrder(id)
@@ -45,6 +55,20 @@ export default function OrderDetailPage() {
     }
   };
 
+  const handlePay = async () => {
+    setPaying(true);
+    try {
+      await createPayment({ orderId: order._id, method: order.paymentMethod });
+      const { data } = await getOrder(id);
+      setOrder(data.data);
+      toast.success('Thanh toán thành công.');
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Không thể thanh toán. Vui lòng thử lại.'));
+    } finally {
+      setPaying(false);
+    }
+  };
+
   if (loading)
     return (
       <PageContainer>
@@ -60,6 +84,10 @@ export default function OrderDetailPage() {
 
   const address = order.shippingAddress || {};
   const canCancel = CANCELLABLE.includes(order.status) && order.paymentStatus !== 'paid';
+  const canPay =
+    order.paymentMethod === 'mock' &&
+    ['pending', 'failed'].includes(order.paymentStatus) &&
+    !['cancelled', 'delivered'].includes(order.status);
 
   return (
     <PageContainer>
@@ -74,6 +102,11 @@ export default function OrderDetailPage() {
         </div>
         <div className="flex items-center gap-3">
           <OrderStatusBadge status={order.status} />
+          {canPay && (
+            <Button onClick={handlePay} loading={paying}>
+              <CreditCard size={14} /> {order.paymentStatus === 'failed' ? 'Thanh toán lại' : 'Thanh toán ngay'}
+            </Button>
+          )}
           {canCancel && (
             <Button variant="danger" size="sm" onClick={() => setConfirmCancel(true)} loading={cancelling}>
               <Ban size={14} /> Hủy đơn
@@ -143,6 +176,18 @@ export default function OrderDetailPage() {
               <div className="flex justify-between border-t pt-3 font-bold text-forest">
                 <span>Tổng cộng</span>
                 <span>{formatCurrency(order.totalAmount)}</span>
+              </div>
+              <div className="flex justify-between text-xs text-slate-500">
+                <span>Trạng thái thanh toán</span>
+                <span className="font-semibold">
+                  {order.paymentStatus === 'paid'
+                    ? 'Đã thanh toán'
+                    : order.paymentStatus === 'failed'
+                      ? 'Thanh toán thất bại'
+                      : order.paymentStatus === 'refunded'
+                        ? 'Đã hoàn tiền'
+                        : 'Chưa thanh toán'}
+                </span>
               </div>
               <div className="flex justify-between text-xs text-slate-500">
                 <span>Phương thức</span>

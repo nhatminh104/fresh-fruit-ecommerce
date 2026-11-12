@@ -115,9 +115,21 @@ export async function updateOrder(orderId, status) {
   if (!order) throw new ApiError(404, 'Order not found');
   if (!Object.keys(Order.allowedTransitions).includes(status) || !Order.allowedTransitions[order.status].includes(status)) throw new ApiError(400, 'Invalid order status transition');
   order.status = status;
-  if (status === 'delivered' && order.paymentMethod === 'cod') order.paymentStatus = 'paid';
-  await order.save();
-  if (status === 'delivered' && order.paymentMethod === 'cod') await Payment.updateOne({ order: order._id }, { $set: { status: 'paid' } });
+  if (status === 'delivered' && order.paymentMethod === 'cod') {
+    order.paymentStatus = 'paid';
+    await order.save();
+    // COD có thể chưa từng tạo Payment doc -> upsert để Order/Payment luôn nhất quán
+    await Payment.findOneAndUpdate(
+      { order: order._id },
+      {
+        $set: { status: 'paid' },
+        $setOnInsert: { order: order._id, method: 'cod', amount: order.totalAmount }
+      },
+      { upsert: true, new: true }
+    );
+  } else {
+    await order.save();
+  }
   return order;
 }
 
