@@ -48,10 +48,6 @@ npm --prefix be run seed:demo  # (tùy chọn) nạp thêm ~20 users, orders, re
 npm run dev              # fe: http://localhost:5173 — be: http://localhost:5001
 ```
 
-Biến môi trường quan trọng: `MONGODB_URI`, `JWT_SECRET`, `CLIENT_URL`, `ACCESS_TOKEN_TTL_SECONDS`, `REFRESH_TOKEN_TTL_SECONDS`, `SEED_ADMIN_PASSWORD`, `SEED_CUSTOMER_PASSWORD`, `SEED_PASSWORD_SALT`. Frontend dùng `VITE_API_URL` (mặc định `http://localhost:5001/api`).
-
-Production nên dùng MongoDB **replica set** để transaction tạo/hủy đơn, stock và voucher có tính nguyên tử đầy đủ (code đã fallback an toàn cho standalone).
-
 ## Kiểm tra & kiểm thử
 
 ```bash
@@ -62,4 +58,3 @@ npm --prefix fe run lint    # eslint
 npm --prefix fe run build   # production build
 ```
 
-Chi tiết: [TESTING_GUIDE.md](TESTING_GUIDE.md) · API: [API_DOCUMENTATION.md](API_DOCUMENTATION.md) · DB: [DATABASE_DESIGN.md](DATABASE_DESIGN.md) · Quy tắc nhóm: [PROJECT_GUIDELINES.md](PROJECT_GUIDELINES.md)
