@@ -52,15 +52,6 @@ Biến môi trường quan trọng: `MONGODB_URI`, `JWT_SECRET`, `CLIENT_URL`, `
 
 Production nên dùng MongoDB **replica set** để transaction tạo/hủy đơn, stock và voucher có tính nguyên tử đầy đủ (code đã fallback an toàn cho standalone).
 
-## Tài khoản demo (sau khi seed)
-
-| Vai trò | Email | Mật khẩu |
-|---|---|---|
-| Admin | `admin@freshfruit.local` | `SEED_ADMIN_PASSWORD` |
-| Customer | `customer@freshfruit.local` | `SEED_CUSTOMER_PASSWORD` |
-
-Dữ liệu seed lõi gồm 10 danh mục, 32 sản phẩm (kèm ảnh trái cây từ Openverse), 20 voucher, bản ghi `Inventory` cho từng sản phẩm và tài khoản demo. `seed:demo` bổ sung ~20 khách hàng (`khach01..khach20@freshfruit.local`, cùng `SEED_CUSTOMER_PASSWORD`), ~35 đơn hàng đủ trạng thái, ~20 review, địa chỉ, giỏ hàng, wishlist — tất cả đi qua service layer thật nên tồn kho/thanh toán/snapshot luôn nhất quán. Cả hai seed đều idempotent — chạy lại không tạo trùng, không ghi đè `stock`/`soldCount`/dữ liệu admin đã chỉnh. Ảnh sản phẩm được map trong `be/seeds/data/product-images.json` (script `be/scripts/fix-fruit-images.mjs`).
-
 ## Kiểm tra & kiểm thử
 
 ```bash
