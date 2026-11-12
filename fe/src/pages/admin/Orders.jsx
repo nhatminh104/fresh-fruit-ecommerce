@@ -11,13 +11,24 @@ import { formatDate } from '../../utils/formatDate';
 import { getErrorMessage } from '../../utils/errorMessage';
 
 const NEXT_ACTIONS = {
-  pending: [['confirmed', 'Xác nhận'], ['cancelled', 'Hủy đơn']],
-  confirmed: [['shipping', 'Đang giao'], ['cancelled', 'Hủy đơn']],
+  pending: [
+    ['confirmed', 'Xác nhận'],
+    ['cancelled', 'Hủy đơn'],
+  ],
+  confirmed: [
+    ['shipping', 'Đang giao'],
+    ['cancelled', 'Hủy đơn'],
+  ],
   shipping: [['delivered', 'Đã giao']],
   delivered: [],
-  cancelled: []
+  cancelled: [],
 };
-const ACTION_STYLE = { cancelled: 'danger', confirmed: 'primary', shipping: 'primary', delivered: 'secondary' };
+const ACTION_STYLE = {
+  cancelled: 'danger',
+  confirmed: 'primary',
+  shipping: 'primary',
+  delivered: 'secondary',
+};
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -38,7 +49,9 @@ export default function Orders() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const changeStatus = async (order, status) => {
     const label = NEXT_ACTIONS[order.status]?.find(([value]) => value === status)?.[1] || status;
@@ -61,10 +74,18 @@ export default function Orders() {
           <p className="eyebrow">Fresh admin</p>
           <h1 className="mt-3 font-display text-5xl text-forest">Quản lý đơn hàng</h1>
         </div>
-        <Button type="button" variant="secondary" onClick={load}>Làm mới</Button>
+        <Button type="button" variant="secondary" onClick={load}>
+          Làm mới
+        </Button>
       </div>
-      {error && <div className="mt-6"><ErrorMessage message={error} /></div>}
-      {loading ? <Loading /> : orders.length === 0 ? (
+      {error && (
+        <div className="mt-6">
+          <ErrorMessage message={error} />
+        </div>
+      )}
+      {loading ? (
+        <Loading />
+      ) : orders.length === 0 ? (
         <p className="mt-8 rounded-2xl bg-white p-6 text-slate-500">Chưa có đơn hàng nào.</p>
       ) : (
         <div className="mt-8 overflow-x-auto rounded-2xl bg-white shadow-sm">
@@ -84,14 +105,23 @@ export default function Orders() {
               {orders.map((order) => (
                 <tr className="border-b last:border-0" key={order._id}>
                   <td className="px-5 py-4 font-bold text-forest">{order.orderCode}</td>
-                  <td className="px-5 py-4 text-slate-700">{order.user?.fullName || order.user?.email || '-'}</td>
+                  <td className="px-5 py-4 text-slate-700">
+                    {order.user?.fullName || order.user?.email || '-'}
+                  </td>
                   <td className="px-5 py-4 text-slate-500">{formatDate(order.createdAt)}</td>
                   <td className="px-5 py-4 font-semibold">{formatCurrency(order.totalAmount)}</td>
-                  <td className="px-5 py-4"><OrderStatusBadge status={order.status} /></td>
+                  <td className="px-5 py-4">
+                    <OrderStatusBadge status={order.status} />
+                  </td>
                   <td className="px-5 py-4 text-slate-600">{order.paymentStatus}</td>
                   <td className="px-5 py-4">
                     <div className="flex flex-wrap gap-2">
-                      <Link className="rounded-full border border-surface-border px-3 py-1.5 text-xs font-bold text-forest hover:border-leaf hover:text-leaf" to={`/admin/orders/${order._id}`}>Chi tiết</Link>
+                      <Link
+                        className="rounded-full border border-surface-border px-3 py-1.5 text-xs font-bold text-forest hover:border-leaf hover:text-leaf"
+                        to={`/admin/orders/${order._id}`}
+                      >
+                        Chi tiết
+                      </Link>
                       {(NEXT_ACTIONS[order.status] || []).map(([status, label]) => (
                         <Button
                           key={status}

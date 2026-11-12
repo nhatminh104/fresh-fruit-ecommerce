@@ -20,7 +20,13 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Route>
 
-      <Route element={<RequireAuth><MainLayout /></RequireAuth>}>
+      <Route
+        element={
+          <RequireAuth>
+            <MainLayout />
+          </RequireAuth>
+        }
+      >
         {protectedRoutes.map(([path, Component]) => (
           <Route key={path} path={path} element={<Component />} />
         ))}
@@ -32,7 +38,14 @@ export default function App() {
         ))}
       </Route>
 
-      <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
+      <Route
+        path="/admin"
+        element={
+          <RequireAdmin>
+            <AdminLayout />
+          </RequireAdmin>
+        }
+      >
         <Route index element={<Dashboard />} />
         {adminRoutes.map(([path, Component]) => (
           <Route key={path} path={path} element={<Component />} />

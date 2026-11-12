@@ -34,7 +34,9 @@ describe('validators', () => {
 
 describe('getErrorMessage', () => {
   it('prefers the API message and falls back gracefully', () => {
-    expect(getErrorMessage({ response: { data: { message: 'Email đã được đăng ký' } } })).toBe('Email đã được đăng ký');
+    expect(getErrorMessage({ response: { data: { message: 'Email đã được đăng ký' } } })).toBe(
+      'Email đã được đăng ký'
+    );
     expect(getErrorMessage(new Error('Network Error'))).toBe('Network Error');
     expect(getErrorMessage(null, 'Lỗi dự phòng')).toBe('Lỗi dự phòng');
   });

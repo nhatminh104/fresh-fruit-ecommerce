@@ -29,7 +29,8 @@ export default function OrderDetailPage() {
   }, [id]);
 
   const handleCancel = async () => {
-    if (!window.confirm('Bạn có chắc muốn hủy đơn hàng này? Tồn kho và mã giảm giá sẽ được hoàn lại.')) return;
+    if (!window.confirm('Bạn có chắc muốn hủy đơn hàng này? Tồn kho và mã giảm giá sẽ được hoàn lại.'))
+      return;
     setCancelling(true);
     try {
       const { data } = await cancelOrder(id);
@@ -42,15 +43,27 @@ export default function OrderDetailPage() {
     }
   };
 
-  if (loading) return <PageContainer><Loading /></PageContainer>;
-  if (error || !order) return <PageContainer><ErrorMessage message={error || 'Không tìm thấy đơn hàng.'} /></PageContainer>;
+  if (loading)
+    return (
+      <PageContainer>
+        <Loading />
+      </PageContainer>
+    );
+  if (error || !order)
+    return (
+      <PageContainer>
+        <ErrorMessage message={error || 'Không tìm thấy đơn hàng.'} />
+      </PageContainer>
+    );
 
   const address = order.shippingAddress || {};
   const canCancel = CANCELLABLE.includes(order.status) && order.paymentStatus !== 'paid';
 
   return (
     <PageContainer>
-      <Link to="/orders" className="text-sm font-bold text-leaf">← Đơn hàng của tôi</Link>
+      <Link to="/orders" className="text-sm font-bold text-leaf">
+        ← Đơn hàng của tôi
+      </Link>
       <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">Chi tiết đơn hàng</p>
@@ -68,7 +81,8 @@ export default function OrderDetailPage() {
       </div>
       {order.status === 'cancelled' && (
         <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-          Đơn hàng đã bị hủy{order.cancelledAt ? ` lúc ${new Date(order.cancelledAt).toLocaleString('vi-VN')}` : ''}.
+          Đơn hàng đã bị hủy
+          {order.cancelledAt ? ` lúc ${new Date(order.cancelledAt).toLocaleString('vi-VN')}` : ''}.
         </p>
       )}
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
@@ -80,30 +94,56 @@ export default function OrderDetailPage() {
                 <img className="h-16 w-16 rounded-xl object-cover" src={item.image} alt={item.productName} />
                 <div className="flex-1">
                   <p className="font-bold text-forest">{item.productName}</p>
-                  <p className="text-sm text-slate-500">{item.quantity} × {formatCurrency(item.price)}</p>
+                  <p className="text-sm text-slate-500">
+                    {item.quantity} × {formatCurrency(item.price)}
+                  </p>
                 </div>
                 <strong>{formatCurrency(item.subtotal)}</strong>
               </div>
             ))}
           </div>
-          {order.note && <p className="mt-4 rounded-xl bg-surface-subtle p-4 text-sm text-slate-600">Ghi chú: {order.note}</p>}
+          {order.note && (
+            <p className="mt-4 rounded-xl bg-surface-subtle p-4 text-sm text-slate-600">
+              Ghi chú: {order.note}
+            </p>
+          )}
         </section>
         <aside className="h-fit space-y-5">
           <div className="rounded-2xl bg-white p-6">
             <h2 className="font-bold text-forest">Giao đến</h2>
             <p className="mt-3 text-sm leading-6 text-slate-500">
-              {address.recipientName} · {address.phone}<br />
+              {address.recipientName} · {address.phone}
+              <br />
               {address.streetAddress}, {address.ward}, {address.district}, {address.province}
             </p>
           </div>
           <div className="rounded-2xl bg-white p-6">
             <h2 className="font-bold text-forest">Thanh toán</h2>
             <div className="mt-4 space-y-3 text-sm">
-              <div className="flex justify-between"><span className="text-slate-500">Tạm tính</span><span>{formatCurrency(order.subtotal)}</span></div>
-              {order.discountAmount > 0 && <div className="flex justify-between text-leaf"><span>Giảm giá</span><span>-{formatCurrency(order.discountAmount)}</span></div>}
-              <div className="flex justify-between"><span className="text-slate-500">Phí giao hàng</span><span>{formatCurrency(order.shippingFee)}</span></div>
-              <div className="flex justify-between border-t pt-3 font-bold text-forest"><span>Tổng cộng</span><span>{formatCurrency(order.totalAmount)}</span></div>
-              <div className="flex justify-between text-xs text-slate-500"><span>Phương thức</span><span>{order.paymentMethod === 'mock' ? 'Thanh toán online (demo)' : 'Thanh toán khi nhận hàng'}</span></div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Tạm tính</span>
+                <span>{formatCurrency(order.subtotal)}</span>
+              </div>
+              {order.discountAmount > 0 && (
+                <div className="flex justify-between text-leaf">
+                  <span>Giảm giá</span>
+                  <span>-{formatCurrency(order.discountAmount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-slate-500">Phí giao hàng</span>
+                <span>{formatCurrency(order.shippingFee)}</span>
+              </div>
+              <div className="flex justify-between border-t pt-3 font-bold text-forest">
+                <span>Tổng cộng</span>
+                <span>{formatCurrency(order.totalAmount)}</span>
+              </div>
+              <div className="flex justify-between text-xs text-slate-500">
+                <span>Phương thức</span>
+                <span>
+                  {order.paymentMethod === 'mock' ? 'Thanh toán online (demo)' : 'Thanh toán khi nhận hàng'}
+                </span>
+              </div>
             </div>
           </div>
         </aside>

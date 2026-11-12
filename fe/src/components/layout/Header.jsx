@@ -12,7 +12,7 @@ import {
   Sparkles,
   Truck,
   User,
-  X
+  X,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useCart } from '../../hooks/useCart';
@@ -74,7 +74,9 @@ export default function Header() {
               className="flex items-center gap-1 text-ink-muted hover:text-brand-500 transition-colors"
             >
               <PhoneCall size={13} className="text-brand-500" />
-              <span>Hotline: <strong className="text-ink">1900 2025</strong></span>
+              <span>
+                Hotline: <strong className="text-ink">1900 2025</strong>
+              </span>
             </a>
             {user?.role === 'admin' && (
               <Link
@@ -92,7 +94,11 @@ export default function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex min-h-[72px] items-center justify-between gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 shrink-0 group" aria-label="Fresh Fruit Trang chủ">
+          <Link
+            to="/"
+            className="flex items-center gap-2.5 shrink-0 group"
+            aria-label="Fresh Fruit Trang chủ"
+          >
             <div className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-500 text-white shadow-sm transition-transform duration-200 group-hover:scale-105 group-hover:bg-brand-700">
               <Leaf size={22} strokeWidth={2.2} />
             </div>

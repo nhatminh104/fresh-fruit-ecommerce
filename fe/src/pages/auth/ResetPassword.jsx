@@ -36,7 +36,13 @@ export default function ResetPassword() {
     setError('');
     setSubmitting(true);
     try {
-      setResult(await authService.resetPassword({ token, password: form.password, confirmPassword: form.confirmPassword }));
+      setResult(
+        await authService.resetPassword({
+          token,
+          password: form.password,
+          confirmPassword: form.confirmPassword,
+        })
+      );
     } catch (submitError) {
       setError(getErrorMessage(submitError, 'Không thể đặt lại mật khẩu.'));
     } finally {
@@ -50,12 +56,20 @@ export default function ResetPassword() {
       <h1 className="mt-2 font-display text-4xl text-forest">Đặt lại mật khẩu</h1>
       <p className="mt-2 text-sm text-slate-500">Chọn mật khẩu mới cho tài khoản của bạn.</p>
 
-      {error && <div className="mt-5"><ErrorMessage message={error} /></div>}
+      {error && (
+        <div className="mt-5">
+          <ErrorMessage message={error} />
+        </div>
+      )}
 
       {result ? (
         <div className="mt-6 space-y-4">
-          <p role="status" className="rounded-xl bg-green-50 p-4 text-sm text-green-800">{result.message}</p>
-          <Link className="btn-primary inline-flex" to="/login">Đăng nhập</Link>
+          <p role="status" className="rounded-xl bg-green-50 p-4 text-sm text-green-800">
+            {result.message}
+          </p>
+          <Link className="btn-primary inline-flex" to="/login">
+            Đăng nhập
+          </Link>
         </div>
       ) : (
         <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
@@ -78,11 +92,20 @@ export default function ResetPassword() {
             onChange={update('confirmPassword')}
             required
           />
-          <Button type="submit" disabled={submitting || !token} className="w-full justify-center disabled:cursor-not-allowed disabled:opacity-60">
+          <Button
+            type="submit"
+            disabled={submitting || !token}
+            className="w-full justify-center disabled:cursor-not-allowed disabled:opacity-60"
+          >
             <ShieldCheck size={17} aria-hidden="true" />
             {submitting ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
           </Button>
-          <Link className="inline-flex text-sm font-semibold text-forest hover:text-leaf" to="/forgot-password">Gửi lại yêu cầu</Link>
+          <Link
+            className="inline-flex text-sm font-semibold text-forest hover:text-leaf"
+            to="/forgot-password"
+          >
+            Gửi lại yêu cầu
+          </Link>
         </form>
       )}
     </div>

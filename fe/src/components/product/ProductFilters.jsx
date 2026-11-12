@@ -2,7 +2,9 @@ import React from 'react';
 import { ArrowDownUp, Filter, RotateCcw } from 'lucide-react';
 
 export default function ProductFilters({ value = {}, onChange }) {
-  const hasActiveFilters = Boolean(value.minPrice || value.maxPrice || (value.sort && value.sort !== 'newest'));
+  const hasActiveFilters = Boolean(
+    value.minPrice || value.maxPrice || (value.sort && value.sort !== 'newest')
+  );
 
   const handleReset = () => {
     onChange?.({ minPrice: '', maxPrice: '', sort: 'newest' });
@@ -30,9 +32,7 @@ export default function ProductFilters({ value = {}, onChange }) {
       <div className="mt-3.5 grid gap-3 sm:grid-cols-3">
         {/* Min Price */}
         <div>
-          <label className="block text-xs font-bold text-ink-muted mb-1">
-            Giá tối thiểu (đ)
-          </label>
+          <label className="block text-xs font-bold text-ink-muted mb-1">Giá tối thiểu (đ)</label>
           <input
             className="w-full rounded-xl border border-surface-border bg-surface-subtle px-3 py-2 text-sm text-ink outline-none transition-all focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-50"
             type="number"
@@ -46,9 +46,7 @@ export default function ProductFilters({ value = {}, onChange }) {
 
         {/* Max Price */}
         <div>
-          <label className="block text-xs font-bold text-ink-muted mb-1">
-            Giá tối đa (đ)
-          </label>
+          <label className="block text-xs font-bold text-ink-muted mb-1">Giá tối đa (đ)</label>
           <input
             className="w-full rounded-xl border border-surface-border bg-surface-subtle px-3 py-2 text-sm text-ink outline-none transition-all focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-50"
             type="number"

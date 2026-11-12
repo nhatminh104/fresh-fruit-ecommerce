@@ -1,16 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Facebook,
-  Heart,
-  Instagram,
-  Leaf,
-  Mail,
-  MapPin,
-  Phone,
-  ShieldCheck,
-  Truck
-} from 'lucide-react';
+import { Facebook, Heart, Instagram, Leaf, Mail, MapPin, Phone, ShieldCheck, Truck } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -76,7 +66,8 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm leading-relaxed text-ink-muted">
-              Hệ thống cung cấp trái cây tươi ngon, tuyển chọn tận vườn với quy trình bảo quản lạnh hiện đại. Mang đến hương vị thiên nhiên ngọt lành trọn vẹn cho gia đình bạn.
+              Hệ thống cung cấp trái cây tươi ngon, tuyển chọn tận vườn với quy trình bảo quản lạnh hiện đại.
+              Mang đến hương vị thiên nhiên ngọt lành trọn vẹn cho gia đình bạn.
             </p>
             <div className="flex gap-2.5 pt-2">
               <a
@@ -104,12 +95,36 @@ export default function Footer() {
           <div>
             <h3 className="footer-title text-brand-700">Hỗ trợ khách hàng</h3>
             <ul className="mt-4 space-y-2 text-sm">
-              <li><Link to="/products" className="footer-link">Tất cả sản phẩm</Link></li>
-              <li><Link to="/categories" className="footer-link">Danh mục trái cây</Link></li>
-              <li><Link to="/vouchers" className="footer-link">Voucher & Khuyến mãi</Link></li>
-              <li><Link to="/faq" className="footer-link">Câu hỏi thường gặp (FAQ)</Link></li>
-              <li><Link to="/shipping-policy" className="footer-link">Chính sách giao hàng</Link></li>
-              <li><Link to="/return-policy" className="footer-link">Chính sách đổi trả & hoàn tiền</Link></li>
+              <li>
+                <Link to="/products" className="footer-link">
+                  Tất cả sản phẩm
+                </Link>
+              </li>
+              <li>
+                <Link to="/categories" className="footer-link">
+                  Danh mục trái cây
+                </Link>
+              </li>
+              <li>
+                <Link to="/vouchers" className="footer-link">
+                  Voucher & Khuyến mãi
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="footer-link">
+                  Câu hỏi thường gặp (FAQ)
+                </Link>
+              </li>
+              <li>
+                <Link to="/shipping-policy" className="footer-link">
+                  Chính sách giao hàng
+                </Link>
+              </li>
+              <li>
+                <Link to="/return-policy" className="footer-link">
+                  Chính sách đổi trả & hoàn tiền
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -117,11 +132,31 @@ export default function Footer() {
           <div>
             <h3 className="footer-title text-brand-700">Thông tin & Chính sách</h3>
             <ul className="mt-4 space-y-2 text-sm">
-              <li><Link to="/about" className="footer-link">Giới thiệu về Fresh</Link></li>
-              <li><Link to="/contact" className="footer-link">Liên hệ hợp tác</Link></li>
-              <li><Link to="/privacy-policy" className="footer-link">Chính sách bảo mật</Link></li>
-              <li><Link to="/terms" className="footer-link">Điều khoản dịch vụ</Link></li>
-              <li><Link to="/reviews" className="footer-link">Đánh giá từ khách hàng</Link></li>
+              <li>
+                <Link to="/about" className="footer-link">
+                  Giới thiệu về Fresh
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="footer-link">
+                  Liên hệ hợp tác
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy-policy" className="footer-link">
+                  Chính sách bảo mật
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="footer-link">
+                  Điều khoản dịch vụ
+                </Link>
+              </li>
+              <li>
+                <Link to="/reviews" className="footer-link">
+                  Đánh giá từ khách hàng
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -135,7 +170,9 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={18} className="shrink-0 text-brand-500" />
-                <span>Hotline: <strong className="text-ink">1900 2025</strong> (8:00 - 21:00)</span>
+                <span>
+                  Hotline: <strong className="text-ink">1900 2025</strong> (8:00 - 21:00)
+                </span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={18} className="shrink-0 text-brand-500" />
@@ -144,7 +181,9 @@ export default function Footer() {
             </ul>
             <div className="mt-5 rounded-2xl border border-surface-border bg-white p-3.5">
               <p className="text-xs font-bold text-ink">Thanh toán an toàn</p>
-              <p className="text-[11px] text-ink-muted mt-0.5">Hỗ trợ COD (Tiền mặt) & Thanh toán thẻ Online</p>
+              <p className="text-[11px] text-ink-muted mt-0.5">
+                Hỗ trợ COD (Tiền mặt) & Thanh toán thẻ Online
+              </p>
             </div>
           </div>
         </div>
@@ -155,11 +194,17 @@ export default function Footer() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 text-xs text-ink-muted sm:flex-row sm:px-6 lg:px-8">
           <p>© 2026 Fresh Fruit Ecommerce. Tất cả các quyền được bảo lưu.</p>
           <div className="flex gap-4">
-            <Link to="/privacy-policy" className="hover:text-brand-500">Chính sách bảo mật</Link>
+            <Link to="/privacy-policy" className="hover:text-brand-500">
+              Chính sách bảo mật
+            </Link>
             <span>•</span>
-            <Link to="/terms" className="hover:text-brand-500">Điều khoản</Link>
+            <Link to="/terms" className="hover:text-brand-500">
+              Điều khoản
+            </Link>
             <span>•</span>
-            <Link to="/shipping-policy" className="hover:text-brand-500">Vận chuyển</Link>
+            <Link to="/shipping-policy" className="hover:text-brand-500">
+              Vận chuyển
+            </Link>
           </div>
         </div>
       </div>

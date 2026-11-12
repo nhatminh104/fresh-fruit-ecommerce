@@ -97,10 +97,10 @@ export default function ProductsPageVi() {
           </span>
           <h1 className="section-title mt-1.5">
             {category
-              ? (categories.find((c) => c.slug === category)?.name || 'Danh mục sản phẩm')
+              ? categories.find((c) => c.slug === category)?.name || 'Danh mục sản phẩm'
               : search
-              ? `Kết quả tìm kiếm cho "${search}"`
-              : 'Tất cả sản phẩm'}
+                ? `Kết quả tìm kiếm cho "${search}"`
+                : 'Tất cả sản phẩm'}
           </h1>
           <p className="mt-1 text-sm text-ink-muted">
             {result.pagination?.total !== undefined
@@ -188,7 +188,9 @@ export default function ProductsPageVi() {
               </button>
 
               <div className="flex items-center gap-1 px-3 text-xs font-bold text-ink-muted">
-                <span>Trang <strong className="text-ink">{page}</strong> / {totalPages}</span>
+                <span>
+                  Trang <strong className="text-ink">{page}</strong> / {totalPages}
+                </span>
               </div>
 
               <button

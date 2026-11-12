@@ -20,17 +20,26 @@ export default function ReviewsPage() {
     <PageContainer>
       <p className="eyebrow">Tài khoản</p>
       <h1 className="mt-3 font-display text-5xl text-forest">Đánh giá của tôi</h1>
-      {loading ? <Loading /> : reviews.length ? (
+      {loading ? (
+        <Loading />
+      ) : reviews.length ? (
         <div className="mt-8 space-y-4">
           {reviews.map((review) => (
             <article className="rounded-2xl bg-white p-6 shadow-sm" key={review._id}>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <Link to={`/products/${review.product?._id || review.product}`} className="font-bold text-forest hover:text-leaf">
+                <Link
+                  to={`/products/${review.product?._id || review.product}`}
+                  className="font-bold text-forest hover:text-leaf"
+                >
                   {review.product?.name || 'Sản phẩm'}
                 </Link>
                 <span className="inline-flex items-center gap-1 text-accent">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={14} className={i < review.rating ? 'fill-accent text-accent' : 'text-slate-200'} />
+                    <Star
+                      key={i}
+                      size={14}
+                      className={i < review.rating ? 'fill-accent text-accent' : 'text-slate-200'}
+                    />
                   ))}
                 </span>
               </div>
@@ -43,7 +52,9 @@ export default function ReviewsPage() {
           ))}
         </div>
       ) : (
-        <div className="mt-8"><EmptyState title="Bạn chưa có đánh giá nào" /></div>
+        <div className="mt-8">
+          <EmptyState title="Bạn chưa có đánh giá nào" />
+        </div>
       )}
     </PageContainer>
   );

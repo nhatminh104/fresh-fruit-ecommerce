@@ -15,25 +15,33 @@ import { getVouchers } from '../../services/voucherService';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { getErrorMessage } from '../../utils/errorMessage';
 
-const blankAddress = { recipientName: '', phone: '', province: '', district: '', ward: '', streetAddress: '' };
+const blankAddress = {
+  recipientName: '',
+  phone: '',
+  province: '',
+  district: '',
+  ward: '',
+  streetAddress: '',
+};
 const ADDRESS_FIELDS = [
   ['recipientName', 'Người nhận'],
   ['phone', 'Số điện thoại'],
   ['province', 'Tỉnh / thành phố'],
   ['district', 'Quận / huyện'],
   ['ward', 'Phường / xã'],
-  ['streetAddress', 'Địa chỉ cụ thể']
+  ['streetAddress', 'Địa chỉ cụ thể'],
 ];
 const PAYMENT_METHODS = [
   ['cod', 'Thanh toán khi nhận hàng'],
-  ['mock', 'Thanh toán online (demo)']
+  ['mock', 'Thanh toán online (demo)'],
 ];
 
 function estimateDiscount(voucher, subtotal) {
   if (!voucher || subtotal < (voucher.minOrderValue || 0)) return 0;
-  const raw = voucher.discountType === 'percent'
-    ? (subtotal * Number(voucher.discountValue)) / 100
-    : Number(voucher.discountValue);
+  const raw =
+    voucher.discountType === 'percent'
+      ? (subtotal * Number(voucher.discountValue)) / 100
+      : Number(voucher.discountValue);
   const capped = voucher.maxDiscount ? Math.min(raw, Number(voucher.maxDiscount)) : raw;
   return Math.min(capped, subtotal);
 }
@@ -62,7 +70,9 @@ export default function CheckoutPage() {
         setAddresses(next);
         setSelected(next.find((address) => address.isDefault)?._id || next[0]?._id || '');
       }),
-      getVouchers().then(({ data }) => setVouchers(data.data || [])).catch(() => {})
+      getVouchers()
+        .then(({ data }) => setVouchers(data.data || []))
+        .catch(() => {}),
     ])
       .catch((err) => setError(err.response?.data?.message || 'Không thể tải địa chỉ.'))
       .finally(() => setLoading(false));
@@ -96,12 +106,14 @@ export default function CheckoutPage() {
         paymentMethod,
         note,
         voucherCode: voucherCode.trim() || undefined,
-        idempotencyKey: idempotencyKey.current
+        idempotencyKey: idempotencyKey.current,
       });
       if (paymentMethod === 'mock') {
         await createPayment({ orderId: response.data.data._id, method: paymentMethod });
       }
-      navigate(`/payment-result?status=${paymentMethod === 'mock' ? 'success' : 'pending'}&orderId=${response.data.data._id}`);
+      navigate(
+        `/payment-result?status=${paymentMethod === 'mock' ? 'success' : 'pending'}&orderId=${response.data.data._id}`
+      );
     } catch (err) {
       setError(getErrorMessage(err, 'Không thể tạo đơn hàng.'));
     } finally {
@@ -109,20 +121,45 @@ export default function CheckoutPage() {
     }
   }
 
-  if (cartLoading || loading) return <PageContainer><Loading /></PageContainer>;
-  if (!items.length) return <PageContainer><EmptyState title="Giỏ hàng đang trống" action={<Link className="btn-primary" to="/products">Xem sản phẩm</Link>} /></PageContainer>;
+  if (cartLoading || loading)
+    return (
+      <PageContainer>
+        <Loading />
+      </PageContainer>
+    );
+  if (!items.length)
+    return (
+      <PageContainer>
+        <EmptyState
+          title="Giỏ hàng đang trống"
+          action={
+            <Link className="btn-primary" to="/products">
+              Xem sản phẩm
+            </Link>
+          }
+        />
+      </PageContainer>
+    );
 
   return (
     <PageContainer>
       <p className="eyebrow">Đặt hàng</p>
       <h1 className="mt-3 font-display text-5xl text-forest">Thanh toán</h1>
-      {error && <div className="mt-6"><ErrorMessage message={error} /></div>}
+      {error && (
+        <div className="mt-6">
+          <ErrorMessage message={error} />
+        </div>
+      )}
       <form className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]" onSubmit={submit}>
         <div className="space-y-6">
           <section className="rounded-2xl bg-white p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-3xl text-forest">Địa chỉ giao hàng</h2>
-              <button type="button" className="text-sm font-bold text-leaf" onClick={() => setNewAddress((value) => !value)}>
+              <button
+                type="button"
+                className="text-sm font-bold text-leaf"
+                onClick={() => setNewAddress((value) => !value)}
+              >
                 {newAddress ? 'Chọn địa chỉ có sẵn' : 'Thêm địa chỉ mới'}
               </button>
             </div>
@@ -135,11 +172,23 @@ export default function CheckoutPage() {
             ) : addresses.length ? (
               <div className="mt-5 grid gap-3">
                 {addresses.map((address) => (
-                  <label key={address._id} className="flex cursor-pointer gap-3 rounded-xl border border-slate-200 p-4 has-[:checked]:border-leaf has-[:checked]:bg-green-50/40">
-                    <input type="radio" name="address" checked={selected === address._id} onChange={() => setSelected(address._id)} />
+                  <label
+                    key={address._id}
+                    className="flex cursor-pointer gap-3 rounded-xl border border-slate-200 p-4 has-[:checked]:border-leaf has-[:checked]:bg-green-50/40"
+                  >
+                    <input
+                      type="radio"
+                      name="address"
+                      checked={selected === address._id}
+                      onChange={() => setSelected(address._id)}
+                    />
                     <span>
-                      <strong>{address.recipientName} · {address.phone}</strong>
-                      <span className="mt-1 block text-sm text-slate-500">{address.streetAddress}, {address.ward}, {address.district}, {address.province}</span>
+                      <strong>
+                        {address.recipientName} · {address.phone}
+                      </strong>
+                      <span className="mt-1 block text-sm text-slate-500">
+                        {address.streetAddress}, {address.ward}, {address.district}, {address.province}
+                      </span>
                     </span>
                   </label>
                 ))}
@@ -153,8 +202,17 @@ export default function CheckoutPage() {
             <h2 className="font-display text-3xl text-forest">Thanh toán</h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {PAYMENT_METHODS.map(([value, label]) => (
-                <label key={value} className="flex cursor-pointer gap-3 rounded-xl border border-slate-200 p-4 has-[:checked]:border-leaf has-[:checked]:bg-green-50/40">
-                  <input type="radio" name="payment" value={value} checked={paymentMethod === value} onChange={(event) => setPaymentMethod(event.target.value)} />
+                <label
+                  key={value}
+                  className="flex cursor-pointer gap-3 rounded-xl border border-slate-200 p-4 has-[:checked]:border-leaf has-[:checked]:bg-green-50/40"
+                >
+                  <input
+                    type="radio"
+                    name="payment"
+                    value={value}
+                    checked={paymentMethod === value}
+                    onChange={(event) => setPaymentMethod(event.target.value)}
+                  />
                   <span className="text-sm font-semibold">{label}</span>
                 </label>
               ))}
@@ -173,11 +231,18 @@ export default function CheckoutPage() {
               </span>
             </label>
             {voucherCode.trim() && !totals.voucher && (
-              <p className="mt-2 text-xs font-semibold text-amber-600">Mã này không khớp voucher nào đang áp dụng — đơn hàng vẫn được tạo, hệ thống sẽ kiểm tra lại.</p>
+              <p className="mt-2 text-xs font-semibold text-amber-600">
+                Mã này không khớp voucher nào đang áp dụng — đơn hàng vẫn được tạo, hệ thống sẽ kiểm tra lại.
+              </p>
             )}
             <label className="mt-5 block text-sm font-medium text-slate-600">
               Ghi chú đơn hàng
-              <textarea className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-leaf" rows="3" value={note} onChange={(event) => setNote(event.target.value)} />
+              <textarea
+                className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-leaf"
+                rows="3"
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+              />
             </label>
           </section>
         </div>
@@ -185,13 +250,31 @@ export default function CheckoutPage() {
         <aside className="h-fit rounded-2xl bg-white p-6">
           <h2 className="font-bold text-forest">Tóm tắt đơn hàng</h2>
           <div className="mt-5 space-y-3 border-b border-slate-100 pb-5 text-sm">
-            <div className="flex justify-between"><span className="text-slate-500">Tạm tính</span><span>{formatCurrency(totals.subtotal)}</span></div>
-            {totals.discount > 0 && <div className="flex justify-between text-leaf"><span>Giảm giá (dự kiến)</span><span>-{formatCurrency(totals.discount)}</span></div>}
-            <div className="flex justify-between"><span className="text-slate-500">Phí giao hàng</span><span>{totals.shipping ? formatCurrency(totals.shipping) : 'Miễn phí'}</span></div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Tạm tính</span>
+              <span>{formatCurrency(totals.subtotal)}</span>
+            </div>
+            {totals.discount > 0 && (
+              <div className="flex justify-between text-leaf">
+                <span>Giảm giá (dự kiến)</span>
+                <span>-{formatCurrency(totals.discount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span className="text-slate-500">Phí giao hàng</span>
+              <span>{totals.shipping ? formatCurrency(totals.shipping) : 'Miễn phí'}</span>
+            </div>
           </div>
-          <div className="mt-5 flex justify-between font-bold text-forest"><span>Tổng cộng</span><span>{formatCurrency(totals.total)}</span></div>
-          <p className="mt-2 text-[11px] text-slate-400">Tổng tiền cuối cùng do hệ thống xác nhận khi tạo đơn.</p>
-          <Button className="mt-6 w-full" type="submit" disabled={saving}>{saving ? 'Đang tạo đơn...' : 'Đặt hàng'}</Button>
+          <div className="mt-5 flex justify-between font-bold text-forest">
+            <span>Tổng cộng</span>
+            <span>{formatCurrency(totals.total)}</span>
+          </div>
+          <p className="mt-2 text-[11px] text-slate-400">
+            Tổng tiền cuối cùng do hệ thống xác nhận khi tạo đơn.
+          </p>
+          <Button className="mt-6 w-full" type="submit" disabled={saving}>
+            {saving ? 'Đang tạo đơn...' : 'Đặt hàng'}
+          </Button>
         </aside>
       </form>
     </PageContainer>

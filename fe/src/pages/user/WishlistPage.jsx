@@ -34,21 +34,30 @@ export default function WishlistPage() {
     <PageContainer>
       <p className="eyebrow">Tài khoản</p>
       <h1 className="mt-3 font-display text-5xl text-forest">Yêu thích</h1>
-      {loading ? <Loading /> : error ? (
-        <div className="mt-6"><ErrorMessage message={error} /></div>
+      {loading ? (
+        <Loading />
+      ) : error ? (
+        <div className="mt-6">
+          <ErrorMessage message={error} />
+        </div>
       ) : products.length ? (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
             <div key={product._id}>
               <ProductCard product={product} />
-              <button className="mt-2 text-sm font-semibold text-red-600 hover:text-red-700" onClick={() => remove(product._id)}>
+              <button
+                className="mt-2 text-sm font-semibold text-red-600 hover:text-red-700"
+                onClick={() => remove(product._id)}
+              >
                 Xóa khỏi yêu thích
               </button>
             </div>
           ))}
         </div>
       ) : (
-        <div className="mt-8"><EmptyState title="Bạn chưa có sản phẩm yêu thích" /></div>
+        <div className="mt-8">
+          <EmptyState title="Bạn chưa có sản phẩm yêu thích" />
+        </div>
       )}
     </PageContainer>
   );

@@ -46,7 +46,7 @@ export default function Register() {
         fullName: form.fullName.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
-        password: form.password
+        password: form.password,
       });
       navigate('/', { replace: true });
     } catch (submitError) {
@@ -62,7 +62,11 @@ export default function Register() {
       <h1 className="mt-2 font-display text-4xl text-forest">Tạo tài khoản</h1>
       <p className="mt-2 text-sm text-slate-500">Nhận ưu đãi, lưu địa chỉ và theo dõi đơn hàng dễ dàng.</p>
 
-      {error && <div className="mt-5"><ErrorMessage message={error} /></div>}
+      {error && (
+        <div className="mt-5">
+          <ErrorMessage message={error} />
+        </div>
+      )}
 
       <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
         <Input
@@ -115,7 +119,11 @@ export default function Register() {
             required
           />
         </div>
-        <Button type="submit" disabled={submitting} className="w-full justify-center disabled:cursor-not-allowed disabled:opacity-60">
+        <Button
+          type="submit"
+          disabled={submitting}
+          className="w-full justify-center disabled:cursor-not-allowed disabled:opacity-60"
+        >
           <UserPlus size={17} aria-hidden="true" />
           {submitting ? 'Đang tạo tài khoản...' : 'Đăng ký'}
         </Button>
@@ -123,7 +131,9 @@ export default function Register() {
 
       <p className="mt-5 text-sm text-slate-500">
         Đã có tài khoản?{' '}
-        <Link className="font-semibold text-forest hover:text-leaf" to="/login">Đăng nhập</Link>
+        <Link className="font-semibold text-forest hover:text-leaf" to="/login">
+          Đăng nhập
+        </Link>
       </p>
     </div>
   );

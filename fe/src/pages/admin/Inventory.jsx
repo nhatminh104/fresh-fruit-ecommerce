@@ -31,7 +31,9 @@ export default function Inventory() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const openEdit = (item) => {
     setEditing(item);
@@ -44,7 +46,7 @@ export default function Inventory() {
     try {
       await updateAdmin('inventory', editing.product?._id || editing.product, {
         quantity: Number(form.quantity),
-        lowStockAt: Number(form.lowStockAt)
+        lowStockAt: Number(form.lowStockAt),
       });
       toast.success('Đã cập nhật tồn kho.');
       setEditing(null);
@@ -63,10 +65,18 @@ export default function Inventory() {
           <p className="eyebrow">Fresh admin</p>
           <h1 className="mt-3 font-display text-5xl text-forest">Quản lý tồn kho</h1>
         </div>
-        <Button type="button" variant="secondary" onClick={load}>Làm mới</Button>
+        <Button type="button" variant="secondary" onClick={load}>
+          Làm mới
+        </Button>
       </div>
-      {error && <div className="mt-6"><ErrorMessage message={error} /></div>}
-      {loading ? <Loading /> : items.length === 0 ? (
+      {error && (
+        <div className="mt-6">
+          <ErrorMessage message={error} />
+        </div>
+      )}
+      {loading ? (
+        <Loading />
+      ) : items.length === 0 ? (
         <p className="mt-8 rounded-2xl bg-white p-6 text-slate-500">Chưa có sản phẩm nào.</p>
       ) : (
         <div className="mt-8 overflow-x-auto rounded-2xl bg-white shadow-sm">
@@ -89,12 +99,21 @@ export default function Inventory() {
                     <td className="px-5 py-4">{item.quantity}</td>
                     <td className="px-5 py-4">{item.lowStockAt ?? 5}</td>
                     <td className="px-5 py-4">
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${low ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`}>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-bold ${low ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`}
+                      >
                         {low ? 'Sắp hết' : 'Đủ hàng'}
                       </span>
                     </td>
                     <td className="px-5 py-4">
-                      <Button type="button" className="px-3 py-1.5 text-xs" variant="secondary" onClick={() => openEdit(item)}>Cập nhật</Button>
+                      <Button
+                        type="button"
+                        className="px-3 py-1.5 text-xs"
+                        variant="secondary"
+                        onClick={() => openEdit(item)}
+                      >
+                        Cập nhật
+                      </Button>
                     </td>
                   </tr>
                 );
@@ -108,11 +127,29 @@ export default function Inventory() {
         {editing && (
           <form className="space-y-4" onSubmit={save}>
             <p className="text-sm font-semibold text-ink">{editing.product?.name}</p>
-            <Input label="Số lượng tồn kho" type="number" min="0" required value={form.quantity} onChange={(e) => setForm((c) => ({ ...c, quantity: e.target.value }))} />
-            <Input label="Mức cảnh báo hết hàng" type="number" min="0" required value={form.lowStockAt} onChange={(e) => setForm((c) => ({ ...c, lowStockAt: e.target.value }))} />
+            <Input
+              label="Số lượng tồn kho"
+              type="number"
+              min="0"
+              required
+              value={form.quantity}
+              onChange={(e) => setForm((c) => ({ ...c, quantity: e.target.value }))}
+            />
+            <Input
+              label="Mức cảnh báo hết hàng"
+              type="number"
+              min="0"
+              required
+              value={form.lowStockAt}
+              onChange={(e) => setForm((c) => ({ ...c, lowStockAt: e.target.value }))}
+            />
             <div className="flex gap-3">
-              <Button type="submit" disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu'}</Button>
-              <Button type="button" variant="secondary" onClick={() => setEditing(null)}>Hủy</Button>
+              <Button type="submit" disabled={saving}>
+                {saving ? 'Đang lưu...' : 'Lưu'}
+              </Button>
+              <Button type="button" variant="secondary" onClick={() => setEditing(null)}>
+                Hủy
+              </Button>
             </div>
           </form>
         )}

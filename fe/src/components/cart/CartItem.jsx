@@ -17,7 +17,10 @@ export default function CartItem({ item, onRemove, onQuantityChange }) {
           className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-surface-border bg-surface-subtle"
         >
           <img
-            src={image || 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=200&q=80'}
+            src={
+              image ||
+              'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=200&q=80'
+            }
             alt={item.name}
             className="h-full w-full object-cover"
           />
@@ -31,7 +34,8 @@ export default function CartItem({ item, onRemove, onQuantityChange }) {
             {item.name}
           </Link>
           <p className="mt-1 text-xs text-ink-muted">
-            Đơn giá: <strong className="text-ink">{formatCurrency(item.price)}</strong> {item.unit ? `/ ${item.unit}` : ''}
+            Đơn giá: <strong className="text-ink">{formatCurrency(item.price)}</strong>{' '}
+            {item.unit ? `/ ${item.unit}` : ''}
           </p>
 
           {/* Stepper on Mobile */}

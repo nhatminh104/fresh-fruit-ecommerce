@@ -15,19 +15,23 @@ export default function Users() {
         { key: 'email', label: 'Email' },
         { key: 'phone', label: 'Điện thoại' },
         { key: 'role', label: 'Vai trò' },
-        { key: 'status', label: 'Trạng thái' }
+        { key: 'status', label: 'Trạng thái' },
       ]}
       actions={[
         {
           label: 'Khóa / Mở khóa',
           run: confirmRun('Đổi trạng thái khóa tài khoản này?', (item, service) =>
-            service.updateAdmin('users', item._id, { status: item.status === 'blocked' ? 'active' : 'blocked' }))
+            service.updateAdmin('users', item._id, {
+              status: item.status === 'blocked' ? 'active' : 'blocked',
+            })
+          ),
         },
         {
           label: 'Đổi vai trò',
           run: confirmRun('Đổi vai trò của người dùng này?', (item, service) =>
-            service.updateAdmin('users', item._id, { role: item.role === 'admin' ? 'customer' : 'admin' }))
-        }
+            service.updateAdmin('users', item._id, { role: item.role === 'admin' ? 'customer' : 'admin' })
+          ),
+        },
       ]}
     />
   );

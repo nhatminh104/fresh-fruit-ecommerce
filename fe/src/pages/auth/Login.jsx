@@ -46,7 +46,11 @@ export default function Login() {
       <h1 className="mt-2 font-display text-4xl text-forest">Đăng nhập</h1>
       <p className="mt-2 text-sm text-slate-500">Tiếp tục mua sắm và theo dõi đơn hàng của bạn.</p>
 
-      {error && <div className="mt-5"><ErrorMessage message={error} /></div>}
+      {error && (
+        <div className="mt-5">
+          <ErrorMessage message={error} />
+        </div>
+      )}
 
       <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
         <Input
@@ -69,17 +73,25 @@ export default function Login() {
           onChange={update('password')}
           required
         />
-        <Button type="submit" disabled={submitting} className="w-full justify-center disabled:cursor-not-allowed disabled:opacity-60">
+        <Button
+          type="submit"
+          disabled={submitting}
+          className="w-full justify-center disabled:cursor-not-allowed disabled:opacity-60"
+        >
           <LogIn size={17} aria-hidden="true" />
           {submitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
         </Button>
       </form>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-500">
-        <Link className="font-semibold text-forest hover:text-leaf" to="/forgot-password">Quên mật khẩu?</Link>
+        <Link className="font-semibold text-forest hover:text-leaf" to="/forgot-password">
+          Quên mật khẩu?
+        </Link>
         <span>
           Chưa có tài khoản?{' '}
-          <Link className="font-semibold text-forest hover:text-leaf" to="/register">Đăng ký</Link>
+          <Link className="font-semibold text-forest hover:text-leaf" to="/register">
+            Đăng ký
+          </Link>
         </span>
       </div>
     </div>

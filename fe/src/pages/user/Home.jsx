@@ -13,7 +13,7 @@ import {
   Sparkles,
   Star,
   Tag,
-  Truck
+  Truck,
 } from 'lucide-react';
 import ProductCard from '../../components/product/ProductCard';
 import { homeData } from '../../data/homeData';
@@ -37,7 +37,7 @@ export default function Home() {
       getCategories(),
       getProducts({ limit: 8, featured: true }),
       getProducts({ limit: 4, sort: 'popular' }),
-      getVouchers()
+      getVouchers(),
     ])
       .then(([catRes, prodRes, seasonRes, voucherRes]) => {
         if (!active) return;
@@ -88,7 +88,8 @@ export default function Home() {
                 </h1>
 
                 <p className="max-w-xl text-base sm:text-lg leading-relaxed text-ink-muted">
-                  Được hái tận vườn từ các nông trại uy tín và bảo quản lạnh tiêu chuẩn. Đặt hàng tiện lợi, giao nhanh trong 2 giờ để giữ trọn vẹn vitamin và vị ngọt nguyên bản.
+                  Được hái tận vườn từ các nông trại uy tín và bảo quản lạnh tiêu chuẩn. Đặt hàng tiện lợi,
+                  giao nhanh trong 2 giờ để giữ trọn vẹn vitamin và vị ngọt nguyên bản.
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -99,10 +100,7 @@ export default function Home() {
                     <span>Mua sắm ngay</span>
                     <ArrowRight size={18} />
                   </Link>
-                  <Link
-                    to="/categories"
-                    className="btn-secondary text-base px-6 py-3.5"
-                  >
+                  <Link to="/categories" className="btn-secondary text-base px-6 py-3.5">
                     Xem danh mục
                   </Link>
                 </div>
@@ -129,9 +127,12 @@ export default function Home() {
                 <div className="relative mx-auto max-w-md lg:max-w-none">
                   {/* Decorative backdrop glow */}
                   <div className="absolute -inset-4 rounded-3xl bg-brand-50/80 -z-10 blur-xl transform rotate-2" />
-                  
+
                   <img
-                    src={homeData?.hero?.image || 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=900&q=80'}
+                    src={
+                      homeData?.hero?.image ||
+                      'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=900&q=80'
+                    }
                     alt="Trái cây tươi ngon"
                     className="w-full aspect-[4/3] sm:aspect-square object-cover rounded-3xl border border-surface-border shadow-elevated"
                     loading="eager"
@@ -143,7 +144,9 @@ export default function Home() {
                       <Check size={22} strokeWidth={2.5} />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-brand-700 uppercase tracking-wide">Tuyển chọn loại 1</p>
+                      <p className="text-xs font-bold text-brand-700 uppercase tracking-wide">
+                        Tuyển chọn loại 1
+                      </p>
                       <p className="text-sm font-bold text-ink">Ngọt đậm đà, an tâm sức khỏe</p>
                     </div>
                   </div>
@@ -177,7 +180,10 @@ export default function Home() {
               >
                 <div className="aspect-square w-full overflow-hidden rounded-xl bg-surface-muted mb-3">
                   <img
-                    src={category.image || 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=400&q=80'}
+                    src={
+                      category.image ||
+                      'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=400&q=80'
+                    }
                     alt={category.name}
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                     loading="lazy"
@@ -186,9 +192,7 @@ export default function Home() {
                 <h3 className="text-sm font-bold text-ink group-hover:text-brand-500 transition-colors line-clamp-1">
                   {category.name}
                 </h3>
-                <span className="text-[11px] text-ink-muted mt-0.5 block">
-                  Xem ngay
-                </span>
+                <span className="text-[11px] text-ink-muted mt-0.5 block">Xem ngay</span>
               </Link>
             ))}
           </div>
@@ -213,7 +217,10 @@ export default function Home() {
             {loading ? (
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 {[...Array(8)].map((_, i) => (
-                  <div key={i} className="h-72 rounded-2xl bg-white border border-surface-border animate-pulse p-4" />
+                  <div
+                    key={i}
+                    className="h-72 rounded-2xl bg-white border border-surface-border animate-pulse p-4"
+                  />
                 ))}
               </div>
             ) : featuredProducts.length > 0 ? (
@@ -242,20 +249,15 @@ export default function Home() {
                 <span className="text-brand-700 italic">tươi ngon đỉnh điểm</span>
               </h2>
               <p className="mt-4 text-sm sm:text-base leading-relaxed text-ink-muted">
-                Thưởng thức xoài cát Hòa Lộc thơm lừng, thanh long đỏ Bình Thuận mọng nước và cam sành Tiền Giang giàu vitamin C với mức giá ưu đãi tận vườn.
+                Thưởng thức xoài cát Hòa Lộc thơm lừng, thanh long đỏ Bình Thuận mọng nước và cam sành Tiền
+                Giang giàu vitamin C với mức giá ưu đãi tận vườn.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link
-                  to="/products?sort=popular"
-                  className="btn-primary text-sm px-6 py-3 shadow-card"
-                >
+                <Link to="/products?sort=popular" className="btn-primary text-sm px-6 py-3 shadow-card">
                   <span>Khám phá ngay</span>
                   <ArrowRight size={16} />
                 </Link>
-                <Link
-                  to="/vouchers"
-                  className="btn-secondary text-sm px-6 py-3"
-                >
+                <Link to="/vouchers" className="btn-secondary text-sm px-6 py-3">
                   Nhận mã giảm giá
                 </Link>
               </div>
@@ -264,7 +266,10 @@ export default function Home() {
             {/* Right seasonal fruit thumbnails */}
             <div className="hidden lg:grid absolute right-12 top-1/2 -translate-y-1/2 grid-cols-2 gap-4 w-96">
               {seasonalProducts.slice(0, 2).map((item) => (
-                <div key={item._id} className="rounded-2xl bg-white/95 p-3.5 shadow-card border border-surface-border">
+                <div
+                  key={item._id}
+                  className="rounded-2xl bg-white/95 p-3.5 shadow-card border border-surface-border"
+                >
                   <img
                     src={item.images?.[0] || item.image}
                     alt={item.name}
@@ -347,21 +352,24 @@ export default function Home() {
               {
                 name: 'Chị Mai Lan',
                 role: 'Quận 1, TP.HCM',
-                comment: 'Trái cây ở Fresh tươi và ngọt đậm tự nhiên, không bị ngâm hóa chất. Dâu tây và xoài cát giao đến đóng gói rất kỹ, nguyên vẹn không bị dập.',
-                rating: 5
+                comment:
+                  'Trái cây ở Fresh tươi và ngọt đậm tự nhiên, không bị ngâm hóa chất. Dâu tây và xoài cát giao đến đóng gói rất kỹ, nguyên vẹn không bị dập.',
+                rating: 5,
               },
               {
                 name: 'Anh Minh Trí',
                 role: 'Bình Thạnh, TP.HCM',
-                comment: 'Giao hàng cực kỳ nhanh, đúng 1 tiếng là có trái cây cho cả văn phòng ăn xế. Giá cả minh bạch và nhiều mã giảm giá hấp dẫn.',
-                rating: 5
+                comment:
+                  'Giao hàng cực kỳ nhanh, đúng 1 tiếng là có trái cây cho cả văn phòng ăn xế. Giá cả minh bạch và nhiều mã giảm giá hấp dẫn.',
+                rating: 5,
               },
               {
                 name: 'Cô Thu Cúc',
                 role: 'Quận 3, TP.HCM',
-                comment: 'Thích nhất là chính sách đổi trả nhanh gọn. Có lần quả bơ bị chín quá một chút, báo hotline là nhân viên mang quả mới đổi tận nhà ngay.',
-                rating: 5
-              }
+                comment:
+                  'Thích nhất là chính sách đổi trả nhanh gọn. Có lần quả bơ bị chín quá một chút, báo hotline là nhân viên mang quả mới đổi tận nhà ngay.',
+                rating: 5,
+              },
             ].map((review, idx) => (
               <div
                 key={idx}
@@ -373,9 +381,7 @@ export default function Home() {
                       <Star key={i} size={16} className="fill-accent text-accent" />
                     ))}
                   </div>
-                  <p className="text-sm leading-relaxed text-ink-muted italic">
-                    "{review.comment}"
-                  </p>
+                  <p className="text-sm leading-relaxed text-ink-muted italic">"{review.comment}"</p>
                 </div>
                 <div className="mt-6 flex items-center gap-3 border-t border-surface-border pt-4">
                   <div className="grid h-9 w-9 place-items-center rounded-full bg-brand-50 text-brand-700 font-bold text-xs">

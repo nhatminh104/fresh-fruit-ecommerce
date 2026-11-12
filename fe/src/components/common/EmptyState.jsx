@@ -6,10 +6,12 @@ export default function EmptyState({
   title = 'Chưa có dữ liệu',
   description = 'Hiện tại danh sách này đang trống.',
   action = null,
-  className = ''
+  className = '',
 }) {
   return (
-    <div className={`flex flex-col items-center justify-center rounded-3xl border border-surface-border bg-white p-10 text-center shadow-subtle ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center rounded-3xl border border-surface-border bg-white p-10 text-center shadow-subtle ${className}`}
+    >
       <div className="grid h-16 w-16 place-items-center rounded-2xl bg-surface-subtle text-brand-500 mb-4">
         <Icon size={32} strokeWidth={1.75} />
       </div>

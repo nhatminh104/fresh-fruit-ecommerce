@@ -37,15 +37,24 @@ export default function ForgotPassword() {
       <h1 className="mt-2 font-display text-4xl text-forest">Quên mật khẩu</h1>
       <p className="mt-2 text-sm text-slate-500">Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu.</p>
 
-      {error && <div className="mt-5"><ErrorMessage message={error} /></div>}
+      {error && (
+        <div className="mt-5">
+          <ErrorMessage message={error} />
+        </div>
+      )}
 
       {result ? (
         <div className="mt-6 space-y-4">
-          <p role="status" className="rounded-xl bg-green-50 p-4 text-sm text-green-800">{result.message}</p>
+          <p role="status" className="rounded-xl bg-green-50 p-4 text-sm text-green-800">
+            {result.message}
+          </p>
           {result.resetToken && (
             <div className="rounded-xl border border-orange/40 bg-orange/10 p-4 text-sm text-slate-700">
               <p className="font-semibold text-forest">Môi trường phát triển</p>
-              <p className="mt-1">Email chưa được cấu hình, dùng liên kết bên dưới để đặt lại mật khẩu. Liên kết hết hạn sau {result.expiresInMinutes} phút.</p>
+              <p className="mt-1">
+                Email chưa được cấu hình, dùng liên kết bên dưới để đặt lại mật khẩu. Liên kết hết hạn sau{' '}
+                {result.expiresInMinutes} phút.
+              </p>
               <Link
                 className="mt-3 inline-flex font-semibold text-forest hover:text-leaf"
                 to={`/reset-password?token=${encodeURIComponent(result.resetToken)}`}
@@ -54,7 +63,9 @@ export default function ForgotPassword() {
               </Link>
             </div>
           )}
-          <Link className="inline-flex text-sm font-semibold text-forest hover:text-leaf" to="/login">Quay lại đăng nhập</Link>
+          <Link className="inline-flex text-sm font-semibold text-forest hover:text-leaf" to="/login">
+            Quay lại đăng nhập
+          </Link>
         </div>
       ) : (
         <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
@@ -68,11 +79,17 @@ export default function ForgotPassword() {
             onChange={(event) => setEmail(event.target.value)}
             required
           />
-          <Button type="submit" disabled={submitting} className="w-full justify-center disabled:cursor-not-allowed disabled:opacity-60">
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="w-full justify-center disabled:cursor-not-allowed disabled:opacity-60"
+          >
             <KeyRound size={17} aria-hidden="true" />
             {submitting ? 'Đang gửi...' : 'Gửi yêu cầu'}
           </Button>
-          <Link className="inline-flex text-sm font-semibold text-forest hover:text-leaf" to="/login">Quay lại đăng nhập</Link>
+          <Link className="inline-flex text-sm font-semibold text-forest hover:text-leaf" to="/login">
+            Quay lại đăng nhập
+          </Link>
         </form>
       )}
     </div>

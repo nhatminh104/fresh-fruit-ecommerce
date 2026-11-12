@@ -10,11 +10,19 @@ export default function Categories() {
       columns={[
         { key: 'name', label: 'Tên' },
         { key: 'slug', label: 'Slug' },
-        { key: 'isActive', label: 'Đang hiển thị' }
+        { key: 'isActive', label: 'Đang hiển thị' },
       ]}
       actions={[
-        { label: 'Ẩn danh mục', hidden: (item) => item.isActive === false, run: (item, service) => service.updateAdmin('categories', item._id, { isActive: false }) },
-        { label: 'Hiện lại', hidden: (item) => item.isActive !== false, run: (item, service) => service.updateAdmin('categories', item._id, { isActive: true }) }
+        {
+          label: 'Ẩn danh mục',
+          hidden: (item) => item.isActive === false,
+          run: (item, service) => service.updateAdmin('categories', item._id, { isActive: false }),
+        },
+        {
+          label: 'Hiện lại',
+          hidden: (item) => item.isActive !== false,
+          run: (item, service) => service.updateAdmin('categories', item._id, { isActive: true }),
+        },
       ]}
     />
   );

@@ -1,14 +1,7 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
-export default function Modal({
-  open,
-  onClose,
-  title,
-  children,
-  maxWidth = 'max-w-lg',
-  showClose = true
-}) {
+export default function Modal({ open, onClose, title, children, maxWidth = 'max-w-lg', showClose = true }) {
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e) => {
@@ -36,9 +29,7 @@ export default function Modal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between pb-3 border-b border-surface-border">
-          {title ? (
-            <h3 className="font-display text-xl font-bold text-ink">{title}</h3>
-          ) : <div />}
+          {title ? <h3 className="font-display text-xl font-bold text-ink">{title}</h3> : <div />}
           {showClose && (
             <button
               type="button"

@@ -11,7 +11,7 @@ import {
   ShieldCheck,
   ShoppingBag,
   Star,
-  Truck
+  Truck,
 } from 'lucide-react';
 import PageContainer from '../../components/layout/PageContainer';
 import Loading from '../../components/common/Loading';
@@ -54,7 +54,7 @@ export default function ProductDetailFullPage() {
     Promise.all([
       getProduct(id),
       getReviews(id),
-      user ? getWishlist() : Promise.resolve({ data: { data: { products: [] } } })
+      user ? getWishlist() : Promise.resolve({ data: { data: { products: [] } } }),
     ])
       .then(([prodRes, reviewRes, wishRes]) => {
         if (!active) return;
@@ -62,7 +62,7 @@ export default function ProductDetailFullPage() {
         setProduct(prodData);
         setSelectedImage(prodData.images?.[0] || prodData.image || '');
         setReviews(reviewRes.data.data || []);
-        
+
         const wished = (wishRes.data?.data?.products || []).some(
           (p) => (p._id || p.id) === (prodData._id || prodData.id)
         );
@@ -72,7 +72,7 @@ export default function ProductDetailFullPage() {
         if (prodData?.category) {
           getProducts({
             category: prodData.category.slug || prodData.category._id || prodData.category,
-            limit: 4
+            limit: 4,
           })
             .then(({ data }) => {
               if (active) {
@@ -162,7 +162,10 @@ export default function ProductDetailFullPage() {
     return (
       <PageContainer>
         <div className="py-8">
-          <Link to="/products" className="inline-flex items-center gap-2 text-sm font-bold text-brand-700 hover:text-brand-500 mb-6">
+          <Link
+            to="/products"
+            className="inline-flex items-center gap-2 text-sm font-bold text-brand-700 hover:text-brand-500 mb-6"
+          >
             <ArrowLeft size={16} /> Quay lại danh sách
           </Link>
           <ErrorMessage message={error || 'Không tìm thấy sản phẩm.'} />
@@ -172,13 +175,15 @@ export default function ProductDetailFullPage() {
   }
 
   const isOutOfStock = product.stock <= 0;
-  const imageFallback = product.slug === 'le-han-quoc'
-    ? 'https://images.unsplash.com/photo-1612100616857-c056b93628b4?auto=format&fit=crop&w=900&q=85'
-    : null;
+  const imageFallback =
+    product.slug === 'le-han-quoc'
+      ? 'https://images.unsplash.com/photo-1612100616857-c056b93628b4?auto=format&fit=crop&w=900&q=85'
+      : null;
   const images = product.images && product.images.length > 0 ? product.images : [product.image];
-  const discountPercent = product.originalPrice && product.originalPrice > product.price
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : null;
+  const discountPercent =
+    product.originalPrice && product.originalPrice > product.price
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+      : null;
 
   const averageRating = reviews.length
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
@@ -187,10 +192,17 @@ export default function ProductDetailFullPage() {
   return (
     <PageContainer>
       {/* Breadcrumb Navigation */}
-      <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-2 text-xs font-semibold text-ink-muted">
-        <Link to="/" className="hover:text-brand-500">Trang chủ</Link>
+      <nav
+        aria-label="Breadcrumb"
+        className="mb-6 flex items-center gap-2 text-xs font-semibold text-ink-muted"
+      >
+        <Link to="/" className="hover:text-brand-500">
+          Trang chủ
+        </Link>
         <span>/</span>
-        <Link to="/products" className="hover:text-brand-500">Sản phẩm</Link>
+        <Link to="/products" className="hover:text-brand-500">
+          Sản phẩm
+        </Link>
         <span>/</span>
         {product.category?.name && (
           <>
@@ -240,7 +252,9 @@ export default function ProductDetailFullPage() {
                   key={idx}
                   onClick={() => setSelectedImage(img)}
                   className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 transition-all ${
-                    selectedImage === img ? 'border-brand-500 shadow-sm' : 'border-surface-border hover:border-brand-200'
+                    selectedImage === img
+                      ? 'border-brand-500 shadow-sm'
+                      : 'border-surface-border hover:border-brand-200'
                   }`}
                 >
                   <img src={img} alt={`${product.name} ${idx + 1}`} className="h-full w-full object-cover" />
@@ -280,7 +294,9 @@ export default function ProductDetailFullPage() {
                   <Star
                     key={i}
                     size={16}
-                    className={i < Math.round(averageRating || 5) ? 'fill-accent text-accent' : 'text-surface-border'}
+                    className={
+                      i < Math.round(averageRating || 5) ? 'fill-accent text-accent' : 'text-surface-border'
+                    }
                   />
                 ))}
               </div>
@@ -303,15 +319,15 @@ export default function ProductDetailFullPage() {
                   </span>
                 )}
                 {product.unit && (
-                  <span className="text-sm font-semibold text-ink-muted">
-                    / 1 {product.unit}
-                  </span>
+                  <span className="text-sm font-semibold text-ink-muted">/ 1 {product.unit}</span>
                 )}
               </div>
 
               <div className="mt-3 flex items-center gap-4 text-xs font-semibold text-ink-muted">
                 {product.origin && (
-                  <span>Xuất xứ: <strong className="text-ink">{product.origin}</strong></span>
+                  <span>
+                    Xuất xứ: <strong className="text-ink">{product.origin}</strong>
+                  </span>
                 )}
                 <span>•</span>
                 <span>
@@ -325,7 +341,8 @@ export default function ProductDetailFullPage() {
 
             {/* Short Description */}
             <p className="text-sm leading-relaxed text-ink-muted">
-              {product.description || 'Trái cây tươi ngon thu hoạch trực tiếp, an toàn vệ sinh thực phẩm, giàu vitamin tốt cho sức khỏe.'}
+              {product.description ||
+                'Trái cây tươi ngon thu hoạch trực tiếp, an toàn vệ sinh thực phẩm, giàu vitamin tốt cho sức khỏe.'}
             </p>
 
             {/* Quantity Selector & Add to Cart */}
@@ -417,7 +434,9 @@ export default function ProductDetailFullPage() {
                             {rev.user?.fullName || 'Khách hàng ẩn danh'}
                           </strong>
                           <span className="text-[11px] text-ink-muted">
-                            {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('vi-VN') : 'Đã mua hàng'}
+                            {rev.createdAt
+                              ? new Date(rev.createdAt).toLocaleDateString('vi-VN')
+                              : 'Đã mua hàng'}
                           </span>
                         </div>
                       </div>
@@ -427,9 +446,7 @@ export default function ProductDetailFullPage() {
                         ))}
                       </div>
                     </div>
-                    <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-                      {rev.comment}
-                    </p>
+                    <p className="mt-3 text-sm leading-relaxed text-ink-muted">{rev.comment}</p>
                   </div>
                 ))
               ) : (
@@ -443,9 +460,7 @@ export default function ProductDetailFullPage() {
           {/* Submit Review Form */}
           <div className="lg:col-span-5">
             <div className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-              <h3 className="font-display text-xl font-bold text-ink">
-                Viết nhận xét của bạn
-              </h3>
+              <h3 className="font-display text-xl font-bold text-ink">Viết nhận xét của bạn</h3>
               <p className="mt-1 text-xs text-ink-muted">
                 Chia sẻ đánh giá thực tế giúp người mua sau có thêm thông tin hữu ích
               </p>
@@ -480,7 +495,10 @@ export default function ProductDetailFullPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="review-comment" className="block text-xs font-bold uppercase tracking-wider text-ink-muted mb-1.5">
+                  <label
+                    htmlFor="review-comment"
+                    className="block text-xs font-bold uppercase tracking-wider text-ink-muted mb-1.5"
+                  >
                     Nội dung nhận xét *
                   </label>
                   <textarea

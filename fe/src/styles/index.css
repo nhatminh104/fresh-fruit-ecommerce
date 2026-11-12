@@ -4,18 +4,18 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: #FFFFFF;
-  --color-bg-secondary: #F8FAF7;
-  --color-primary: #2E7D32;
-  --color-primary-dark: #1B5E20;
-  --color-primary-light: #EAF5E8;
-  --color-accent: #F59E0B;
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f8faf7;
+  --color-primary: #2e7d32;
+  --color-primary-dark: #1b5e20;
+  --color-primary-light: #eaf5e8;
+  --color-accent: #f59e0b;
   --color-text: #263238;
   --color-text-secondary: #647067;
-  --color-border: #E5EAE5;
-  --color-success: #2E7D32;
-  --color-error: #DC2626;
-  --color-warning: #D97706;
+  --color-border: #e5eae5;
+  --color-success: #2e7d32;
+  --color-error: #dc2626;
+  --color-warning: #d97706;
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -37,13 +37,18 @@
   }
   body {
     @apply m-0 bg-white font-sans text-ink antialiased selection:bg-brand-50 selection:text-brand-700;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     color: #263238;
   }
-  button, a {
+  button,
+  a {
     @apply outline-none transition-colors duration-150;
   }
-  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
     @apply ring-2 ring-brand-500 ring-offset-2 ring-offset-white;
   }
 }
@@ -110,8 +115,8 @@
   }
 
   /* Cards */
-    .product-card {
-      @apply relative flex flex-col overflow-hidden rounded-2xl border border-surface-border bg-white p-3.5 transition-all duration-300 hover:-translate-y-1 hover:border-brand-100 hover:shadow-card;
+  .product-card {
+    @apply relative flex flex-col overflow-hidden rounded-2xl border border-surface-border bg-white p-3.5 transition-all duration-300 hover:-translate-y-1 hover:border-brand-100 hover:shadow-card;
   }
   .product-image-wrap {
     @apply relative block aspect-square w-full overflow-hidden rounded-xl bg-surface-subtle;
@@ -130,8 +135,8 @@
   }
 
   /* Category card */
-    .category-card {
-      @apply relative overflow-hidden rounded-2xl border border-surface-border bg-surface-subtle p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-brand-500 hover:shadow-card;
+  .category-card {
+    @apply relative overflow-hidden rounded-2xl border border-surface-border bg-surface-subtle p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-brand-500 hover:shadow-card;
   }
 
   /* Footer */
@@ -149,7 +154,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;

@@ -12,11 +12,19 @@ export default function Products() {
         { key: 'category', label: 'Danh mục' },
         { key: 'price', label: 'Giá', type: 'currency' },
         { key: 'stock', label: 'Tồn kho' },
-        { key: 'isActive', label: 'Đang bán' }
+        { key: 'isActive', label: 'Đang bán' },
       ]}
       actions={[
-        { label: 'Ẩn sản phẩm', hidden: (item) => item.isActive === false, run: (item, service) => service.updateAdmin('products', item._id, { isActive: false }) },
-        { label: 'Hiện lại', hidden: (item) => item.isActive !== false, run: (item, service) => service.updateAdmin('products', item._id, { isActive: true }) }
+        {
+          label: 'Ẩn sản phẩm',
+          hidden: (item) => item.isActive === false,
+          run: (item, service) => service.updateAdmin('products', item._id, { isActive: false }),
+        },
+        {
+          label: 'Hiện lại',
+          hidden: (item) => item.isActive !== false,
+          run: (item, service) => service.updateAdmin('products', item._id, { isActive: true }),
+        },
       ]}
     />
   );

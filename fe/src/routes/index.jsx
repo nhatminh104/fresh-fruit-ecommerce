@@ -68,7 +68,7 @@ export const publicRoutes = [
   ['/shipping-policy', ShippingPolicy],
   ['/return-policy', ReturnPolicy],
   ['/privacy-policy', PrivacyPolicy],
-  ['/terms', Terms]
+  ['/terms', Terms],
 ];
 
 export const protectedRoutes = [
@@ -80,14 +80,14 @@ export const protectedRoutes = [
   ['/wishlist', Wishlist],
   ['/reviews', Reviews],
   ['/profile', AccountProfile],
-  ['/addresses', AccountAddresses]
+  ['/addresses', AccountAddresses],
 ];
 
 export const authRoutes = [
   ['/login', Login],
   ['/register', Register],
   ['/forgot-password', ForgotPassword],
-  ['/reset-password', ResetPassword]
+  ['/reset-password', ResetPassword],
 ];
 
 export const adminRoutes = [
@@ -105,5 +105,5 @@ export const adminRoutes = [
   ['vouchers', AdminVouchers],
   ['vouchers/new', VoucherForm],
   ['vouchers/:id/edit', VoucherForm],
-  ['inventory', Inventory]
+  ['inventory', Inventory],
 ];

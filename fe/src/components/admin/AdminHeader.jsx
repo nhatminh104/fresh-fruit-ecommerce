@@ -17,12 +17,18 @@ export default function AdminHeader() {
       </Link>
       <div className="flex items-center gap-3">
         <span className="hidden text-sm text-ink-muted sm:inline">{user?.fullName || user?.email}</span>
-        <Link to="/" className="inline-flex items-center gap-1.5 rounded-full border border-surface-border px-3 py-1.5 text-xs font-bold text-ink hover:border-leaf hover:text-leaf">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 rounded-full border border-surface-border px-3 py-1.5 text-xs font-bold text-ink hover:border-leaf hover:text-leaf"
+        >
           <Store size={14} /> Về cửa hàng
         </Link>
         <button
           type="button"
-          onClick={async () => { await logout(); navigate('/login'); }}
+          onClick={async () => {
+            await logout();
+            navigate('/login');
+          }}
           className="inline-flex items-center gap-1.5 rounded-full border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50"
         >
           <LogOut size={14} /> Đăng xuất

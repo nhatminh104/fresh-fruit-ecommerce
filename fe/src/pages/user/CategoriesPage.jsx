@@ -41,7 +41,10 @@ export default function CategoriesPage() {
             >
               <div className="aspect-[16/10] w-full overflow-hidden rounded-2xl bg-surface-subtle mb-5">
                 <img
-                  src={category.image || 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=600&q=80'}
+                  src={
+                    category.image ||
+                    'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=600&q=80'
+                  }
                   alt={category.name}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"

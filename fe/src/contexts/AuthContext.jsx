@@ -92,7 +92,7 @@ export function AuthProvider({ children }) {
       register,
       logout,
       refreshUser,
-      setUser
+      setUser,
     }),
     [user, initializing, login, register, logout, refreshUser]
   );

@@ -15,7 +15,10 @@ export default function Input({
   return (
     <div className={`w-full text-left ${className}`}>
       {label && (
-        <label htmlFor={inputId} className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-ink-muted">
+        <label
+          htmlFor={inputId}
+          className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-ink-muted"
+        >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}

@@ -4,7 +4,10 @@ import { ArrowRight, CheckCircle2, ShieldCheck, Truck } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatCurrency';
 
 export default function CartSummary({ items = [] }) {
-  const subtotal = items.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 1), 0);
+  const subtotal = items.reduce(
+    (sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 1),
+    0
+  );
   const freeshipThreshold = 500000;
   const isFreeship = subtotal >= freeshipThreshold;
   const shippingFee = isFreeship ? 0 : 30000;
@@ -14,9 +17,7 @@ export default function CartSummary({ items = [] }) {
 
   return (
     <aside className="rounded-3xl border border-surface-border bg-white p-6 shadow-card h-fit space-y-6">
-      <h3 className="font-display text-xl font-bold text-ink">
-        Tóm tắt đơn hàng
-      </h3>
+      <h3 className="font-display text-xl font-bold text-ink">Tóm tắt đơn hàng</h3>
 
       {/* Freeship Progress Indicator */}
       <div className="rounded-2xl border border-brand-100 bg-brand-50/60 p-4">
@@ -30,7 +31,8 @@ export default function CartSummary({ items = [] }) {
             <>
               <Truck size={16} className="text-brand-500 shrink-0" />
               <span>
-                Mua thêm <strong className="text-brand-700">{formatCurrency(amountNeededForFreeship)}</strong> để được FREESHIP!
+                Mua thêm <strong className="text-brand-700">{formatCurrency(amountNeededForFreeship)}</strong>{' '}
+                để được FREESHIP!
               </span>
             </>
           )}
@@ -61,18 +63,13 @@ export default function CartSummary({ items = [] }) {
       <div className="flex items-baseline justify-between">
         <span className="text-base font-bold text-ink">Tổng thanh toán</span>
         <div className="text-right">
-          <span className="font-display text-2xl font-black text-brand-700">
-            {formatCurrency(total)}
-          </span>
+          <span className="font-display text-2xl font-black text-brand-700">{formatCurrency(total)}</span>
           <span className="block text-[11px] text-ink-muted">(Đã bao gồm VAT nếu có)</span>
         </div>
       </div>
 
       {/* Action Button */}
-      <Link
-        to="/checkout"
-        className="btn-primary w-full py-3.5 text-base shadow-card hover:shadow-elevated"
-      >
+      <Link to="/checkout" className="btn-primary w-full py-3.5 text-base shadow-card hover:shadow-elevated">
         <span>Tiến hành thanh toán</span>
         <ArrowRight size={18} />
       </Link>

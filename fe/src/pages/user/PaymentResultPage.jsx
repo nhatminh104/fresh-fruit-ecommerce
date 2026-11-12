@@ -31,9 +31,13 @@ export default function PaymentResultPage() {
         </p>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
           {orderId && (
-            <Link className="btn-secondary" to={`/orders/${orderId}`}>Xem chi tiết đơn hàng</Link>
+            <Link className="btn-secondary" to={`/orders/${orderId}`}>
+              Xem chi tiết đơn hàng
+            </Link>
           )}
-          <Link className="btn-primary" to="/orders">Đơn hàng của tôi</Link>
+          <Link className="btn-primary" to="/orders">
+            Đơn hàng của tôi
+          </Link>
         </div>
       </div>
     </PageContainer>

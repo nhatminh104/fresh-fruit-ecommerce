@@ -12,11 +12,13 @@ export default function Button({
   icon: Icon,
   ...props
 }) {
-  const baseStyles = 'inline-flex items-center justify-center font-bold transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 select-none';
+  const baseStyles =
+    'inline-flex items-center justify-center font-bold transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 select-none';
 
   const variants = {
     primary: 'bg-brand-500 text-white hover:bg-brand-700 shadow-sm hover:shadow',
-    secondary: 'border border-surface-border bg-white text-ink hover:border-brand-500 hover:bg-brand-50 hover:text-brand-700',
+    secondary:
+      'border border-surface-border bg-white text-ink hover:border-brand-500 hover:bg-brand-50 hover:text-brand-700',
     outline: 'border border-brand-500 bg-transparent text-brand-500 hover:bg-brand-50',
     ghost: 'bg-transparent text-ink-muted hover:bg-surface-subtle hover:text-brand-500',
     danger: 'bg-red-600 text-white hover:bg-red-700 shadow-sm',

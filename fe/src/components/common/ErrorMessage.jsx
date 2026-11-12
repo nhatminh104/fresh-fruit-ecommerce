@@ -4,7 +4,7 @@ import { AlertCircle } from 'lucide-react';
 export default function ErrorMessage({
   message = 'Có lỗi xảy ra, vui lòng thử lại.',
   onRetry = null,
-  className = ''
+  className = '',
 }) {
   return (
     <div

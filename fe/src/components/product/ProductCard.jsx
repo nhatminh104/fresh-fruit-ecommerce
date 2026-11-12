@@ -12,7 +12,10 @@ function SafeImage({ src, fallbackSrc, alt, className }) {
   const [failed, setFailed] = useState(false);
   if (failed || !src) {
     return (
-      <div aria-label={alt} className={`${className} flex flex-col items-center justify-center bg-surface-subtle text-brand-500`}>
+      <div
+        aria-label={alt}
+        className={`${className} flex flex-col items-center justify-center bg-surface-subtle text-brand-500`}
+      >
         <Leaf size={28} className="text-brand-500/70" aria-hidden="true" />
         <span className="mt-1 text-[11px] font-bold text-ink-muted">Fresh Fruit</span>
       </div>
@@ -32,7 +35,8 @@ function SafeImage({ src, fallbackSrc, alt, className }) {
   );
 }
 
-const KOREAN_PEAR_FALLBACK = 'https://images.unsplash.com/photo-1612100616857-c056b93628b4?auto=format&fit=crop&w=900&q=85';
+const KOREAN_PEAR_FALLBACK =
+  'https://images.unsplash.com/photo-1612100616857-c056b93628b4?auto=format&fit=crop&w=900&q=85';
 
 export default function ProductCard({ product, className = '', inWishlist = false, onWishlistChange }) {
   const navigate = useNavigate();
@@ -50,9 +54,10 @@ export default function ProductCard({ product, className = '', inWishlist = fals
   const image = product.images?.[0] || product.image;
   const imageFallback = product.slug === 'le-han-quoc' ? KOREAN_PEAR_FALLBACK : null;
   const isOutOfStock = product.stock !== undefined && product.stock <= 0;
-  const discountPercent = product.originalPrice && product.originalPrice > product.price
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : null;
+  const discountPercent =
+    product.originalPrice && product.originalPrice > product.price
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+      : null;
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
@@ -123,11 +128,7 @@ export default function ProductCard({ product, className = '', inWishlist = fals
               Hết hàng
             </span>
           ) : (
-            product.origin && (
-              <span className="product-tag">
-                {product.origin}
-              </span>
-            )
+            product.origin && <span className="product-tag">{product.origin}</span>
           )}
         </div>
 
@@ -176,20 +177,14 @@ export default function ProductCard({ product, className = '', inWishlist = fals
 
         <div className="mt-3 flex items-baseline justify-between gap-2 border-t border-surface-border/60 pt-2.5">
           <div className="flex items-baseline gap-1.5 flex-wrap">
-            <span className="text-base font-extrabold text-brand-700">
-              {formatCurrency(product.price)}
-            </span>
+            <span className="text-base font-extrabold text-brand-700">{formatCurrency(product.price)}</span>
             {product.originalPrice && product.originalPrice > product.price && (
               <span className="text-xs text-ink-light line-through">
                 {formatCurrency(product.originalPrice)}
               </span>
             )}
           </div>
-          {product.unit && (
-            <span className="text-xs font-medium text-ink-muted">
-              /{product.unit}
-            </span>
-          )}
+          {product.unit && <span className="text-xs font-medium text-ink-muted">/{product.unit}</span>}
         </div>
       </div>
     </article>
