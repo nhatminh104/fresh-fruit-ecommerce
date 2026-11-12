@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import PageContainer from '../../components/layout/PageContainer';
 import CartItem from '../../components/cart/CartItem';
-import CartSummary from '../../components/cart/CartSummaryV2';
+import CartSummary from '../../components/cart/CartSummary';
 import EmptyState from '../../components/common/EmptyState';
 import Loading from '../../components/common/Loading';
 import { useCart } from '../../hooks/useCart';

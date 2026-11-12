@@ -1,15 +1,48 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import PageContainer from '../../components/layout/PageContainer';
-import Input from '../../components/common/Input';
-import Button from '../../components/common/Button';
-import ErrorMessage from '../../components/common/ErrorMessage';
-import * as adminService from '../../services/adminService';
-import { getErrorMessage } from '../../utils/errorMessage';
+import { useEffect, useState } from 'react';
+import EntityForm from '../../components/admin/EntityForm';
+import { listAdmin } from '../../services/adminService';
+
+const toNumber = (value) => (value === '' || value === undefined || value === null ? undefined : Number(value));
 
 export default function ProductForm() {
-  const navigate = useNavigate(); const [form, setForm] = useState({ name: '', slug: '', category: '', price: '', unit: 'kg', origin: '', stock: '0' }); const [error, setError] = useState(''); const [saving, setSaving] = useState(false);
-  const update = (field) => (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
-  const submit = async (event) => { event.preventDefault(); setSaving(true); setError(''); try { await adminService.createAdmin('products', { ...form, price: Number(form.price), stock: Number(form.stock) }); navigate('/admin/products'); } catch (saveError) { setError(getErrorMessage(saveError, 'Không thể tạo sản phẩm.')); } finally { setSaving(false); } };
-  return <PageContainer><p className="eyebrow">Fresh admin</p><h1 className="mt-3 font-display text-5xl text-forest">Tạo sản phẩm</h1>{error && <div className="mt-6"><ErrorMessage message={error} /></div>}<form className="mt-8 grid max-w-2xl gap-4 rounded-2xl bg-white p-6 sm:grid-cols-2" onSubmit={submit}><Input label="Tên sản phẩm" value={form.name} onChange={update('name')} required /><Input label="Slug" value={form.slug} onChange={update('slug')} required /><Input label="Category ID" value={form.category} onChange={update('category')} required /><Input label="Giá" type="number" min="0" value={form.price} onChange={update('price')} required /><Input label="Đơn vị" value={form.unit} onChange={update('unit')} required /><Input label="Xuất xứ" value={form.origin} onChange={update('origin')} required /><Input label="Tồn kho" type="number" min="0" value={form.stock} onChange={update('stock')} required /><Button type="submit" disabled={saving} className="sm:col-span-2">{saving ? 'Đang lưu...' : 'Tạo sản phẩm'}</Button></form></PageContainer>;
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    listAdmin('categories').then((data) => setCategories(Array.isArray(data) ? data : [])).catch(() => {});
+  }, []);
+
+  const fields = [
+    { key: 'name', label: 'Tên sản phẩm', required: true },
+    { key: 'slug', label: 'Slug', required: true, placeholder: 'vi-du:-tao-ngot-ngap', helpText: 'Chữ thường, gạch ngang, không dấu.' },
+    { key: 'category', label: 'Danh mục', type: 'select', required: true, options: categories.map((c) => ({ value: c._id, label: c.name })) },
+    { key: 'price', label: 'Giá bán (VND)', type: 'number', required: true },
+    { key: 'originalPrice', label: 'Giá gốc (VND)', type: 'number' },
+    { key: 'unit', label: 'Đơn vị', required: true, placeholder: 'VD: kg, hộp 500g' },
+    { key: 'origin', label: 'Xuất xứ', required: true },
+    { key: 'stock', label: 'Tồn kho', type: 'number', required: true },
+    { key: 'images', label: 'Hình ảnh (URL, cách nhau bởi dấu phẩy)', type: 'text', toForm: (value) => (Array.isArray(value) ? value.join(', ') : value || '') },
+    { key: 'description', label: 'Mô tả', type: 'textarea' },
+    { key: 'isFeatured', label: 'Sản phẩm nổi bật', type: 'checkbox' },
+    { key: 'isActive', label: 'Đang kinh doanh', type: 'checkbox' }
+  ];
+
+  const toPayload = (form) => ({
+    ...form,
+    price: toNumber(form.price),
+    originalPrice: toNumber(form.originalPrice),
+    stock: toNumber(form.stock),
+    images: String(form.images || '').split(',').map((url) => url.trim()).filter(Boolean),
+    isFeatured: Boolean(form.isFeatured),
+    isActive: form.isActive === undefined ? true : Boolean(form.isActive)
+  });
+
+  return (
+    <EntityForm
+      title="Sản phẩm"
+      resource="products"
+      fields={fields}
+      initial={{ unit: 'kg', stock: '0', isActive: true, isFeatured: false }}
+      toPayload={toPayload}
+    />
+  );
 }

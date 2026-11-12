@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middlewares/authMiddleware.js';
+import { rateLimit } from '../../middlewares/rateLimit.js';
 import {
   forgotPasswordController,
   loginController,
@@ -19,12 +20,14 @@ import {
 
 const router = Router();
 
-router.post('/register', registerValidator, registerController);
-router.post('/login', loginValidator, loginController);
-router.post('/refresh', refreshValidator, refreshController);
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 40 });
+
+router.post('/register', authLimiter, registerValidator, registerController);
+router.post('/login', authLimiter, loginValidator, loginController);
+router.post('/refresh', authLimiter, refreshValidator, refreshController);
 router.post('/logout', logoutController);
-router.post('/forgot-password', forgotPasswordValidator, forgotPasswordController);
-router.post('/reset-password', resetPasswordValidator, resetPasswordController);
+router.post('/forgot-password', authLimiter, forgotPasswordValidator, forgotPasswordController);
+router.post('/reset-password', authLimiter, resetPasswordValidator, resetPasswordController);
 router.get('/me', requireAuth, meController);
 
 export default router;

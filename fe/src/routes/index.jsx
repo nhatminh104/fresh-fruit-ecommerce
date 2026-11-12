@@ -17,8 +17,6 @@ import OrderDetail from '../pages/user/OrderDetailPage';
 import Wishlist from '../pages/user/WishlistPage';
 import Vouchers from '../pages/user/VouchersPage';
 import Reviews from '../pages/user/ReviewsPage';
-import Profile from '../pages/user/Profile';
-import Addresses from '../pages/user/Addresses';
 import AccountProfile from '../pages/user/AccountProfile';
 import AccountAddresses from '../pages/user/AccountAddresses';
 import About from '../pages/user/About';
@@ -31,12 +29,14 @@ import Terms from '../pages/user/Terms';
 import AdminProducts from '../pages/admin/Products';
 import ProductForm from '../pages/admin/ProductForm';
 import AdminCategories from '../pages/admin/Categories';
+import CategoryForm from '../pages/admin/CategoryForm';
 import AdminOrders from '../pages/admin/Orders';
 import AdminOrderDetail from '../pages/admin/OrderDetail';
 import Users from '../pages/admin/Users';
 import UserDetail from '../pages/admin/UserDetail';
 import AdminReviews from '../pages/admin/Reviews';
 import AdminVouchers from '../pages/admin/Vouchers';
+import VoucherForm from '../pages/admin/VoucherForm';
 import Inventory from '../pages/admin/Inventory';
 
 export function RequireAuth({ children }) {
@@ -62,7 +62,6 @@ export const publicRoutes = [
   ['/products/:id', ProductDetail],
   ['/search', SearchResults],
   ['/vouchers', Vouchers],
-  ['/reviews', Reviews],
   ['/about', About],
   ['/contact', Contact],
   ['/faq', FAQ],
@@ -79,6 +78,7 @@ export const protectedRoutes = [
   ['/orders', Orders],
   ['/orders/:id', OrderDetail],
   ['/wishlist', Wishlist],
+  ['/reviews', Reviews],
   ['/profile', AccountProfile],
   ['/addresses', AccountAddresses]
 ];
@@ -93,12 +93,17 @@ export const authRoutes = [
 export const adminRoutes = [
   ['products', AdminProducts],
   ['products/new', ProductForm],
+  ['products/:id/edit', ProductForm],
   ['categories', AdminCategories],
+  ['categories/new', CategoryForm],
+  ['categories/:id/edit', CategoryForm],
   ['orders', AdminOrders],
   ['orders/:id', AdminOrderDetail],
   ['users', Users],
   ['users/:id', UserDetail],
   ['reviews', AdminReviews],
   ['vouchers', AdminVouchers],
+  ['vouchers/new', VoucherForm],
+  ['vouchers/:id/edit', VoucherForm],
   ['inventory', Inventory]
 ];

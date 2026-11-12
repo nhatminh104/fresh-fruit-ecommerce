@@ -15,8 +15,6 @@ import {
   Tag,
   Truck
 } from 'lucide-react';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
 import ProductCard from '../../components/product/ProductCard';
 import { homeData } from '../../data/homeData';
 import { getCategories } from '../../services/categoryService';
@@ -72,8 +70,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-ink">
-      <Header />
-
       <main className="flex-1">
         {/* 1. HERO BANNER */}
         <section className="relative overflow-hidden bg-gradient-to-b from-surface-subtle via-white to-white py-12 lg:py-20 border-b border-surface-border/50">
@@ -419,8 +415,6 @@ export default function Home() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

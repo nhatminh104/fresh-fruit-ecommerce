@@ -84,8 +84,8 @@ Production nên dùng MongoDB replica set để transaction Order, stock và vou
 ## Trạng thái hiện tại
 
 - Backend controllers đã dùng `asyncHandler` và response lỗi được chuẩn hóa.
-- Auth dùng JWT access token, refresh token rotation và session lưu hash.
-- Cart, catalog, checkout, order, payment, voucher, review, wishlist và admin đã có API chính.
-- Frontend Home đã lấy product/category thật từ backend.
+- Auth dùng JWT access token, refresh token rotation và session lưu hash; auth/order/payment endpoints có rate limit.
+- Cart, catalog, checkout (có voucher), order, payment, voucher, review, wishlist, address và admin đã có API chính.
+- Frontend dùng `MainLayout` chung cho mọi page (kể cả Home); admin có CRUD sản phẩm/danh mục/voucher, chuyển trạng thái đơn, sửa tồn kho và phân quyền người dùng.
 - Test hiện tại là unit/contract test; integration test với MongoDB thật vẫn cần bổ sung.
-- ESLint/Prettier chưa được cài trong project.
+- ESLint/Prettier đã cấu hình ở `fe/`; CI chạy ở `.github/workflows/ci.yml`.

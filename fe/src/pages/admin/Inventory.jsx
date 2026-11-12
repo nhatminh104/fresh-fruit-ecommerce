@@ -1,2 +1,122 @@
-import AdminDataPage from '../../components/admin/AdminDataPage';
-export default function Inventory() { return <AdminDataPage title="Quản lý tồn kho" resource="inventory" columns={[{ key: 'product', label: 'Sản phẩm' }, { key: 'quantity', label: 'Số lượng' }, { key: 'lowStockAt', label: 'Mức cảnh báo' }]} />; }
+import { useEffect, useState } from 'react';
+import PageContainer from '../../components/layout/PageContainer';
+import Loading from '../../components/common/Loading';
+import ErrorMessage from '../../components/common/ErrorMessage';
+import Button from '../../components/common/Button';
+import Modal from '../../components/common/Modal';
+import Input from '../../components/common/Input';
+import { listAdmin, updateAdmin } from '../../services/adminService';
+import { getErrorMessage } from '../../utils/errorMessage';
+import { useToast } from '../../contexts/ToastContext';
+
+export default function Inventory() {
+  const toast = useToast();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ quantity: '', lowStockAt: '' });
+  const [saving, setSaving] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const data = await listAdmin('inventory');
+      setItems(Array.isArray(data) ? data : []);
+    } catch (loadError) {
+      setError(getErrorMessage(loadError, 'Không thể tải tồn kho.'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const openEdit = (item) => {
+    setEditing(item);
+    setForm({ quantity: String(item.quantity ?? ''), lowStockAt: String(item.lowStockAt ?? 5) });
+  };
+
+  const save = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    try {
+      await updateAdmin('inventory', editing.product?._id || editing.product, {
+        quantity: Number(form.quantity),
+        lowStockAt: Number(form.lowStockAt)
+      });
+      toast.success('Đã cập nhật tồn kho.');
+      setEditing(null);
+      await load();
+    } catch (saveError) {
+      toast.error(getErrorMessage(saveError, 'Không thể cập nhật tồn kho.'));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <PageContainer>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="eyebrow">Fresh admin</p>
+          <h1 className="mt-3 font-display text-5xl text-forest">Quản lý tồn kho</h1>
+        </div>
+        <Button type="button" variant="secondary" onClick={load}>Làm mới</Button>
+      </div>
+      {error && <div className="mt-6"><ErrorMessage message={error} /></div>}
+      {loading ? <Loading /> : items.length === 0 ? (
+        <p className="mt-8 rounded-2xl bg-white p-6 text-slate-500">Chưa có sản phẩm nào.</p>
+      ) : (
+        <div className="mt-8 overflow-x-auto rounded-2xl bg-white shadow-sm">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead className="border-b bg-cream text-xs uppercase text-slate-500">
+              <tr>
+                <th className="px-5 py-4">Sản phẩm</th>
+                <th className="px-5 py-4">Tồn kho</th>
+                <th className="px-5 py-4">Mức cảnh báo</th>
+                <th className="px-5 py-4">Trạng thái</th>
+                <th className="px-5 py-4">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item) => {
+                const low = item.quantity <= (item.lowStockAt ?? 5);
+                return (
+                  <tr className="border-b last:border-0" key={item.product?._id || item.product}>
+                    <td className="px-5 py-4 font-semibold text-forest">{item.product?.name || '-'}</td>
+                    <td className="px-5 py-4">{item.quantity}</td>
+                    <td className="px-5 py-4">{item.lowStockAt ?? 5}</td>
+                    <td className="px-5 py-4">
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${low ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`}>
+                        {low ? 'Sắp hết' : 'Đủ hàng'}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <Button type="button" className="px-3 py-1.5 text-xs" variant="secondary" onClick={() => openEdit(item)}>Cập nhật</Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <Modal open={Boolean(editing)} onClose={() => setEditing(null)} title="Cập nhật tồn kho">
+        {editing && (
+          <form className="space-y-4" onSubmit={save}>
+            <p className="text-sm font-semibold text-ink">{editing.product?.name}</p>
+            <Input label="Số lượng tồn kho" type="number" min="0" required value={form.quantity} onChange={(e) => setForm((c) => ({ ...c, quantity: e.target.value }))} />
+            <Input label="Mức cảnh báo hết hàng" type="number" min="0" required value={form.lowStockAt} onChange={(e) => setForm((c) => ({ ...c, lowStockAt: e.target.value }))} />
+            <div className="flex gap-3">
+              <Button type="submit" disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu'}</Button>
+              <Button type="button" variant="secondary" onClick={() => setEditing(null)}>Hủy</Button>
+            </div>
+          </form>
+        )}
+      </Modal>
+    </PageContainer>
+  );
+}

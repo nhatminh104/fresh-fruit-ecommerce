@@ -18,6 +18,7 @@ export default function ProductsPageVi() {
   const [error, setError] = useState('');
 
   const search = params.get('search') || params.get('q') || '';
+  const [searchInput, setSearchInput] = useState(search);
   const category = params.get('category') || '';
   const minPrice = params.get('minPrice') || '';
   const maxPrice = params.get('maxPrice') || '';
@@ -30,6 +31,18 @@ export default function ProductsPageVi() {
       .then(({ data }) => setCategories(data.data || []))
       .catch(() => setCategories([]));
   }, []);
+
+  // Debounce the search box so typing does not fire a request per keystroke
+  useEffect(() => {
+    setSearchInput(search);
+  }, [search]);
+
+  useEffect(() => {
+    const trimmed = searchInput.trim();
+    if (trimmed === search) return undefined;
+    const timer = setTimeout(() => update('search', trimmed), 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch products whenever params change
   useEffect(() => {
@@ -101,8 +114,8 @@ export default function ProductsPageVi() {
           <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
           <input
             type="search"
-            value={search}
-            onChange={(e) => update('search', e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Tìm theo tên trái cây..."
             className="w-full rounded-full border border-surface-border bg-surface-subtle py-2.5 pl-10 pr-4 text-sm text-ink outline-none transition-all focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-50"
           />

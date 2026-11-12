@@ -11,9 +11,8 @@ import { RequireAdmin, RequireAuth, adminRoutes, authRoutes, protectedRoutes, pu
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-
       <Route element={<MainLayout />}>
+        <Route path="/" element={<HomePage />} />
         {publicRoutes.map(([path, Component]) => (
           <Route key={path} path={path} element={<Component />} />
         ))}
