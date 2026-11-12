@@ -39,6 +39,7 @@ export async function dashboard() {
       { $sort: { _id: 1 } }
     ]),
     Order.aggregate([
+      { $match: { status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' } } },
       { $unwind: '$items' },
       { $group: { _id: '$items.product', name: { $first: '$items.productName' }, quantity: { $sum: '$items.quantity' }, revenue: { $sum: { $multiply: ['$items.price', '$items.quantity'] } } } },
       { $sort: { quantity: -1 } },
@@ -126,6 +127,21 @@ export async function updateUser(userId, payload, actorId) {
   const set = pick(payload, ['fullName', 'phone', 'role', 'status']);
   if (actorId && String(userId) === String(actorId) && (set.role !== undefined || set.status !== undefined)) {
     throw new ApiError(400, 'Không thể tự thay đổi vai trò hoặc trạng thái tài khoản của chính mình');
+  }
+  const target = await User.findById(id(userId, 'User id')).lean();
+  if (!target) throw new ApiError(404, 'User not found');
+  const demotesAdmin =
+    (set.role !== undefined && set.role !== 'admin') ||
+    (set.status !== undefined && set.status !== 'active');
+  if (target.role === 'admin' && demotesAdmin) {
+    const otherActiveAdmins = await User.countDocuments({
+      _id: { $ne: target._id },
+      role: 'admin',
+      status: 'active'
+    });
+    if (otherActiveAdmins === 0) {
+      throw new ApiError(400, 'Không thể hạ quyền hoặc vô hiệu hóa quản trị viên đang hoạt động cuối cùng');
+    }
   }
   const user = await User.findByIdAndUpdate(id(userId, 'User id'), { $set: set }, { new: true, runValidators: true });
   if (!user) throw new ApiError(404, 'User not found');

@@ -59,7 +59,7 @@ Production nên dùng MongoDB **replica set** để transaction tạo/hủy đơ
 | Admin | `admin@freshfruit.local` | `SEED_ADMIN_PASSWORD` |
 | Customer | `customer@freshfruit.local` | `SEED_CUSTOMER_PASSWORD` |
 
-Dữ liệu seed lõi gồm 3 danh mục, 11 sản phẩm, 2 voucher (`WELCOME10`, `FREESHIP30`), bản ghi `Inventory` cho từng sản phẩm và 2 tài khoản demo. `seed:demo` bổ sung ~20 khách hàng (`khach01..khach20@freshfruit.local`, cùng `SEED_CUSTOMER_PASSWORD`), ~30 đơn hàng đủ trạng thái, ~20 review, địa chỉ, giỏ hàng, wishlist và voucher đa dạng — tất cả đi qua service layer thật nên tồn kho/thanh toán/ snapshot luôn nhất quán. Cả hai seed đều idempotent — chạy lại không tạo trùng, không ghi đè `stock`/`soldCount`/dữ liệu admin đã chỉnh.
+Dữ liệu seed lõi gồm 10 danh mục, 32 sản phẩm (kèm ảnh trái cây từ Openverse), 20 voucher, bản ghi `Inventory` cho từng sản phẩm và tài khoản demo. `seed:demo` bổ sung ~20 khách hàng (`khach01..khach20@freshfruit.local`, cùng `SEED_CUSTOMER_PASSWORD`), ~35 đơn hàng đủ trạng thái, ~20 review, địa chỉ, giỏ hàng, wishlist — tất cả đi qua service layer thật nên tồn kho/thanh toán/snapshot luôn nhất quán. Cả hai seed đều idempotent — chạy lại không tạo trùng, không ghi đè `stock`/`soldCount`/dữ liệu admin đã chỉnh. Ảnh sản phẩm được map trong `be/seeds/data/product-images.json` (script `be/scripts/fix-fruit-images.mjs`).
 
 ## Kiểm tra & kiểm thử
 
