@@ -8,10 +8,51 @@ import ErrorMessage from '../common/ErrorMessage';
 import api from '../../services/api';
 import * as adminService from '../../services/adminService';
 import { getErrorMessage } from '../../utils/errorMessage';
+import ProductImage from '../common/ProductImage';
+
+function ImageUrlsField({ field, value, onChange }) {
+  const urls = String(value ?? '')
+    .split(',')
+    .map((url) => url.trim())
+    .filter(Boolean);
+  return (
+    <div className="block text-sm font-medium text-slate-600 sm:col-span-2">
+      <label htmlFor={`field-${field.key}`}>
+        {field.label}
+        {field.required && ' *'}
+      </label>
+      <input
+        id={`field-${field.key}`}
+        type="text"
+        className="mt-1 w-full rounded-xl border border-surface-border bg-white px-4 py-2.5 text-sm outline-none focus:border-leaf"
+        value={value ?? ''}
+        onChange={(event) => onChange(field.key, event.target.value)}
+        placeholder={field.placeholder || 'https://... , https://...'}
+      />
+      {field.helpText && <p className="mt-1 text-xs text-slate-400">{field.helpText}</p>}
+      {urls.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-3">
+          {urls.slice(0, 6).map((url, index) => (
+            <ProductImage
+              key={`${url}-${index}`}
+              src={url}
+              alt={`Ảnh ${index + 1}`}
+              className="h-20 w-20 rounded-xl border border-surface-border bg-surface-subtle"
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Field({ field, value, onChange }) {
   const update = (event) =>
     onChange(field.key, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
+
+  if (field.type === 'images') {
+    return <ImageUrlsField field={field} value={value} onChange={onChange} />;
+  }
 
   if (field.type === 'textarea') {
     return (

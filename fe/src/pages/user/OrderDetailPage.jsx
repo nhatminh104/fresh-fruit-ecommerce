@@ -5,6 +5,7 @@ import PageContainer from '../../components/layout/PageContainer';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import OrderStatusBadge from '../../components/order/OrderStatusBadge';
+import ProductImage from '../../components/common/ProductImage';
 import Button from '../../components/common/Button';
 import { cancelOrder, getOrder } from '../../services/orderService';
 import { formatCurrency } from '../../utils/formatCurrency';
@@ -91,7 +92,11 @@ export default function OrderDetailPage() {
           <div className="mt-4 divide-y divide-slate-100">
             {order.items.map((item) => (
               <div className="flex items-center gap-4 py-4" key={String(item.product)}>
-                <img className="h-16 w-16 rounded-xl object-cover" src={item.image} alt={item.productName} />
+                <ProductImage
+                  className="h-16 w-16 shrink-0 rounded-xl border border-surface-border"
+                  src={item.image}
+                  alt={item.productName}
+                />
                 <div className="flex-1">
                   <p className="font-bold text-forest">{item.productName}</p>
                   <p className="text-sm text-slate-500">

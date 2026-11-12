@@ -1,4 +1,5 @@
 import AdminDataPage from '../../components/admin/AdminDataPage';
+import ProductImage from '../../components/common/ProductImage';
 
 export default function Products() {
   return (
@@ -8,6 +9,17 @@ export default function Products() {
       createPath="/admin/products/new"
       editPath={(item) => `/admin/products/${item._id}/edit`}
       columns={[
+        {
+          key: 'images',
+          label: '',
+          render: (item) => (
+            <ProductImage
+              className="h-12 w-12 rounded-xl border border-surface-border bg-surface-subtle"
+              src={item.images?.[0] || item.image}
+              alt={item.name}
+            />
+          ),
+        },
         { key: 'name', label: 'Tên' },
         { key: 'category', label: 'Danh mục' },
         { key: 'price', label: 'Giá', type: 'currency' },

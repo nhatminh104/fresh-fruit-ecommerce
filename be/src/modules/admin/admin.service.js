@@ -18,13 +18,43 @@ const id = (value, label = 'Id') => {
 const pick = (source, fields) => Object.fromEntries(fields.filter((field) => source[field] !== undefined).map((field) => [field, source[field]]));
 
 export async function dashboard() {
-  const [users, products, orders, revenue] = await Promise.all([
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+  sixMonthsAgo.setDate(1);
+  sixMonthsAgo.setHours(0, 0, 0, 0);
+
+  const [users, products, orders, revenue, ordersByStatus, monthlyRevenue, topProducts, lowStock, recentOrders] = await Promise.all([
     User.countDocuments(),
     Product.countDocuments({ isActive: true }),
     Order.countDocuments(),
-    Order.aggregate([{ $match: { status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' }, $or: [{ status: 'delivered' }, { paymentStatus: 'paid' }] } }, { $group: { _id: null, total: { $sum: '$totalAmount' } } }])
+    Order.aggregate([{ $match: { status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' }, $or: [{ status: 'delivered' }, { paymentStatus: 'paid' }] } }, { $group: { _id: null, total: { $sum: '$totalAmount' } } }]),
+    Order.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
+    Order.aggregate([
+      { $match: { createdAt: { $gte: sixMonthsAgo }, status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' } } },
+      { $group: { _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } }, total: { $sum: '$totalAmount' }, count: { $sum: 1 } } },
+      { $sort: { _id: 1 } }
+    ]),
+    Order.aggregate([
+      { $unwind: '$items' },
+      { $group: { _id: '$items.product', name: { $first: '$items.productName' }, quantity: { $sum: '$items.quantity' }, revenue: { $sum: { $multiply: ['$items.price', '$items.quantity'] } } } },
+      { $sort: { quantity: -1 } },
+      { $limit: 5 }
+    ]),
+    Inventory.aggregate([{ $match: { $expr: { $lte: ['$quantity', '$lowStockAt'] } } }, { $count: 'count' }]),
+    Order.find().sort({ createdAt: -1 }).limit(5).populate('user', 'fullName email').select('orderCode status paymentStatus totalAmount createdAt user').lean()
   ]);
-  return { users, products, orders, revenue: revenue[0]?.total || 0 };
+
+  return {
+    users,
+    products,
+    orders,
+    revenue: revenue[0]?.total || 0,
+    ordersByStatus: ordersByStatus.map((s) => ({ status: s._id, count: s.count })),
+    monthlyRevenue,
+    topProducts,
+    lowStockCount: lowStock[0]?.count || 0,
+    recentOrders
+  };
 }
 
 export const listProducts = () => Product.find().populate('category', 'name slug').sort({ createdAt: -1 }).lean();

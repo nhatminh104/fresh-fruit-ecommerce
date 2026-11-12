@@ -1,13 +1,159 @@
 [
-  { "name": "Xoài cát chu", "slug": "xoai-cat-chu", "description": "Xoài cát chu chín mọng, thịt mềm thơm ngọt.", "categorySlug": "trai-cay-viet-nam", "price": 89000, "originalPrice": 99000, "unit": "kg", "origin": "Đồng Tháp, Việt Nam", "images": ["https://images.unsplash.com/photo-1553279768-865429fa0078"], "stock": 80, "isFeatured": true },
-  { "name": "Sầu riêng Ri6", "slug": "sau-rieng-ri6", "description": "Sầu riêng Ri6 cơm vàng béo ngậy, thơm đặc trưng miền Tây.", "categorySlug": "trai-cay-viet-nam", "price": 159000, "unit": "kg", "origin": "Bến Tre, Việt Nam", "images": ["https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e"], "stock": 35, "isFeatured": true },
-  { "name": "Dâu tây Đà Lạt", "slug": "dau-tay-da-lat", "description": "Dâu tây tươi Đà Lạt, ngọt đậm, thích hợp tráng miệng.", "categorySlug": "trai-cay-viet-nam", "price": 125000, "unit": "hộp 500g", "origin": "Đà Lạt, Việt Nam", "images": ["https://images.unsplash.com/photo-1464965911861-746a04b4bca6"], "stock": 50 },
-  { "name": "Bưởi da xanh", "slug": "buoi-da-xanh", "description": "Bưởi da xanh Năm Roi, tép giòn ngọt, ít hạt.", "categorySlug": "trai-cay-viet-nam", "price": 65000, "unit": "kg", "origin": "Bắc Giang, Việt Nam", "images": ["https://images.unsplash.com/photo-1619566636858-adf3ef46400b"], "stock": 60 },
-  { "name": "Thanh long ruột đỏ", "slug": "thanh-long-ruot-do", "description": "Thanh long ruột đỏ Việt Nam, giòn mát, nhiều nước.", "categorySlug": "trai-cay-viet-nam", "price": 45000, "unit": "kg", "origin": "Bình Thuận, Việt Nam", "images": ["https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea"], "stock": 100 },
-  { "name": "Cam sành", "slug": "cam-sanh", "description": "Cam sành Vĩnh Long, vỏ dày, nước nhiều, vị chua ngọt.", "categorySlug": "trai-cay-viet-nam", "price": 55000, "unit": "kg", "origin": "Vĩnh Long, Việt Nam", "images": ["https://images.unsplash.com/photo-1610832958506-aa56368176cf"], "stock": 70 },
-  { "name": "Lê Hàn Quốc", "slug": "le-han-quoc", "description": "Lê Hàn Quốc giòn ngọt, ít hạt, bảo quản tốt.", "categorySlug": "trai-cay-nhap-khau", "price": 145000, "unit": "kg", "origin": "Hàn Quốc", "images": ["https://images.unsplash.com/photo-1514756331096-242fdeb70d4f"], "stock": 42 },
-  { "name": "Nho úc", "slug": "nho-uc", "description": "Nho úc không hạt, ngọt thanh, thích hợp ăn trực tiếp.", "categorySlug": "trai-cay-nhap-khau", "price": 179000, "unit": "kg", "origin": "Úc", "images": ["https://images.unsplash.com/photo-1537640538966-79f369143f8f"], "stock": 25 },
-  { "name": "Táo Envy", "slug": "tao-envy", "description": "Táo Envy đỏ tươi, giòn ngọt, nhiều vitamin.", "categorySlug": "trai-cay-nhap-khau", "price": 169000, "unit": "kg", "origin": "New Zealand", "images": ["https://images.unsplash.com/photo-1514756331096-242fdeb70d4f"], "stock": 30 },
-  { "name": "Combo gia đình", "slug": "combo-gia-dinh", "description": "Combo trái cây tươi theo mùa cho gia đình 3-4 người.", "categorySlug": "combo-trai-cay", "price": 299000, "unit": "combo", "origin": "Tuyển chọn Fresh Fruit", "images": ["https://images.unsplash.com/photo-1610832958506-aa56368176cf"], "stock": 20, "isFeatured": true },
-  { "name": "Combo detox", "slug": "combo-detox", "description": "Combo trái cây ít đường, giàu vitamin cho thực đơn lành mạnh.", "categorySlug": "combo-trai-cay", "price": 199000, "unit": "combo", "origin": "Tuyển chọn Fresh Fruit", "images": ["https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea"], "stock": 25 }
+  {
+    "name": "Xoài cát chu",
+    "slug": "xoai-cat-chu",
+    "description": "Xoài cát chu chín mọng, thịt mềm thơm ngọt.",
+    "categorySlug": "trai-cay-viet-nam",
+    "price": 89000,
+    "originalPrice": 99000,
+    "unit": "kg",
+    "origin": "Đồng Tháp, Việt Nam",
+    "images": [
+      "https://api.openverse.org/v1/images/40c7d898-599c-43fc-91ca-11e50bab8901/thumb/",
+      "https://api.openverse.org/v1/images/a4ea264e-ca8a-49a5-b3ef-876ebe37c1d6/thumb/"
+    ],
+    "stock": 80,
+    "isFeatured": true
+  },
+  {
+    "name": "Sầu riêng Ri6",
+    "slug": "sau-rieng-ri6",
+    "description": "Sầu riêng Ri6 cơm vàng béo ngậy, thơm đặc trưng miền Tây.",
+    "categorySlug": "trai-cay-viet-nam",
+    "price": 159000,
+    "unit": "kg",
+    "origin": "Bến Tre, Việt Nam",
+    "images": [
+      "https://api.openverse.org/v1/images/01bacaa1-08cb-40a7-91d6-2da503556d90/thumb/",
+      "https://api.openverse.org/v1/images/8a9d14d3-cbc8-4f1a-895e-61fb85328ca6/thumb/"
+    ],
+    "stock": 35,
+    "isFeatured": true
+  },
+  {
+    "name": "Dâu tây Đà Lạt",
+    "slug": "dau-tay-da-lat",
+    "description": "Dâu tây tươi Đà Lạt, ngọt đậm, thích hợp tráng miệng.",
+    "categorySlug": "trai-cay-viet-nam",
+    "price": 125000,
+    "unit": "hộp 500g",
+    "origin": "Đà Lạt, Việt Nam",
+    "images": [
+      "https://api.openverse.org/v1/images/6b5aa7aa-4ad3-4748-b9cc-4a2bac797031/thumb/",
+      "https://api.openverse.org/v1/images/99fb31da-e37d-4317-90d8-a148f9d9804b/thumb/"
+    ],
+    "stock": 50
+  },
+  {
+    "name": "Bưởi da xanh",
+    "slug": "buoi-da-xanh",
+    "description": "Bưởi da xanh Năm Roi, tép giòn ngọt, ít hạt.",
+    "categorySlug": "trai-cay-viet-nam",
+    "price": 65000,
+    "unit": "kg",
+    "origin": "Bắc Giang, Việt Nam",
+    "images": [
+      "https://api.openverse.org/v1/images/f338fc03-5846-4ea0-8ba1-4eba553aafa4/thumb/"
+    ],
+    "stock": 60
+  },
+  {
+    "name": "Thanh long ruột đỏ",
+    "slug": "thanh-long-ruot-do",
+    "description": "Thanh long ruột đỏ Việt Nam, giòn mát, nhiều nước.",
+    "categorySlug": "trai-cay-viet-nam",
+    "price": 45000,
+    "unit": "kg",
+    "origin": "Bình Thuận, Việt Nam",
+    "images": [
+      "https://api.openverse.org/v1/images/5857ee6f-8ec4-4199-b347-5bd03ed6cba1/thumb/",
+      "https://api.openverse.org/v1/images/f672bbe9-8c68-4552-99f6-ebf3b4a888bf/thumb/"
+    ],
+    "stock": 100
+  },
+  {
+    "name": "Cam sành",
+    "slug": "cam-sanh",
+    "description": "Cam sành Vĩnh Long, vỏ dày, nước nhiều, vị chua ngọt.",
+    "categorySlug": "trai-cay-viet-nam",
+    "price": 55000,
+    "unit": "kg",
+    "origin": "Vĩnh Long, Việt Nam",
+    "images": [
+      "https://api.openverse.org/v1/images/9e33f5b5-d36d-41b7-84c3-65796d84401f/thumb/",
+      "https://api.openverse.org/v1/images/d04a4ab3-88fc-4074-82f5-260372770da4/thumb/"
+    ],
+    "stock": 70
+  },
+  {
+    "name": "Lê Hàn Quốc",
+    "slug": "le-han-quoc",
+    "description": "Lê Hàn Quốc giòn ngọt, ít hạt, bảo quản tốt.",
+    "categorySlug": "trai-cay-nhap-khau",
+    "price": 145000,
+    "unit": "kg",
+    "origin": "Hàn Quốc",
+    "images": [
+      "https://api.openverse.org/v1/images/b91148ee-5694-4048-9134-fe543ff21c84/thumb/",
+      "https://api.openverse.org/v1/images/c9adb79f-0231-49e9-9043-bc6cad683858/thumb/"
+    ],
+    "stock": 42
+  },
+  {
+    "name": "Nho úc",
+    "slug": "nho-uc",
+    "description": "Nho úc không hạt, ngọt thanh, thích hợp ăn trực tiếp.",
+    "categorySlug": "trai-cay-nhap-khau",
+    "price": 179000,
+    "unit": "kg",
+    "origin": "Úc",
+    "images": [
+      "https://api.openverse.org/v1/images/9b6b2511-0a80-4cc3-a082-33c583751aa4/thumb/",
+      "https://api.openverse.org/v1/images/96c11f10-153f-4665-8b3d-0664131ee191/thumb/"
+    ],
+    "stock": 25
+  },
+  {
+    "name": "Táo Envy",
+    "slug": "tao-envy",
+    "description": "Táo Envy đỏ tươi, giòn ngọt, nhiều vitamin.",
+    "categorySlug": "trai-cay-nhap-khau",
+    "price": 169000,
+    "unit": "kg",
+    "origin": "New Zealand",
+    "images": [
+      "https://api.openverse.org/v1/images/c103b127-a165-43e7-bb1c-31fa3ee56f5d/thumb/",
+      "https://api.openverse.org/v1/images/bd5e8d51-1376-43bd-829b-11c3f62899f4/thumb/"
+    ],
+    "stock": 30
+  },
+  {
+    "name": "Combo gia đình",
+    "slug": "combo-gia-dinh",
+    "description": "Combo trái cây tươi theo mùa cho gia đình 3-4 người.",
+    "categorySlug": "combo-trai-cay",
+    "price": 299000,
+    "unit": "combo",
+    "origin": "Tuyển chọn Fresh Fruit",
+    "images": [
+      "https://api.openverse.org/v1/images/97325eb2-e7f7-42a9-a342-bf23afbc32cb/thumb/",
+      "https://api.openverse.org/v1/images/f293a466-d6a7-49d2-bd00-dbd1f9df90fd/thumb/"
+    ],
+    "stock": 20,
+    "isFeatured": true
+  },
+  {
+    "name": "Combo detox",
+    "slug": "combo-detox",
+    "description": "Combo trái cây ít đường, giàu vitamin cho thực đơn lành mạnh.",
+    "categorySlug": "combo-trai-cay",
+    "price": 199000,
+    "unit": "combo",
+    "origin": "Tuyển chọn Fresh Fruit",
+    "images": [
+      "https://api.openverse.org/v1/images/fe6c99e1-79b8-4964-89d7-f103eb2face9/thumb/",
+      "https://api.openverse.org/v1/images/32364271-c007-400c-8da5-95703da634bf/thumb/"
+    ],
+    "stock": 25
+  }
 ]

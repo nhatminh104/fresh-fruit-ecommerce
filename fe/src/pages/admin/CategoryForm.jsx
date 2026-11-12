@@ -10,7 +10,7 @@ const fields = [
     helpText: 'Chữ thường, gạch ngang, không dấu.',
   },
   { key: 'description', label: 'Mô tả', type: 'textarea' },
-  { key: 'image', label: 'Hình ảnh (URL)', type: 'text' },
+  { key: 'image', label: 'Hình ảnh (URL)', type: 'images' },
   { key: 'isActive', label: 'Đang hiển thị', type: 'checkbox' },
 ];
 

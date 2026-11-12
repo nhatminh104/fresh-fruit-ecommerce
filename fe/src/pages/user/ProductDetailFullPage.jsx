@@ -18,6 +18,7 @@ import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import Button from '../../components/common/Button';
 import ProductCard from '../../components/product/ProductCard';
+import ProductImage from '../../components/common/ProductImage';
 import { getProduct, getProducts } from '../../services/productService';
 import { getReviews, createReview } from '../../services/reviewService';
 import { addWishlistItem, removeWishlistItem, getWishlist } from '../../services/wishlistService';
@@ -175,11 +176,7 @@ export default function ProductDetailFullPage() {
   }
 
   const isOutOfStock = product.stock <= 0;
-  const imageFallback =
-    product.slug === 'le-han-quoc'
-      ? 'https://images.unsplash.com/photo-1612100616857-c056b93628b4?auto=format&fit=crop&w=900&q=85'
-      : null;
-  const images = product.images && product.images.length > 0 ? product.images : [product.image];
+  const images = product.images && product.images.length > 0 ? product.images : [product.image].filter(Boolean);
   const discountPercent =
     product.originalPrice && product.originalPrice > product.price
       ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -219,17 +216,13 @@ export default function ProductDetailFullPage() {
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
         {/* Left: Product Images Gallery */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="relative aspect-square w-full overflow-hidden rounded-3xl border border-surface-border bg-surface-subtle shadow-subtle">
-            <img
+          <div className="relative aspect-square w-full overflow-hidden rounded-3xl border border-surface-border bg-gradient-to-br from-brand-50/60 to-surface-subtle shadow-subtle">
+            <ProductImage
+              key={selectedImage || images[0]}
               src={selectedImage || images[0]}
               alt={product.name}
-              className="h-full w-full object-cover transition-all duration-300"
-              onError={(event) => {
-                if (imageFallback && event.currentTarget.src !== imageFallback) {
-                  event.currentTarget.src = imageFallback;
-                  setSelectedImage(imageFallback);
-                }
-              }}
+              className="h-full w-full transition-all duration-300"
+              eager
             />
             {discountPercent && (
               <span className="absolute left-4 top-4 rounded-full bg-accent px-3 py-1 text-xs font-bold text-white shadow-sm">
@@ -257,7 +250,7 @@ export default function ProductDetailFullPage() {
                       : 'border-surface-border hover:border-brand-200'
                   }`}
                 >
-                  <img src={img} alt={`${product.name} ${idx + 1}`} className="h-full w-full object-cover" />
+                  <ProductImage src={img} alt={`${product.name} ${idx + 1}`} className="h-full w-full" />
                 </button>
               ))}
             </div>

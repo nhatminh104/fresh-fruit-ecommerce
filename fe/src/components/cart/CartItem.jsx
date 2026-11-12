@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatCurrency';
+import ProductImage from '../common/ProductImage';
 
 export default function CartItem({ item, onRemove, onQuantityChange }) {
   const itemId = item.id || item._id;
@@ -16,14 +17,7 @@ export default function CartItem({ item, onRemove, onQuantityChange }) {
           to={`/products/${itemId}`}
           className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-surface-border bg-surface-subtle"
         >
-          <img
-            src={
-              image ||
-              'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=200&q=80'
-            }
-            alt={item.name}
-            className="h-full w-full object-cover"
-          />
+          <ProductImage src={image} alt={item.name} className="h-full w-full" />
         </Link>
 
         <div className="min-w-0 flex-1">

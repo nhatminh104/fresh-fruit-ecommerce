@@ -20,6 +20,8 @@ import { homeData } from '../../data/homeData';
 import { getCategories } from '../../services/categoryService';
 import { getProducts } from '../../services/productService';
 import { getVouchers } from '../../services/voucherService';
+import { getLatestReviews } from '../../services/reviewService';
+import ProductImage from '../../components/common/ProductImage';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { useToast } from '../../contexts/ToastContext';
 
@@ -29,6 +31,7 @@ export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [seasonalProducts, setSeasonalProducts] = useState([]);
   const [vouchers, setVouchers] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,13 +41,15 @@ export default function Home() {
       getProducts({ limit: 8, featured: true }),
       getProducts({ limit: 4, sort: 'popular' }),
       getVouchers(),
+      getLatestReviews(6),
     ])
-      .then(([catRes, prodRes, seasonRes, voucherRes]) => {
+      .then(([catRes, prodRes, seasonRes, voucherRes, reviewRes]) => {
         if (!active) return;
         setCategories(catRes.data.data || []);
         setFeaturedProducts(prodRes.data.data?.items || []);
         setSeasonalProducts(seasonRes.data.data?.items || []);
         setVouchers(voucherRes.data.data || []);
+        setReviews(reviewRes.data.data || []);
       })
       .catch(() => {
         if (active) {
@@ -52,6 +57,7 @@ export default function Home() {
           setFeaturedProducts([]);
           setSeasonalProducts([]);
           setVouchers([]);
+          setReviews([]);
         }
       })
       .finally(() => {
@@ -79,7 +85,7 @@ export default function Home() {
               <div className="lg:col-span-7 space-y-6">
                 <div className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3.5 py-1 text-xs font-bold text-brand-700 shadow-sm">
                   <Sparkles size={14} className="text-accent" />
-                  <span>Nông sản sạch VietGAP 100% tự nhiên</span>
+                  <span>Trái cây tươi hái mỗi ngày</span>
                 </div>
 
                 <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-ink leading-[1.08]">
@@ -88,8 +94,8 @@ export default function Home() {
                 </h1>
 
                 <p className="max-w-xl text-base sm:text-lg leading-relaxed text-ink-muted">
-                  Được hái tận vườn từ các nông trại uy tín và bảo quản lạnh tiêu chuẩn. Đặt hàng tiện lợi,
-                  giao nhanh trong 2 giờ để giữ trọn vẹn vitamin và vị ngọt nguyên bản.
+                  Trái cây được tuyển chọn kỹ từ các vùng trồng uy tín và bảo quản lạnh tiêu chuẩn.
+                  Đặt hàng tiện lợi, giao nhanh để giữ trọn vẹn vitamin và vị ngọt nguyên bản.
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -108,16 +114,16 @@ export default function Home() {
                 {/* Trust Badges */}
                 <div className="grid grid-cols-3 gap-4 pt-6 border-t border-surface-border">
                   <div>
-                    <strong className="block font-display text-2xl font-bold text-brand-700">2 Giờ</strong>
-                    <span className="text-xs text-ink-muted">Giao siêu tốc nội thành</span>
+                    <strong className="block font-display text-2xl font-bold text-brand-700">Toàn quốc</strong>
+                    <span className="text-xs text-ink-muted">Giao hàng mọi tỉnh thành</span>
                   </div>
                   <div>
                     <strong className="block font-display text-2xl font-bold text-brand-700">100%</strong>
-                    <span className="text-xs text-ink-muted">Chuẩn tươi sạch VietGAP</span>
+                    <span className="text-xs text-ink-muted">Cam kết trái cây tươi ngon</span>
                   </div>
                   <div>
                     <strong className="block font-display text-2xl font-bold text-brand-700">24h</strong>
-                    <span className="text-xs text-ink-muted">Đổi trả nếu dập nát</span>
+                    <span className="text-xs text-ink-muted">Hỗ trợ đổi trả nhanh chóng</span>
                   </div>
                 </div>
               </div>
@@ -270,10 +276,10 @@ export default function Home() {
                   key={item._id}
                   className="rounded-2xl bg-white/95 p-3.5 shadow-card border border-surface-border"
                 >
-                  <img
+                  <ProductImage
                     src={item.images?.[0] || item.image}
                     alt={item.name}
-                    className="aspect-square w-full rounded-xl object-cover"
+                    className="aspect-square w-full rounded-xl bg-white"
                   />
                   <h4 className="mt-2 text-xs font-bold text-ink truncate">{item.name}</h4>
                   <p className="text-xs font-bold text-brand-700 mt-1">{formatCurrency(item.price)}</p>
@@ -336,66 +342,57 @@ export default function Home() {
         )}
 
         {/* 6. CUSTOMER REVIEWS & TESTIMONIALS */}
-        <section className="section-shell">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="eyebrow justify-center">
-              <Star size={14} className="text-accent fill-accent" /> Khách hàng nói gì
-            </span>
-            <h2 className="section-title mt-2">Hơn 10.000+ bữa ăn ngon</h2>
-            <p className="mt-3 text-sm text-ink-muted">
-              Sự hài lòng của bạn là động lực để Fresh mỗi ngày tìm kiếm những mùa quả ngọt lành nhất.
-            </p>
-          </div>
+        {reviews.length > 0 && (
+          <section className="section-shell">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="eyebrow justify-center">
+                <Star size={14} className="text-accent fill-accent" /> Khách hàng nói gì
+              </span>
+              <h2 className="section-title mt-2">Đánh giá từ đơn hàng thực tế</h2>
+              <p className="mt-3 text-sm text-ink-muted">
+                Những chia sẻ chân thực từ khách hàng đã nhận và đánh giá sản phẩm trên Fresh.
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {[
-              {
-                name: 'Chị Mai Lan',
-                role: 'Quận 1, TP.HCM',
-                comment:
-                  'Trái cây ở Fresh tươi và ngọt đậm tự nhiên, không bị ngâm hóa chất. Dâu tây và xoài cát giao đến đóng gói rất kỹ, nguyên vẹn không bị dập.',
-                rating: 5,
-              },
-              {
-                name: 'Anh Minh Trí',
-                role: 'Bình Thạnh, TP.HCM',
-                comment:
-                  'Giao hàng cực kỳ nhanh, đúng 1 tiếng là có trái cây cho cả văn phòng ăn xế. Giá cả minh bạch và nhiều mã giảm giá hấp dẫn.',
-                rating: 5,
-              },
-              {
-                name: 'Cô Thu Cúc',
-                role: 'Quận 3, TP.HCM',
-                comment:
-                  'Thích nhất là chính sách đổi trả nhanh gọn. Có lần quả bơ bị chín quá một chút, báo hotline là nhân viên mang quả mới đổi tận nhà ngay.',
-                rating: 5,
-              },
-            ].map((review, idx) => (
-              <div
-                key={idx}
-                className="rounded-3xl border border-surface-border bg-white p-6 shadow-card flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex gap-1 text-accent mb-3">
-                    {[...Array(review.rating)].map((_, i) => (
-                      <Star key={i} size={16} className="fill-accent text-accent" />
-                    ))}
-                  </div>
-                  <p className="text-sm leading-relaxed text-ink-muted italic">"{review.comment}"</p>
-                </div>
-                <div className="mt-6 flex items-center gap-3 border-t border-surface-border pt-4">
-                  <div className="grid h-9 w-9 place-items-center rounded-full bg-brand-50 text-brand-700 font-bold text-xs">
-                    {review.name[0]}
-                  </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {reviews.slice(0, 3).map((review) => (
+                <div
+                  key={review._id}
+                  className="rounded-3xl border border-surface-border bg-white p-6 shadow-card flex flex-col justify-between"
+                >
                   <div>
-                    <h4 className="text-sm font-bold text-ink">{review.name}</h4>
-                    <p className="text-xs text-ink-light">{review.role}</p>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex gap-0.5 text-accent">
+                        {[...Array(review.rating || 5)].map((_, i) => (
+                          <Star key={i} size={16} className="fill-accent text-accent" />
+                        ))}
+                      </div>
+                      {review.product?.name && (
+                        <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-[11px] font-bold text-brand-700">
+                          {review.product.name}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm leading-relaxed text-ink-muted italic">
+                      "{review.comment || 'Sản phẩm tươi ngon, đóng gói cẩn thận.'}"
+                    </p>
+                  </div>
+                  <div className="mt-6 flex items-center gap-3 border-t border-surface-border pt-4">
+                    <div className="grid h-9 w-9 place-items-center rounded-full bg-brand-50 text-brand-700 font-bold text-xs">
+                      {(review.user?.fullName || 'K')[0]}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-ink">{review.user?.fullName || 'Khách hàng'}</h4>
+                      <p className="text-xs text-ink-light">
+                        {review.createdAt ? new Date(review.createdAt).toLocaleDateString('vi-VN') : ''}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* 7. CALL TO ACTION */}
         <section className="bg-surface-subtle py-16 border-t border-surface-border">

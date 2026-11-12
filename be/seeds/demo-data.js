@@ -2,6 +2,7 @@
 // addresses, carts, wishlists, vouchers, products, categories.
 // Chạy: node seeds/demo-data.js  (idempotent — chạy lại không tạo trùng)
 import dotenv from 'dotenv';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { connectDatabase, closeDatabase } from '../src/config/database.js';
@@ -124,10 +125,13 @@ async function main() {
   if (!password) throw new Error('SEED_CUSTOMER_PASSWORD is not configured');
   const hashed = await hashPassword(password);
 
+  const imageMap = JSON.parse(await fs.readFile(path.join(here, 'data', 'product-images.json'), 'utf8'));
+
   // --- Categories ---
   for (const c of CATEGORIES) {
+    const data = { ...c, image: imageMap[`cat:${c.slug}`]?.url || c.image };
     const existed = await Category.findOne({ slug: c.slug }).select('_id').lean();
-    await Category.findOneAndUpdate({ slug: c.slug }, { $set: c }, { upsert: true });
+    await Category.findOneAndUpdate({ slug: c.slug }, { $set: data }, { upsert: true });
     existed ? bump('categories_existing') : bump('categories_new');
   }
 
@@ -136,7 +140,7 @@ async function main() {
   for (const c of await Category.find().select('slug _id').lean()) categoryIds.set(c.slug, c._id);
   const productDocs = [];
   for (const [i, p] of PRODUCTS.entries()) {
-    const doc = { name: p.name, slug: p.slug, description: p.desc, category: categoryIds.get(p.cat), price: p.price, unit: p.unit, origin: p.origin, images: [p.img || IMAGES[i % IMAGES.length]], stock: p.stock, isFeatured: Boolean(p.featured), isActive: p.stock >= 10 };
+    const doc = { name: p.name, slug: p.slug, description: p.desc, category: categoryIds.get(p.cat), price: p.price, unit: p.unit, origin: p.origin, images: imageMap[p.slug]?.urls || [imageMap[p.slug]?.url || p.img || IMAGES[i % IMAGES.length]], stock: p.stock, isFeatured: Boolean(p.featured), isActive: p.stock >= 10 };
     const { stock, ...catalog } = doc;
     const existed = await Product.findOne({ slug: p.slug }).select('_id').lean();
     await Product.findOneAndUpdate({ slug: p.slug }, { $set: catalog, $setOnInsert: { stock, soldCount: 0 } }, { upsert: true, setDefaultsOnInsert: true });

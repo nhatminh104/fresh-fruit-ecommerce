@@ -5,6 +5,7 @@ import PageContainer from '../../components/layout/PageContainer';
 import Loading from '../../components/common/Loading';
 import EmptyState from '../../components/common/EmptyState';
 import { getCategories } from '../../services/categoryService';
+import ProductImage from '../../components/common/ProductImage';
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState([]);
@@ -40,14 +41,11 @@ export default function CategoriesPage() {
               className="group relative flex flex-col overflow-hidden rounded-3xl border border-surface-border bg-white p-6 shadow-subtle transition-all duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-card"
             >
               <div className="aspect-[16/10] w-full overflow-hidden rounded-2xl bg-surface-subtle mb-5">
-                <img
-                  src={
-                    category.image ||
-                    'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=600&q=80'
-                  }
+                <ProductImage
+                  src={category.image}
                   alt={category.name}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
+                  fit="cover"
+                  className="h-full w-full transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
 

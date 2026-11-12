@@ -37,8 +37,8 @@ export default function ProductForm() {
     { key: 'stock', label: 'Tồn kho', type: 'number', required: true },
     {
       key: 'images',
-      label: 'Hình ảnh (URL, cách nhau bởi dấu phẩy)',
-      type: 'text',
+      label: 'Hình ảnh (URL, cách nhau bởi dấu phẩy — ảnh đầu tiên làm ảnh chính)',
+      type: 'images',
       toForm: (value) => (Array.isArray(value) ? value.join(', ') : value || ''),
     },
     { key: 'description', label: 'Mô tả', type: 'textarea' },

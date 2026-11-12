@@ -1,42 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Check, Heart, Leaf, ShoppingBag } from 'lucide-react';
+import { Check, Heart, ShoppingBag } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { useCart } from '../../hooks/useCart';
 import { useAuth } from '../../hooks/useAuth';
 import { addWishlistItem, removeWishlistItem } from '../../services/wishlistService';
 import { useToast } from '../../contexts/ToastContext';
-
-function SafeImage({ src, fallbackSrc, alt, className }) {
-  const [currentSrc, setCurrentSrc] = useState(src);
-  const [failed, setFailed] = useState(false);
-  if (failed || !src) {
-    return (
-      <div
-        aria-label={alt}
-        className={`${className} flex flex-col items-center justify-center bg-surface-subtle text-brand-500`}
-      >
-        <Leaf size={28} className="text-brand-500/70" aria-hidden="true" />
-        <span className="mt-1 text-[11px] font-bold text-ink-muted">Fresh Fruit</span>
-      </div>
-    );
-  }
-  return (
-    <img
-      src={currentSrc}
-      alt={alt}
-      className={className}
-      loading="lazy"
-      onError={() => {
-        if (fallbackSrc && currentSrc !== fallbackSrc) setCurrentSrc(fallbackSrc);
-        else setFailed(true);
-      }}
-    />
-  );
-}
-
-const KOREAN_PEAR_FALLBACK =
-  'https://images.unsplash.com/photo-1612100616857-c056b93628b4?auto=format&fit=crop&w=900&q=85';
+import ProductImage from '../common/ProductImage';
 
 export default function ProductCard({ product, className = '', inWishlist = false, onWishlistChange }) {
   const navigate = useNavigate();
@@ -52,7 +22,6 @@ export default function ProductCard({ product, className = '', inWishlist = fals
 
   const productId = product._id || product.id;
   const image = product.images?.[0] || product.image;
-  const imageFallback = product.slug === 'le-han-quoc' ? KOREAN_PEAR_FALLBACK : null;
   const isOutOfStock = product.stock !== undefined && product.stock <= 0;
   const discountPercent =
     product.originalPrice && product.originalPrice > product.price
@@ -113,7 +82,7 @@ export default function ProductCard({ product, className = '', inWishlist = fals
       {/* Image Container */}
       <div className="product-image-wrap group/img">
         <Link to={`/products/${productId}`} className="block h-full w-full">
-          <SafeImage src={image} fallbackSrc={imageFallback} alt={product.name} className="product-image" />
+          <ProductImage src={image} alt={product.name} className="product-image" />
         </Link>
 
         {/* Tags */}

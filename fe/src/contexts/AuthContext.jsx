@@ -72,6 +72,26 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  // Tự đăng xuất sau IDLE_TIMEOUT_MS không có thao tác (click/phím/cuộn/chạm).
+  const logoutRef = React.useRef(logout);
+  logoutRef.current = logout;
+  React.useEffect(() => {
+    if (!user) return undefined;
+    const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+    const ACTIVITY_EVENTS = ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'];
+    let timer = null;
+    const reset = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => logoutRef.current(), IDLE_TIMEOUT_MS);
+    };
+    ACTIVITY_EVENTS.forEach((e) => window.addEventListener(e, reset, { passive: true }));
+    reset();
+    return () => {
+      clearTimeout(timer);
+      ACTIVITY_EVENTS.forEach((e) => window.removeEventListener(e, reset));
+    };
+  }, [user]);
+
   const refreshUser = React.useCallback(async () => {
     try {
       return await loadCurrentUser();

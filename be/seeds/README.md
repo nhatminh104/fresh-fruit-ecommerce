@@ -19,3 +19,13 @@ npm --prefix be run seed:demo
 ```
 
 Expands the database for full-flow testing: ~20 demo customers (`khachNN@freshfruit.local`, password from `SEED_CUSTOMER_PASSWORD`), additional categories/products/vouchers, addresses, carts, wishlists, ~30 orders across all statuses, matching payments, and ~20 reviews. Orders/payments/reviews are created through the real service layer so stock, totals, snapshots and payment state stay consistent. Fully idempotent: orders are keyed by `idempotencyKey` (`demo-order-*`), users by email, catalogs by slug/code — safe to re-run; it never deletes or overwrites existing user data.
+
+## Product images (`product-images.json`)
+
+Product/category images are CC-licensed photos fetched via the Openverse API and stored in `data/product-images.json` (slug → verified URLs). Regenerate or refresh with:
+
+```bash
+node scripts/update-product-images.mjs --apply
+```
+
+The script queries Openverse per product keyword, keeps only reachable URLs, deduplicates across products, and writes up to 2 images per product (main + gallery) plus one image per category. `seed.js` and `demo-data.js` read this file so fresh setups get the same images.

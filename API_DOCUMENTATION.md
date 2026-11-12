@@ -64,6 +64,7 @@ Rate limit tạo đơn: 30 req / 15 phút / user-IP.
 ## Reviews — `/api/reviews`
 
 - `GET /product/:productId` — review đã duyệt.
+- `GET /latest?limit=6` — review đã duyệt mới nhất (kèm user.fullName, product.name/images), dùng cho trang chủ.
 - `GET /mine` (auth) — review của tôi.
 - `POST /` (auth) `{ product, rating 1-5, comment?, order? }` — chỉ cho đơn `delivered` chứa sản phẩm; mỗi user 1 review / sản phẩm; mặc định chờ duyệt.
 
@@ -75,7 +76,7 @@ Rate limit tạo đơn: 30 req / 15 phút / user-IP.
 
 | Resource | Endpoints |
 |---|---|
-| `/dashboard` | GET — users, products, orders, revenue |
+| `/dashboard` | GET — users, products, orders, revenue, ordersByStatus, monthlyRevenue (6 tháng), topProducts (5), lowStockCount, recentOrders (5) |
 | `/products` | GET, POST; `/products/:id` PATCH, DELETE (archive = isActive:false) |
 | `/categories` | GET, POST; `/categories/:id` PATCH, DELETE |
 | `/orders` | GET, `/orders/:id` GET; `/orders/:id` PATCH `{status}` — chuyển trạng thái theo `Order.allowedTransitions` |

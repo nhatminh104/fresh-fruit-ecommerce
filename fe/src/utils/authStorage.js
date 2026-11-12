@@ -1,7 +1,9 @@
 const ACCESS_TOKEN_KEY = 'fresh.accessToken';
 const REFRESH_TOKEN_KEY = 'fresh.refreshToken';
 
-const storage = () => (typeof window !== 'undefined' ? window.localStorage : null);
+// sessionStorage: phiên chỉ tồn tại trong tab hiện tại — đóng tab/trình duyệt là mất,
+// không lưu lại phiên đăng nhập như localStorage.
+const storage = () => (typeof window !== 'undefined' ? window.sessionStorage : null);
 
 export function getAccessToken() {
   return storage()?.getItem(ACCESS_TOKEN_KEY) || null;

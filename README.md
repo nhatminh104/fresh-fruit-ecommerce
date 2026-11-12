@@ -11,6 +11,7 @@ Nền tảng mua sắm trái cây tươi MERN stack: React/Vite/Tailwind ở fro
 ## Chức năng chính
 
 - Đăng ký/đăng nhập, refresh token rotation, quên/đặt lại mật khẩu.
+- Phiên đăng nhập lưu trong `sessionStorage`: đóng tab/trình duyệt là hết phiên; tự đăng xuất sau 30 phút không thao tác; logout xóa token và vô hiệu refresh token phía server.
 - Danh mục & sản phẩm: tìm kiếm, lọc danh mục/giá, sắp xếp, phân trang.
 - Giỏ hàng, checkout (địa chỉ, COD / thanh toán online demo, mã giảm giá), idempotency key chống tạo đơn trùng.
 - Đơn hàng: xem danh sách/chi tiết, hủy đơn (hoàn stock + voucher đúng một lần).
