@@ -20,7 +20,7 @@ import { createOrder, cancelOrder } from '../src/modules/orders/order.service.js
 import { createReview } from '../src/modules/reviews/review.service.js';
 import { addItem, getCart, updateItem, removeItem } from '../src/modules/carts/cart.service.js';
 import { listAddresses, createAddress, updateAddress, deleteAddress } from '../src/modules/addresses/address.service.js';
-import { updateOrder } from '../src/modules/admin/admin.service.js';
+import { updateOrder, updateUser } from '../src/modules/admin/admin.service.js';
 import { updateProfile } from '../src/modules/users/user.service.js';
 
 // Dùng database riêng để tránh xung đột khi node --test chạy song song nhiều file test.
@@ -264,4 +264,20 @@ test('customer profile update cannot change role or status', async () => {
   const fresh = await User.findById(user._id);
   assert.equal(fresh.role, 'customer');
   assert.equal(fresh.status, 'active');
+});
+
+test('admin cannot change own role or status via updateUser', async () => {
+  const admin = await createUser('admin');
+  await assert.rejects(
+    () => updateUser(admin._id, { role: 'customer' }, admin._id),
+    (error) => error.status === 400
+  );
+  await assert.rejects(
+    () => updateUser(admin._id, { status: 'blocked' }, admin._id),
+    (error) => error.status === 400
+  );
+  // Admin vẫn sửa được profile người khác
+  const other = await createUser('customer');
+  const updated = await updateUser(other._id, { status: 'blocked' }, admin._id);
+  assert.equal(updated.status, 'blocked');
 });

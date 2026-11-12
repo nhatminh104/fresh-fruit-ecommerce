@@ -87,8 +87,12 @@ export async function updateOrder(orderId, status) {
 
 export const listUsers = () => User.find().sort({ createdAt: -1 }).lean();
 export async function getUser(userId) { const user = await User.findById(id(userId, 'User id')).lean(); if (!user) throw new ApiError(404, 'User not found'); return user; }
-export async function updateUser(userId, payload) {
-  const user = await User.findByIdAndUpdate(id(userId, 'User id'), { $set: pick(payload, ['fullName', 'phone', 'role', 'status']) }, { new: true, runValidators: true });
+export async function updateUser(userId, payload, actorId) {
+  const set = pick(payload, ['fullName', 'phone', 'role', 'status']);
+  if (actorId && String(userId) === String(actorId) && (set.role !== undefined || set.status !== undefined)) {
+    throw new ApiError(400, 'Không thể tự thay đổi vai trò hoặc trạng thái tài khoản của chính mình');
+  }
+  const user = await User.findByIdAndUpdate(id(userId, 'User id'), { $set: set }, { new: true, runValidators: true });
   if (!user) throw new ApiError(404, 'User not found');
   return user;
 }

@@ -42,7 +42,8 @@ npm install
 npm --prefix fe install
 npm --prefix be install
 cp .env.example .env     # điền MONGODB_URI, JWT_SECRET, SEED_*_PASSWORD
-npm run seed             # nạp dữ liệu mẫu (cần MongoDB đang chạy)
+npm run seed             # nạp danh mục/sản phẩm/voucher/tài khoản demo lõi
+npm --prefix be run seed:demo  # (tùy chọn) nạp thêm ~20 users, orders, reviews, địa chỉ, giỏ hàng... vào DB hiện có
 npm run dev              # fe: http://localhost:5173 — be: http://localhost:5001
 ```
 
@@ -57,7 +58,7 @@ Production nên dùng MongoDB **replica set** để transaction tạo/hủy đơ
 | Admin | `admin@freshfruit.local` | `SEED_ADMIN_PASSWORD` |
 | Customer | `customer@freshfruit.local` | `SEED_CUSTOMER_PASSWORD` |
 
-Dữ liệu seed gồm 3 danh mục, 11 sản phẩm, 2 voucher (`WELCOME10`, `FREESHIP30`), bản ghi `Inventory` cho từng sản phẩm và 2 tài khoản demo. Seed idempotent — chạy lại không tạo trùng, không ghi đè `stock`/`soldCount`/tồn kho admin đã chỉnh.
+Dữ liệu seed lõi gồm 3 danh mục, 11 sản phẩm, 2 voucher (`WELCOME10`, `FREESHIP30`), bản ghi `Inventory` cho từng sản phẩm và 2 tài khoản demo. `seed:demo` bổ sung ~20 khách hàng (`khach01..khach20@freshfruit.local`, cùng `SEED_CUSTOMER_PASSWORD`), ~30 đơn hàng đủ trạng thái, ~20 review, địa chỉ, giỏ hàng, wishlist và voucher đa dạng — tất cả đi qua service layer thật nên tồn kho/thanh toán/ snapshot luôn nhất quán. Cả hai seed đều idempotent — chạy lại không tạo trùng, không ghi đè `stock`/`soldCount`/dữ liệu admin đã chỉnh.
 
 ## Kiểm tra & kiểm thử
 

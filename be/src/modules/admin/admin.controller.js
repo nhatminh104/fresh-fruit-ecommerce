@@ -16,7 +16,7 @@ export const orderDetail = asyncHandler(async (req, res) => send(res, await serv
 export const updateOrder = asyncHandler(async (req, res) => send(res, await service.updateOrder(req.params.id, req.body.status)));
 export const users = asyncHandler(async (req, res) => send(res, await service.listUsers()));
 export const userDetail = asyncHandler(async (req, res) => send(res, await service.getUser(req.params.id)));
-export const updateUser = asyncHandler(async (req, res) => send(res, await service.updateUser(req.params.id, req.body)));
+export const updateUser = asyncHandler(async (req, res) => send(res, await service.updateUser(req.params.id, req.body, req.user?._id)));
 export const reviews = asyncHandler(async (req, res) => send(res, await service.listReviews()));
 export const updateReview = asyncHandler(async (req, res) => send(res, await service.updateReview(req.params.id, req.body.isApproved)));
 export const deleteReview = asyncHandler(async (req, res) => send(res, await service.deleteReview(req.params.id)));

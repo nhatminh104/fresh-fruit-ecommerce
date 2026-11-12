@@ -79,7 +79,7 @@ Rate limit tạo đơn: 30 req / 15 phút / user-IP.
 | `/products` | GET, POST; `/products/:id` PATCH, DELETE (archive = isActive:false) |
 | `/categories` | GET, POST; `/categories/:id` PATCH, DELETE |
 | `/orders` | GET, `/orders/:id` GET; `/orders/:id` PATCH `{status}` — chuyển trạng thái theo `Order.allowedTransitions` |
-| `/users` | GET, `/users/:id` GET; `/users/:id` PATCH `{fullName, phone, role, status}` |
+| `/users` | GET, `/users/:id` GET; `/users/:id` PATCH `{fullName, phone, role, status}` — admin không thể tự đổi `role`/`status` của chính mình (400) |
 | `/reviews` | GET; `/reviews/:id` PATCH `{isApproved}`, DELETE |
 | `/vouchers` | GET, POST; `/vouchers/:id` PATCH, DELETE |
 | `/inventory` | GET; `/inventory/:productId` PATCH `{quantity, lowStockAt}` |
