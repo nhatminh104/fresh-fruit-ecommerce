@@ -7,6 +7,7 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 import OrderStatusBadge from '../../components/order/OrderStatusBadge';
 import ProductImage from '../../components/common/ProductImage';
 import Button from '../../components/common/Button';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { cancelOrder, getOrder } from '../../services/orderService';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { getErrorMessage } from '../../utils/errorMessage';
@@ -20,6 +21,7 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -30,8 +32,6 @@ export default function OrderDetailPage() {
   }, [id]);
 
   const handleCancel = async () => {
-    if (!window.confirm('Bạn có chắc muốn hủy đơn hàng này? Tồn kho và mã giảm giá sẽ được hoàn lại.'))
-      return;
     setCancelling(true);
     try {
       const { data } = await cancelOrder(id);
@@ -41,6 +41,7 @@ export default function OrderDetailPage() {
       toast.error(getErrorMessage(err, 'Không thể hủy đơn hàng.'));
     } finally {
       setCancelling(false);
+      setConfirmCancel(false);
     }
   };
 
@@ -74,7 +75,7 @@ export default function OrderDetailPage() {
         <div className="flex items-center gap-3">
           <OrderStatusBadge status={order.status} />
           {canCancel && (
-            <Button variant="danger" size="sm" onClick={handleCancel} loading={cancelling}>
+            <Button variant="danger" size="sm" onClick={() => setConfirmCancel(true)} loading={cancelling}>
               <Ban size={14} /> Hủy đơn
             </Button>
           )}
@@ -87,7 +88,7 @@ export default function OrderDetailPage() {
         </p>
       )}
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-        <section className="rounded-2xl bg-white p-6">
+        <section className="rounded-2xl border border-surface-border bg-white p-6 shadow-subtle">
           <h2 className="font-display text-3xl text-forest">Sản phẩm</h2>
           <div className="mt-4 divide-y divide-slate-100">
             {order.items.map((item) => (
@@ -114,7 +115,7 @@ export default function OrderDetailPage() {
           )}
         </section>
         <aside className="h-fit space-y-5">
-          <div className="rounded-2xl bg-white p-6">
+          <div className="rounded-2xl border border-surface-border bg-white p-6 shadow-subtle">
             <h2 className="font-bold text-forest">Giao đến</h2>
             <p className="mt-3 text-sm leading-6 text-slate-500">
               {address.recipientName} · {address.phone}
@@ -122,7 +123,7 @@ export default function OrderDetailPage() {
               {address.streetAddress}, {address.ward}, {address.district}, {address.province}
             </p>
           </div>
-          <div className="rounded-2xl bg-white p-6">
+          <div className="rounded-2xl border border-surface-border bg-white p-6 shadow-subtle">
             <h2 className="font-bold text-forest">Thanh toán</h2>
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between">
@@ -153,6 +154,15 @@ export default function OrderDetailPage() {
           </div>
         </aside>
       </div>
+      <ConfirmDialog
+        open={confirmCancel}
+        onClose={() => setConfirmCancel(false)}
+        onConfirm={handleCancel}
+        title="Hủy đơn hàng"
+        message="Bạn có chắc muốn hủy đơn hàng này? Tồn kho và mã giảm giá sẽ được hoàn lại."
+        confirmLabel="Hủy đơn"
+        danger
+      />
     </PageContainer>
   );
 }

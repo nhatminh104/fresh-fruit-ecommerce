@@ -191,9 +191,25 @@ export default function EntityForm({ title, resource, fields, initial = {}, toPa
         </div>
       )}
       <form className="mt-8 grid max-w-3xl gap-4 rounded-2xl bg-white p-6 sm:grid-cols-2" onSubmit={submit}>
-        {fields.map((field) => (
-          <Field key={field.key} field={field} value={form[field.key]} onChange={setField} />
-        ))}
+        {(() => {
+          const groups = [];
+          fields.forEach((field) => {
+            const section = field.section || '';
+            const last = groups[groups.length - 1];
+            if (last && last.section === section) last.items.push(field);
+            else groups.push({ section, items: [field] });
+          });
+          return groups.map((group, groupIndex) => (
+            <div key={group.section || groupIndex} className="contents">
+              {group.section && (
+                <h2 className="font-display text-base font-bold text-forest sm:col-span-2">{group.section}</h2>
+              )}
+              {group.items.map((field) => (
+                <Field key={field.key} field={field} value={form[field.key]} onChange={setField} />
+              ))}
+            </div>
+          ));
+        })()}
         <div className="flex gap-3 sm:col-span-2">
           <Button type="submit" disabled={saving}>
             {saving ? 'Đang lưu...' : isEdit ? 'Lưu thay đổi' : 'Tạo mới'}

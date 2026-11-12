@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import * as addressService from '../../services/addressService';
@@ -34,6 +35,7 @@ export default function AccountAddresses() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [pendingDelete, setPendingDelete] = useState(null);
 
   const load = () =>
     addressService
@@ -80,14 +82,15 @@ export default function AccountAddresses() {
     }
   };
 
-  const remove = async (id) => {
-    if (!window.confirm('Xóa địa chỉ này?')) return;
+  const remove = async () => {
     try {
-      await addressService.deleteAddress(id);
-      if (editingId === id) reset();
+      await addressService.deleteAddress(pendingDelete);
+      if (editingId === pendingDelete) reset();
       await load();
     } catch (deleteError) {
       setError(getErrorMessage(deleteError, 'Không thể xóa địa chỉ.'));
+    } finally {
+      setPendingDelete(null);
     }
   };
 
@@ -104,7 +107,7 @@ export default function AccountAddresses() {
         <Loading />
       ) : (
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_1.2fr]">
-          <form className="space-y-4 rounded-2xl bg-white p-6" onSubmit={submit}>
+          <form className="space-y-4 rounded-2xl border border-surface-border bg-white p-6 shadow-subtle" onSubmit={submit}>
             <h2 className="font-display text-3xl text-forest">
               {editingId ? 'Chỉnh sửa địa chỉ' : 'Thêm địa chỉ'}
             </h2>
@@ -128,10 +131,10 @@ export default function AccountAddresses() {
           </form>
           <div className="space-y-4">
             {addresses.length === 0 ? (
-              <p className="rounded-2xl bg-white p-6 text-slate-500">Bạn chưa có địa chỉ nào.</p>
+              <p className="rounded-2xl border border-surface-border bg-white p-6 text-slate-500">Bạn chưa có địa chỉ nào.</p>
             ) : (
               addresses.map((address) => (
-                <article className="rounded-2xl bg-white p-6 shadow-sm" key={address._id}>
+                <article className="rounded-2xl border border-surface-border bg-white p-6 shadow-sm" key={address._id}>
                   <div className="flex justify-between gap-4">
                     <div>
                       <h2 className="font-bold text-forest">
@@ -152,7 +155,7 @@ export default function AccountAddresses() {
                       </button>
                       <button
                         className="text-sm font-semibold text-red-600"
-                        onClick={() => remove(address._id)}
+                        onClick={() => setPendingDelete(address._id)}
                       >
                         Xóa
                       </button>
@@ -164,6 +167,15 @@ export default function AccountAddresses() {
           </div>
         </div>
       )}
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={remove}
+        title="Xóa địa chỉ"
+        message="Xóa địa chỉ giao hàng này? Hành động không thể hoàn tác."
+        confirmLabel="Xóa"
+        danger
+      />
     </PageContainer>
   );
 }

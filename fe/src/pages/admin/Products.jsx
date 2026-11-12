@@ -8,6 +8,8 @@ export default function Products() {
       resource="products"
       createPath="/admin/products/new"
       editPath={(item) => `/admin/products/${item._id}/edit`}
+      searchFields={['name', 'slug']}
+      filters={[{ key: 'isActive', label: 'Trạng thái', options: [{ value: 'true', label: 'Đang bán' }, { value: 'false', label: 'Đã ẩn' }] }]}
       columns={[
         {
           key: 'images',

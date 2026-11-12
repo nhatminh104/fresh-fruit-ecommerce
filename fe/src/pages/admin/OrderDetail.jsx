@@ -4,6 +4,7 @@ import PageContainer from '../../components/layout/PageContainer';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import Button from '../../components/common/Button';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 import OrderStatusBadge from '../../components/order/OrderStatusBadge';
 import ProductImage from '../../components/common/ProductImage';
 import api from '../../services/api';
@@ -33,6 +34,7 @@ export default function OrderDetail() {
   const [order, setOrder] = useState(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState(null);
 
   const load = () =>
     api
@@ -44,17 +46,18 @@ export default function OrderDetail() {
     load();
   }, [id]);
 
-  const changeStatus = async (status) => {
-    if (!window.confirm('Xác nhận thay đổi trạng thái đơn hàng?')) return;
+  const changeStatus = async () => {
+    if (!pendingStatus) return;
     setBusy(true);
     try {
-      await updateAdmin('orders', id, { status });
+      await updateAdmin('orders', id, { status: pendingStatus.status });
       toast.success('Đã cập nhật trạng thái đơn hàng.');
       await load();
     } catch (actionError) {
       toast.error(getErrorMessage(actionError, 'Không thể cập nhật trạng thái.'));
     } finally {
       setBusy(false);
+      setPendingStatus(null);
     }
   };
 
@@ -96,12 +99,22 @@ export default function OrderDetail() {
             type="button"
             variant={status === 'cancelled' ? 'danger' : 'primary'}
             disabled={busy}
-            onClick={() => changeStatus(status)}
+            onClick={() => setPendingStatus({ status, label })}
           >
             {label}
           </Button>
         ))}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(pendingStatus)}
+        onClose={() => setPendingStatus(null)}
+        onConfirm={changeStatus}
+        title="Cập nhật trạng thái đơn hàng"
+        message={pendingStatus ? `Chuyển đơn ${order?.orderCode} sang "${pendingStatus.label}"?` : ''}
+        confirmLabel={pendingStatus?.label || 'Xác nhận'}
+        danger={pendingStatus?.status === 'cancelled'}
+      />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
         <section className="rounded-2xl bg-white p-6">

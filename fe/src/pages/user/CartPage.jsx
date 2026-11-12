@@ -39,7 +39,7 @@ export default function CartPage() {
         />
       ) : (
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-          <div className="rounded-2xl bg-white px-6">
+          <div className="rounded-2xl border border-surface-border bg-white px-6 shadow-subtle">
             {items.map((item) => (
               <CartItem key={item.id} item={item} onRemove={removeItem} onQuantityChange={updateQuantity} />
             ))}

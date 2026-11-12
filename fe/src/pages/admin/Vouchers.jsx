@@ -8,6 +8,11 @@ export default function Vouchers() {
       resource="vouchers"
       createPath="/admin/vouchers/new"
       editPath={(item) => `/admin/vouchers/${item._id}/edit`}
+      searchFields={['code']}
+      filters={[
+        { key: 'discountType', label: 'Loại giảm', options: [{ value: 'percent', label: 'Phần trăm' }, { value: 'fixed', label: 'Cố định' }] },
+        { key: 'isActive', label: 'Trạng thái', options: [{ value: 'true', label: 'Đang áp dụng' }, { value: 'false', label: 'Đã tắt' }] },
+      ]}
       columns={[
         { key: 'code', label: 'Mã' },
         {

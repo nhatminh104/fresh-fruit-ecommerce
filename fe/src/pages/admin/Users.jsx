@@ -1,15 +1,15 @@
 import AdminDataPage from '../../components/admin/AdminDataPage';
 
-const confirmRun = (message, run) => async (item, service) => {
-  if (!window.confirm(message)) return undefined;
-  return run(item, service);
-};
-
 export default function Users() {
   return (
     <AdminDataPage
       title="Quản lý người dùng"
       resource="users"
+      searchFields={['fullName', 'email', 'phone']}
+      filters={[
+        { key: 'role', label: 'Vai trò', options: [{ value: 'customer', label: 'Khách hàng' }, { value: 'admin', label: 'Admin' }] },
+        { key: 'status', label: 'Trạng thái', options: [{ value: 'active', label: 'Hoạt động' }, { value: 'blocked', label: 'Đã khóa' }] },
+      ]}
       columns={[
         { key: 'fullName', label: 'Họ tên' },
         { key: 'email', label: 'Email' },
@@ -20,17 +20,21 @@ export default function Users() {
       actions={[
         {
           label: 'Khóa / Mở khóa',
-          run: confirmRun('Đổi trạng thái khóa tài khoản này?', (item, service) =>
+          confirm: (item) =>
+            `Đổi trạng thái tài khoản của ${item.fullName || item.email}?`,
+          confirmLabel: 'Đổi trạng thái',
+          run: (item, service) =>
             service.updateAdmin('users', item._id, {
               status: item.status === 'blocked' ? 'active' : 'blocked',
-            })
-          ),
+            }),
         },
         {
           label: 'Đổi vai trò',
-          run: confirmRun('Đổi vai trò của người dùng này?', (item, service) =>
-            service.updateAdmin('users', item._id, { role: item.role === 'admin' ? 'customer' : 'admin' })
-          ),
+          confirm: (item) =>
+            `Đổi vai trò của ${item.fullName || item.email} sang ${item.role === 'admin' ? 'Khách hàng' : 'Admin'}?`,
+          confirmLabel: 'Đổi vai trò',
+          run: (item, service) =>
+            service.updateAdmin('users', item._id, { role: item.role === 'admin' ? 'customer' : 'admin' }),
         },
       ]}
     />

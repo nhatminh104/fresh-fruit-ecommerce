@@ -24,25 +24,95 @@ const STATUS_COLORS = {
   cancelled: 'bg-rose-400'
 };
 
-function BarChart({ data, labelKey, valueKey, formatValue, colorClass = 'bg-brand-500' }) {
-  if (!data?.length) return null;
-  const max = Math.max(...data.map((d) => d[valueKey] || 0), 1);
+function AreaChart({ data, formatValue }) {
+  if (!data?.length) return <p className="mt-5 text-sm text-ink-muted">Chưa có dữ liệu.</p>;
+  const W = 640, H = 200, P = 28;
+  const max = Math.max(...data.map((d) => d.value), 1);
+  const stepX = (W - P * 2) / Math.max(data.length - 1, 1);
+  const points = data.map((d, i) => [
+    P + i * stepX,
+    H - P - (d.value / max) * (H - P * 2 - 10),
+  ]);
+  const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const area = `${line} L${points[points.length - 1][0].toFixed(1)},${H - P} L${points[0][0].toFixed(1)},${H - P} Z`;
   return (
-    <div className="space-y-3">
-      {data.map((d) => (
-        <div key={d[labelKey]} className="flex items-center gap-3">
-          <span className="w-16 shrink-0 text-xs font-bold text-ink-muted">{d[labelKey]}</span>
-          <div className="h-4 flex-1 overflow-hidden rounded-full bg-surface-subtle">
-            <div
-              className={`h-full rounded-full ${colorClass} transition-all`}
-              style={{ width: `${Math.max((d[valueKey] / max) * 100, 2)}%` }}
-            />
-          </div>
-          <span className="w-24 shrink-0 text-right text-xs font-bold text-ink">
-            {formatValue ? formatValue(d[valueKey]) : d[valueKey]}
-          </span>
-        </div>
-      ))}
+    <div className="mt-5">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Biểu đồ doanh thu">
+        <defs>
+          <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#3d9e4d" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#3d9e4d" stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+        {[0.25, 0.5, 0.75].map((r) => (
+          <line key={r} x1={P} x2={W - P} y1={P + r * (H - P * 2)} y2={P + r * (H - P * 2)} stroke="#eef2ee" strokeWidth="1" />
+        ))}
+        <path d={area} fill="url(#revGrad)" />
+        <path d={line} fill="none" stroke="#2e8b3a" strokeWidth="2.5" strokeLinejoin="round" />
+        {points.map((p, i) => (
+          <circle key={i} cx={p[0]} cy={p[1]} r="3" fill="#2e8b3a">
+            <title>{`${data[i].label}: ${formatValue ? formatValue(data[i].value) : data[i].value}`}</title>
+          </circle>
+        ))}
+        {data.map((d, i) => (
+          <text key={`t${i}`} x={points[i][0]} y={H - 8} textAnchor="middle" fontSize="10" fill="#8a94a6">
+            {d.label}
+          </text>
+        ))}
+      </svg>
+      <div className="mt-2 flex justify-between text-[11px] text-ink-muted">
+        <span>Thấp nhất: {formatValue ? formatValue(Math.min(...data.map((d) => d.value))) : ''}</span>
+        <span className="font-bold text-brand-700">
+          Cao nhất: {formatValue ? formatValue(Math.max(...data.map((d) => d.value))) : ''}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+const PAYMENT_LABELS = { cod: 'COD', mock: 'Thanh toán online', bank: 'Chuyển khoản' };
+const PAYMENT_COLORS = ['#2e8b3a', '#e8930c', '#4a7fd4', '#8a94a6'];
+
+function DoughnutChart({ data }) {
+  if (!data?.length) return <p className="mt-5 text-sm text-ink-muted">Chưa có đơn hàng.</p>;
+  const total = data.reduce((s, d) => s + (d.count || 0), 0) || 1;
+  const R = 52, C = 2 * Math.PI * R;
+  let offset = 0;
+  return (
+    <div className="mt-5 flex flex-col items-center gap-5 sm:flex-row">
+      <svg viewBox="0 0 140 140" className="h-36 w-36 shrink-0 -rotate-90">
+        <circle cx="70" cy="70" r={R} fill="none" stroke="#f0f4f0" strokeWidth="16" />
+        {data.map((d, i) => {
+          const frac = (d.count || 0) / total;
+          const dash = `${frac * C} ${C}`;
+          const el = (
+            <circle
+              key={d.method}
+              cx="70" cy="70" r={R} fill="none"
+              stroke={PAYMENT_COLORS[i % PAYMENT_COLORS.length]}
+              strokeWidth="16" strokeDasharray={dash} strokeDashoffset={-offset * C}
+              strokeLinecap="butt"
+            >
+              <title>{`${PAYMENT_LABELS[d.method] || d.method}: ${d.count} đơn`}</title>
+            </circle>
+          );
+          offset += frac;
+          return el;
+        })}
+      </svg>
+      <ul className="w-full space-y-2 text-sm">
+        {data.map((d, i) => (
+          <li key={d.method} className="flex items-center justify-between gap-3">
+            <span className="flex items-center gap-2 text-slate-600">
+              <span className="h-3 w-3 rounded-sm" style={{ background: PAYMENT_COLORS[i % PAYMENT_COLORS.length] }} />
+              {PAYMENT_LABELS[d.method] || d.method}
+            </span>
+            <span className="font-bold text-ink">
+              {d.count} <span className="text-xs font-semibold text-ink-muted">({Math.round((d.count / total) * 100)}%)</span>
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -76,11 +146,20 @@ export default function Dashboard() {
     color: STATUS_COLORS[s.status] || 'bg-slate-400'
   }));
   const maxStatus = Math.max(...statusData.map((s) => s.value), 1);
-  const monthly = (data.monthlyRevenue || []).map((m) => ({
-    label: m._id,
-    value: m.total,
-    count: m.count
-  }));
+  const monthlyMap = Object.fromEntries(
+    (data.monthlyRevenue || []).map((m) => [m._id, m])
+  );
+  const monthly = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - (5 - i));
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const m = monthlyMap[key];
+    return {
+      label: `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(2)}`,
+      value: m?.total || 0,
+      count: m?.count || 0
+    };
+  });
   const kpis = [
     { label: 'Người dùng', value: data.users, icon: Users, href: '/admin/users' },
     { label: 'Sản phẩm đang bán', value: data.products, icon: Package, href: '/admin/products' },
@@ -125,7 +204,16 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      {/* Revenue chart - full width */}
+      <section className="mt-8 rounded-3xl border border-surface-border bg-white p-6 shadow-subtle">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-display text-lg font-bold text-ink">Doanh thu 6 tháng gần nhất</h2>
+          <span className="text-xs font-semibold text-ink-muted">Đơn vị: VNĐ · chỉ tính đơn không hủy và đã thanh toán/giao</span>
+        </div>
+        <AreaChart data={monthly} formatValue={(v) => formatCurrency(v)} />
+      </section>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {/* Orders by status */}
         <section className="rounded-3xl border border-surface-border bg-white p-6 shadow-subtle">
           <div className="flex items-center justify-between">
@@ -148,23 +236,10 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* Revenue by month */}
+        {/* Orders by payment method */}
         <section className="rounded-3xl border border-surface-border bg-white p-6 shadow-subtle">
-          <h2 className="font-display text-lg font-bold text-ink">Doanh thu 6 tháng gần nhất</h2>
-          {monthly.length === 0 ? (
-            <p className="mt-5 text-sm text-ink-muted">Chưa có dữ liệu doanh thu.</p>
-          ) : (
-            <div className="mt-5">
-              <BarChart
-                data={monthly}
-                labelKey="label"
-                valueKey="value"
-                colorClass="bg-brand-500"
-                formatValue={(v) => formatCurrency(v)}
-              />
-              <p className="mt-4 text-[11px] text-ink-light">Đơn vị: VNĐ — chỉ tính đơn không hủy và đã thanh toán/giao.</p>
-            </div>
-          )}
+          <h2 className="font-display text-lg font-bold text-ink">Cơ cấu đơn theo phương thức thanh toán</h2>
+          <DoughnutChart data={data.ordersByPayment || []} />
         </section>
       </div>
 
@@ -175,21 +250,31 @@ export default function Dashboard() {
           {(data.topProducts || []).length === 0 ? (
             <p className="mt-5 text-sm text-ink-muted">Chưa có đơn hàng nào.</p>
           ) : (
-            <ul className="mt-4 divide-y divide-surface-border">
-              {data.topProducts.map((p, i) => (
-                <li key={p._id || i} className="flex items-center justify-between gap-3 py-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-50 text-xs font-bold text-brand-700">
-                      {i + 1}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-ink">{p.name}</p>
-                      <p className="text-xs text-ink-muted">{p.quantity} sản phẩm đã bán</p>
+            <ul className="mt-5 space-y-4">
+              {(() => {
+                const maxQty = Math.max(...data.topProducts.map((p) => p.quantity || 0), 1);
+                return data.topProducts.map((p, i) => (
+                  <li key={p._id || i}>
+                    <div className="flex items-center justify-between gap-3 text-sm">
+                      <span className="flex min-w-0 items-center gap-2.5">
+                        <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-50 text-[11px] font-bold text-brand-700">
+                          {i + 1}
+                        </span>
+                        <span className="truncate font-semibold text-ink">{p.name}</span>
+                      </span>
+                      <span className="shrink-0 text-xs font-bold text-brand-700">
+                        {p.quantity} đã bán · {formatCurrency(p.revenue)}
+                      </span>
                     </div>
-                  </div>
-                  <span className="shrink-0 text-sm font-bold text-brand-700">{formatCurrency(p.revenue)}</span>
-                </li>
-              ))}
+                    <div className="ml-8 mt-1.5 h-3 overflow-hidden rounded-full bg-surface-subtle">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-brand-400 to-brand-600 transition-all"
+                        style={{ width: `${Math.max(((p.quantity || 0) / maxQty) * 100, 3)}%` }}
+                      />
+                    </div>
+                  </li>
+                ));
+              })()}
             </ul>
           )}
         </section>

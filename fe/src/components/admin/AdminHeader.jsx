@@ -1,15 +1,24 @@
 import { Link } from 'react-router-dom';
-import { Leaf, LogOut, Store } from 'lucide-react';
+import { Leaf, LogOut, Menu, Store } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
-export default function AdminHeader() {
+export default function AdminHeader({ onMenuClick }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   return (
-    <header className="flex items-center justify-between border-b bg-white px-5 py-4">
-      <Link to="/admin" className="flex items-center gap-2.5">
+    <header className="sticky top-0 z-20 flex items-center justify-between border-b border-surface-border bg-white/90 px-4 py-3 backdrop-blur sm:px-5">
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="grid h-9 w-9 place-items-center rounded-xl border border-surface-border text-ink hover:bg-surface-subtle md:hidden"
+          aria-label="Mở menu"
+        >
+          <Menu size={18} />
+        </button>
+        <Link to="/admin" className="flex items-center gap-2.5">
         <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-500 text-white">
           <Leaf size={18} />
         </span>
@@ -33,6 +42,7 @@ export default function AdminHeader() {
         >
           <LogOut size={14} /> Đăng xuất
         </button>
+      </div>
       </div>
     </header>
   );

@@ -25,7 +25,7 @@ export default function ReviewsPage() {
       ) : reviews.length ? (
         <div className="mt-8 space-y-4">
           {reviews.map((review) => (
-            <article className="rounded-2xl bg-white p-6 shadow-sm" key={review._id}>
+            <article className="rounded-2xl border border-surface-border bg-white p-6 shadow-sm" key={review._id}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Link
                   to={`/products/${review.product?._id || review.product}`}

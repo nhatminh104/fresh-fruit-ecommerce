@@ -58,6 +58,8 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [note, setNote] = useState('');
   const [voucherCode, setVoucherCode] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [voucherError, setVoucherError] = useState('');
   const [vouchers, setVouchers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -78,14 +80,47 @@ export default function CheckoutPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const subtotal = useMemo(
+    () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [items]
+  );
+
+  const voucherEligible = (voucher) => {
+    if (!voucher) return false;
+    const now = Date.now();
+    if (voucher.isActive === false) return false;
+    if (voucher.startDate && new Date(voucher.startDate).getTime() > now) return false;
+    if (voucher.endDate && new Date(voucher.endDate).getTime() < now) return false;
+    if (voucher.usageLimit && (voucher.usageCount || 0) >= voucher.usageLimit) return false;
+    if (subtotal < (voucher.minOrderValue || 0)) return false;
+    return true;
+  };
+
+  const applyVoucher = (voucher) => {
+    setVoucherError('');
+    if (!voucher) {
+      setVoucherError('Mã voucher không tồn tại.');
+      return;
+    }
+    if (!voucherEligible(voucher)) {
+      setVoucherError('Voucher không khả dụng: kiểm tra thời hạn, lượt dùng và đơn tối thiểu.');
+      return;
+    }
+    setAppliedVoucher(voucher);
+    setVoucherCode(voucher.code);
+  };
+
+  const clearVoucher = () => {
+    setAppliedVoucher(null);
+    setVoucherCode('');
+    setVoucherError('');
+  };
+
   const totals = useMemo(() => {
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shipping = subtotal >= 500000 ? 0 : 30000;
-    const code = voucherCode.trim().toUpperCase();
-    const voucher = code ? vouchers.find((item) => item.code === code) : null;
-    const discount = estimateDiscount(voucher, subtotal);
-    return { subtotal, shipping, discount, total: Math.max(0, subtotal - discount + shipping), voucher };
-  }, [items, voucherCode, vouchers]);
+    const discount = estimateDiscount(appliedVoucher, subtotal);
+    return { subtotal, shipping, discount, total: Math.max(0, subtotal - discount + shipping), voucher: appliedVoucher };
+  }, [subtotal, appliedVoucher]);
 
   const update = (field) => (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
 
@@ -105,7 +140,7 @@ export default function CheckoutPage() {
         shippingAddress: address,
         paymentMethod,
         note,
-        voucherCode: voucherCode.trim() || undefined,
+        voucherCode: appliedVoucher?.code || undefined,
         idempotencyKey: idempotencyKey.current,
       });
       if (paymentMethod === 'mock') {
@@ -152,7 +187,7 @@ export default function CheckoutPage() {
       )}
       <form className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]" onSubmit={submit}>
         <div className="space-y-6">
-          <section className="rounded-2xl bg-white p-6">
+          <section className="rounded-2xl border border-surface-border bg-white p-6 shadow-subtle">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-3xl text-forest">Địa chỉ giao hàng</h2>
               <button
@@ -198,7 +233,7 @@ export default function CheckoutPage() {
             )}
           </section>
 
-          <section className="rounded-2xl bg-white p-6">
+          <section className="rounded-2xl border border-surface-border bg-white p-6 shadow-subtle">
             <h2 className="font-display text-3xl text-forest">Thanh toán</h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {PAYMENT_METHODS.map(([value, label]) => (
@@ -217,24 +252,91 @@ export default function CheckoutPage() {
                 </label>
               ))}
             </div>
-            <label className="mt-5 block text-sm font-medium text-slate-600">
-              Mã giảm giá
-              <span className="relative mt-2 block">
-                <Tag size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
-                <input
-                  type="text"
-                  value={voucherCode}
-                  onChange={(event) => setVoucherCode(event.target.value.toUpperCase())}
-                  placeholder="Nhập mã voucher (nếu có)"
-                  className="w-full rounded-xl border border-slate-200 py-3 pl-10 pr-4 text-sm outline-none focus:border-leaf"
-                />
-              </span>
-            </label>
-            {voucherCode.trim() && !totals.voucher && (
-              <p className="mt-2 text-xs font-semibold text-amber-600">
-                Mã này không khớp voucher nào đang áp dụng — đơn hàng vẫn được tạo, hệ thống sẽ kiểm tra lại.
-              </p>
-            )}
+            <div className="mt-5">
+              <span className="text-sm font-medium text-slate-600">Mã giảm giá</span>
+              {appliedVoucher ? (
+                <div className="mt-2 flex items-center justify-between gap-3 rounded-xl border border-leaf bg-green-50 px-4 py-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-forest">{appliedVoucher.code}</p>
+                    <p className="text-xs text-slate-500">
+                      Giảm{' '}
+                      {appliedVoucher.discountType === 'percent'
+                        ? `${appliedVoucher.discountValue}%`
+                        : formatCurrency(appliedVoucher.discountValue)}
+                      {appliedVoucher.minOrderValue
+                        ? ` · Đơn tối thiểu ${formatCurrency(appliedVoucher.minOrderValue)}`
+                        : ''}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={clearVoucher}
+                    className="shrink-0 rounded-full border border-slate-300 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-white"
+                  >
+                    Hủy
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="relative mt-2">
+                    <Tag size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+                    <input
+                      type="text"
+                      value={voucherCode}
+                      onChange={(event) => {
+                        setVoucherCode(event.target.value.toUpperCase());
+                        setVoucherError('');
+                      }}
+                      placeholder="Nhập mã voucher (nếu có)"
+                      className="w-full rounded-xl border border-slate-200 py-3 pl-10 pr-4 text-sm outline-none focus:border-leaf"
+                    />
+                  </div>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="px-4 py-2 text-sm"
+                      onClick={() =>
+                        applyVoucher(vouchers.find((v) => v.code === voucherCode.trim().toUpperCase()))
+                      }
+                      disabled={!voucherCode.trim()}
+                    >
+                      Áp dụng
+                    </Button>
+                    {voucherCode.trim() && (
+                      <button
+                        type="button"
+                        onClick={clearVoucher}
+                        className="text-xs font-semibold text-slate-500 hover:text-ink"
+                      >
+                        Xóa
+                      </button>
+                    )}
+                  </div>
+                  {voucherError && <p className="mt-2 text-xs font-semibold text-red-600">{voucherError}</p>}
+                </>
+              )}
+              {!appliedVoucher && vouchers.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {vouchers
+                    .filter((v) => voucherEligible(v))
+                    .slice(0, 4)
+                    .map((voucher) => (
+                      <button
+                        key={voucher._id}
+                        type="button"
+                        onClick={() => applyVoucher(voucher)}
+                        className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800 transition-colors hover:bg-amber-100"
+                      >
+                        {voucher.code} ·{' '}
+                        {voucher.discountType === 'percent'
+                          ? `-${voucher.discountValue}%`
+                          : `-${formatCurrency(voucher.discountValue)}`}
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
             <label className="mt-5 block text-sm font-medium text-slate-600">
               Ghi chú đơn hàng
               <textarea
@@ -247,7 +349,7 @@ export default function CheckoutPage() {
           </section>
         </div>
 
-        <aside className="h-fit rounded-2xl bg-white p-6">
+        <aside className="h-fit rounded-2xl border border-surface-border bg-white p-6 shadow-subtle">
           <h2 className="font-bold text-forest">Tóm tắt đơn hàng</h2>
           <div className="mt-5 space-y-3 border-b border-slate-100 pb-5 text-sm">
             <div className="flex justify-between">

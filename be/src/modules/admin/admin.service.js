@@ -23,12 +23,16 @@ export async function dashboard() {
   sixMonthsAgo.setDate(1);
   sixMonthsAgo.setHours(0, 0, 0, 0);
 
-  const [users, products, orders, revenue, ordersByStatus, monthlyRevenue, topProducts, lowStock, recentOrders] = await Promise.all([
+  const [users, products, orders, revenue, ordersByStatus, ordersByPayment, monthlyRevenue, topProducts, lowStock, recentOrders] = await Promise.all([
     User.countDocuments(),
     Product.countDocuments({ isActive: true }),
     Order.countDocuments(),
     Order.aggregate([{ $match: { status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' }, $or: [{ status: 'delivered' }, { paymentStatus: 'paid' }] } }, { $group: { _id: null, total: { $sum: '$totalAmount' } } }]),
     Order.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
+    Order.aggregate([
+      { $match: { status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' } } },
+      { $group: { _id: '$paymentMethod', count: { $sum: 1 }, total: { $sum: '$totalAmount' } } }
+    ]),
     Order.aggregate([
       { $match: { createdAt: { $gte: sixMonthsAgo }, status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' } } },
       { $group: { _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } }, total: { $sum: '$totalAmount' }, count: { $sum: 1 } } },
@@ -50,6 +54,7 @@ export async function dashboard() {
     orders,
     revenue: revenue[0]?.total || 0,
     ordersByStatus: ordersByStatus.map((s) => ({ status: s._id, count: s.count })),
+    ordersByPayment: ordersByPayment.map((p) => ({ method: p._id, count: p.count, total: p.total })),
     monthlyRevenue,
     topProducts,
     lowStockCount: lowStock[0]?.count || 0,

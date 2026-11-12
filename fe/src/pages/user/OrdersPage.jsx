@@ -37,7 +37,7 @@ export default function OrdersPage() {
             <Link
               to={`/orders/${order._id}`}
               key={order._id}
-              className="block rounded-2xl bg-white p-5 transition hover:-translate-y-0.5"
+              className="block rounded-2xl border border-surface-border bg-white p-5 shadow-subtle transition hover:-translate-y-0.5 hover:shadow-card"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>

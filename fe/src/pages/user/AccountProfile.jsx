@@ -57,7 +57,7 @@ export default function AccountProfile() {
           {message}
         </p>
       )}
-      <form className="mt-8 grid max-w-2xl gap-4 rounded-2xl bg-white p-6" onSubmit={submit}>
+      <form className="mt-8 grid max-w-2xl gap-4 rounded-2xl border border-surface-border bg-white p-6 shadow-subtle" onSubmit={submit}>
         <Input label="Email" value={form.email} readOnly />
         <Input label="Họ và tên" value={form.fullName} onChange={update('fullName')} required />
         <Input label="Số điện thoại" value={form.phone} onChange={update('phone')} />
