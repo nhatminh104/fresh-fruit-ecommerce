@@ -57,6 +57,8 @@ Production nên dùng MongoDB **replica set** để transaction tạo/hủy đơ
 | Admin | `admin@freshfruit.local` | `SEED_ADMIN_PASSWORD` |
 | Customer | `customer@freshfruit.local` | `SEED_CUSTOMER_PASSWORD` |
 
+Dữ liệu seed gồm 3 danh mục, 11 sản phẩm, 2 voucher (`WELCOME10`, `FREESHIP30`), bản ghi `Inventory` cho từng sản phẩm và 2 tài khoản demo. Seed idempotent — chạy lại không tạo trùng, không ghi đè `stock`/`soldCount`/tồn kho admin đã chỉnh.
+
 ## Kiểm tra & kiểm thử
 
 ```bash

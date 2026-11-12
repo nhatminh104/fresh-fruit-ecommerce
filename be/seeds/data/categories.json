@@ -1,5 +1,5 @@
 [
-  { "name": "Vietnamese fruits", "slug": "trai-cay-viet-nam", "description": "Seasonal fruit grown in Vietnam", "image": "https://images.unsplash.com/photo-1619566636858-adf3ef46400b" },
-  { "name": "Imported fruits", "slug": "trai-cay-nhap-khau", "description": "Imported fruit for the demo catalogue", "image": "https://images.unsplash.com/photo-1610832958506-aa56368176cf" },
-  { "name": "Fruit combos", "slug": "combo-trai-cay", "description": "Prepared fruit selections", "image": "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea" }
+  { "name": "Trái cây Việt Nam", "slug": "trai-cay-viet-nam", "description": "Trái cây tươi theo mùa được trồng tại Việt Nam", "image": "https://images.unsplash.com/photo-1619566636858-adf3ef46400b" },
+  { "name": "Trái cây nhập khẩu", "slug": "trai-cay-nhap-khau", "description": "Trái cây nhập khẩu chất lượng cao cho thực đơn đa dạng", "image": "https://images.unsplash.com/photo-1610832958506-aa56368176cf" },
+  { "name": "Combo trái cây", "slug": "combo-trai-cay", "description": "Combo trái cây cắt sẵn, tiện lợi cho gia đình và văn phòng", "image": "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea" }
 ]

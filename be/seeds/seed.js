@@ -7,6 +7,7 @@ import User from '../src/modules/users/user.model.js';
 import Category from '../src/modules/categories/category.model.js';
 import Product from '../src/modules/products/product.model.js';
 import Voucher from '../src/modules/vouchers/voucher.model.js';
+import Inventory from '../src/modules/inventory/inventory.model.js';
 import { hashPassword } from '../src/utils/password.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -24,7 +25,23 @@ async function main() {
   const categoryIds = new Map();
   const counts = { created: 0, updated: 0 };
   for (const data of categories) { const state = await upsert(Category, { slug: data.slug }, data); categoryIds.set(data.slug, (await Category.findOne({ slug: data.slug }).select('_id'))._id); counts[state]++; }
-  for (const data of products) { const { categorySlug, ...product } = data; product.category = categoryIds.get(categorySlug); const state = await upsert(Product, { slug: product.slug }, product); counts[state]++; }
+  // stock/soldCount chỉ set khi insert — re-seed không ghi đè số liệu bán hàng/tồn kho thực tế.
+  for (const data of products) {
+    const { categorySlug, stock, soldCount, ...product } = data;
+    product.category = categoryIds.get(categorySlug);
+    const result = await Product.findOneAndUpdate(
+      { slug: product.slug },
+      { $set: product, $setOnInsert: { stock: stock ?? 0, soldCount: soldCount ?? 0 } },
+      { upsert: true, new: true, setDefaultsOnInsert: true, includeResultMetadata: true }
+    );
+    counts[result.lastErrorObject?.updatedExisting ? 'updated' : 'created']++;
+    // Đảm bảo bản ghi Inventory tồn tại; không ghi đè số lượng admin đã chỉnh.
+    await Inventory.findOneAndUpdate(
+      { product: result.value._id },
+      { $setOnInsert: { quantity: result.value.stock, lowStockAt: 5 } },
+      { upsert: true }
+    );
+  }
   for (const data of users) { const { passwordEnv, ...user } = data; const password = process.env[passwordEnv]; if (!password) throw new Error(`${passwordEnv} is not configured; set demo passwords in .env before seeding`); user.password = await hashPassword(password); const state = await upsert(User, { email: user.email }, user); counts[state]++; }
   for (const data of vouchers) { const state = await upsert(Voucher, { code: data.code }, data); counts[state]++; }
   console.log(`Seed complete: ${counts.created} created, ${counts.updated} updated, 0 deleted.`);

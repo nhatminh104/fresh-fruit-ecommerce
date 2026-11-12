@@ -1,3 +1,4 @@
 [
-  { "code": "WELCOME10", "description": "10% off for demo checkout", "discountType": "percent", "discountValue": 10, "minOrderValue": 200000, "maxDiscount": 50000, "startDate": "2025-01-01T00:00:00.000Z", "endDate": "2030-12-31T23:59:59.000Z", "usageLimit": 1000 }
+  { "code": "WELCOME10", "description": "Giảm 10% cho đơn hàng đầu tiên, tối đa 50.000đ", "discountType": "percent", "discountValue": 10, "minOrderValue": 200000, "maxDiscount": 50000, "startDate": "2025-01-01T00:00:00.000Z", "endDate": "2030-12-31T23:59:59.000Z", "usageLimit": 1000 },
+  { "code": "FREESHIP30", "description": "Giảm 30.000đ cho đơn từ 150.000đ", "discountType": "fixed", "discountValue": 30000, "minOrderValue": 150000, "startDate": "2025-01-01T00:00:00.000Z", "endDate": "2030-12-31T23:59:59.000Z", "usageLimit": 500 }
 ]
