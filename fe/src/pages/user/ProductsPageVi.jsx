@@ -111,13 +111,13 @@ export default function ProductsPageVi() {
 
         {/* Search Input */}
         <div className="relative w-full md:w-80">
-          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+          <Search size={18} className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
           <input
             type="search"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Tìm theo tên trái cây..."
-            className="w-full rounded-full border border-surface-border bg-surface-subtle py-2.5 pl-10 pr-4 text-sm text-ink outline-none transition-all focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-50"
+            className="h-11 w-full rounded-full border border-surface-border bg-surface-subtle py-0 pl-10 pr-4 text-sm leading-11 text-ink outline-none transition-all focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-50"
           />
         </div>
       </div>

@@ -48,7 +48,7 @@ function estimateDiscount(voucher, subtotal) {
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const { items, loading: cartLoading } = useCart();
+  const { items, loading: cartLoading, clear: clearCart } = useCart();
   const idempotencyKey = useRef(`web-${Date.now()}-${Math.random().toString(36).slice(2)}`);
 
   const [addresses, setAddresses] = useState([]);
@@ -144,6 +144,8 @@ export default function CheckoutPage() {
         idempotencyKey: idempotencyKey.current,
       });
       const order = response.data.data;
+      // Backend đã xóa giỏ khi tạo đơn — đồng bộ context để giỏ không "hồi sinh"
+      await clearCart().catch(() => {});
       if (paymentMethod === 'mock') {
         try {
           await createPayment({ orderId: order._id, method: paymentMethod });

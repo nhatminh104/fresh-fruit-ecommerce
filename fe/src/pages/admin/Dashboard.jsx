@@ -33,8 +33,42 @@ function AreaChart({ data, formatValue }) {
     P + i * stepX,
     H - P - (d.value / max) * (H - P * 2 - 10),
   ]);
-  const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
-  const area = `${line} L${points[points.length - 1][0].toFixed(1)},${H - P} L${points[0][0].toFixed(1)},${H - P} Z`;
+  // Đường cong monotone cubic (Fritsch-Carlson): mượt nhưng không overshoot
+  // xuống dưới/trên min-max dữ liệu -> không bị lõm xuống trục khi có tháng = 0
+  const smoothLine = (pts) => {
+    const n = pts.length;
+    if (n < 3) return pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+    const xs = pts.map((p) => p[0]);
+    const ys = pts.map((p) => p[1]);
+    // Các điểm cách đều nhau -> secant slope d[i] = dy/dx
+    const d = [];
+    for (let i = 0; i < n - 1; i++) {
+      const dx = xs[i + 1] - xs[i] || 1;
+      d.push((ys[i + 1] - ys[i]) / dx);
+    }
+    // Tangent m[i]: 0 khi đổi hướng, ngược lại harmonic mean của 2 secant kề
+    // -> bảo đảm monotone, đường không overshoot xuống dưới min dữ liệu
+    const m = new Array(n).fill(0);
+    m[0] = d[0];
+    m[n - 1] = d[n - 2];
+    for (let i = 1; i < n - 1; i++) {
+      m[i] = d[i - 1] * d[i] <= 0 ? 0 : (2 * d[i - 1] * d[i]) / (d[i - 1] + d[i]);
+    }
+    let path = `M${xs[0].toFixed(1)},${ys[0].toFixed(1)}`;
+    for (let i = 0; i < n - 1; i++) {
+      const dx = (xs[i + 1] - xs[i]) / 3;
+      const c1x = xs[i] + dx;
+      const c1y = ys[i] + m[i] * dx;
+      const c2x = xs[i + 1] - dx;
+      const c2y = ys[i + 1] - m[i + 1] * dx;
+      path += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${xs[i + 1].toFixed(1)},${ys[i + 1].toFixed(1)}`;
+    }
+    return path;
+  };
+  const line = smoothLine(points);
+  const last = points[points.length - 1];
+  const first = points[0];
+  const area = `${line} L${last[0].toFixed(1)},${H - P} L${first[0].toFixed(1)},${H - P} Z`;
   return (
     <div className="mt-5">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Biểu đồ doanh thu">

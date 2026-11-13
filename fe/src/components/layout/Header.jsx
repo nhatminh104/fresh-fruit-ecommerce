@@ -115,20 +115,21 @@ export default function Header() {
           {/* Search bar (desktop & tablet) */}
           <form
             onSubmit={handleSearch}
-            className="hidden sm:flex flex-1 max-w-lg items-center header-search"
+            className="hidden sm:my-auto sm:flex flex-1 max-w-lg items-center header-search"
             role="search"
           >
-            <Search size={18} className="shrink-0 text-ink-muted" aria-hidden="true" />
+            <Search size={18} className="h-4 w-4 shrink-0 self-center text-ink-muted" aria-hidden="true" />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Tìm kiếm táo, xoài, cam, dâu tây..."
               aria-label="Tìm kiếm sản phẩm"
+              className="h-8 self-center"
             />
             <button
               type="submit"
-              className="rounded-full bg-brand-500 px-3.5 py-1 text-xs font-bold text-white hover:bg-brand-700 transition-colors"
+              className="grid h-8 shrink-0 place-items-center self-center rounded-full bg-brand-500 px-3.5 text-xs font-bold leading-none text-white hover:bg-brand-700 transition-colors"
             >
               Tìm
             </button>
@@ -256,13 +257,13 @@ export default function Header() {
         {/* Search bar on mobile */}
         <div className="pb-3 sm:hidden">
           <form onSubmit={handleSearch} className="flex items-center header-search w-full" role="search">
-            <Search size={16} className="shrink-0 text-ink-muted" aria-hidden="true" />
+            <Search size={16} className="h-4 w-4 shrink-0 self-center text-ink-muted" aria-hidden="true" />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Tìm kiếm trái cây..."
-              className="text-xs"
+              className="h-8 self-center text-xs"
             />
           </form>
         </div>

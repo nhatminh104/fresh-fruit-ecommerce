@@ -57,7 +57,7 @@ export default function Register() {
   };
 
   return (
-    <div className="w-full max-w-lg rounded-3xl bg-white p-7 shadow-sm sm:p-9">
+    <div className="w-full max-w-lg rounded-3xl border border-surface-border bg-white p-7 shadow-card sm:p-9">
       <p className="eyebrow">Fresh account</p>
       <h1 className="mt-2 font-display text-4xl text-forest">Tạo tài khoản</h1>
       <p className="mt-2 text-sm text-slate-500">Nhận ưu đãi, lưu địa chỉ và theo dõi đơn hàng dễ dàng.</p>

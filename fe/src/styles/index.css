@@ -87,8 +87,12 @@
   .header-search {
     @apply flex h-11 items-center gap-2.5 rounded-full border border-surface-border bg-surface-subtle px-4 text-sm text-ink transition-all focus-within:border-brand-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-50;
   }
+  .header-search > * {
+    align-self: center;
+  }
   .header-search input {
-    @apply min-w-0 flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-ink-light;
+    @apply min-w-0 flex-1 self-center bg-transparent text-sm leading-8 text-ink outline-none placeholder:text-ink-light;
+    height: 2rem;
   }
   .cart-badge {
     @apply absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 text-[11px] font-bold text-white shadow-sm;
