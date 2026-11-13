@@ -30,7 +30,7 @@ export function CartProvider({ children }) {
     return next;
   }, []);
   React.useEffect(() => {
-    if (!user || !getAccessToken()) {
+    if (!user?.id || !getAccessToken()) {
       setItems([]);
       setLoading(false);
       return undefined;

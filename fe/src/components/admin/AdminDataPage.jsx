@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import PageContainer from '../layout/PageContainer';
@@ -49,7 +49,7 @@ export default function AdminDataPage({
   const [actionLoading, setActionLoading] = useState(null);
   const [pendingAction, setPendingAction] = useState(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -60,10 +60,10 @@ export default function AdminDataPage({
     } finally {
       setLoading(false);
     }
-  };
+  }, [resource]);
   useEffect(() => {
     load();
-  }, [resource]);
+  }, [load]);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search.trim().toLowerCase()), 300);

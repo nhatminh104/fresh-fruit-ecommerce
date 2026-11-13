@@ -50,10 +50,12 @@ Kiến trúc backend: `Route → Controller → Service → Model`, lỗi tập 
 │   └── tests/             # node:test — auth, validation, commerce, business-logic
 ├── fe/
 │   └── src/{pages,components,services,contexts,hooks,routes,layouts,utils}
+├── docs/
+│   ├── API_DOCUMENTATION.md   # đặc tả REST API
+│   ├── DATABASE_DESIGN.md     # thiết kế schema & quan hệ
+│   ├── TESTING_GUIDE.md       # hướng dẫn kiểm thử
+│   └── PROJECT_GUIDELINES.md  # quy ước kiến trúc & code
 ├── .github/workflows/ci.yml
-├── API_DOCUMENTATION.md   # đặc tả REST API
-├── DATABASE_DESIGN.md     # thiết kế schema & quan hệ
-├── TESTING_GUIDE.md       # hướng dẫn kiểm thử
 └── .env.example           # biến môi trường backend (copy thành .env ở root)
 ```
 
@@ -77,7 +79,7 @@ npm run dev                 # chạy cả FE (:5173) và BE (:5001) song song
 ## Kiểm thử
 
 ```bash
-npm --prefix be test        # backend: node:test (45 tests — auth, giỏ hàng, đơn, voucher, payment, admin)
+npm --prefix be test        # backend: node:test (50 tests — auth, giỏ hàng, đơn, voucher, payment, admin)
 npm --prefix be run check   # syntax check toàn bộ backend
 npm --prefix fe test        # frontend: vitest
 npm --prefix fe run lint    # eslint
@@ -89,8 +91,15 @@ npm --prefix fe run build   # production build
 - **COD**: đơn ở `pending`, admin chuyển `confirmed → shipping → delivered`; khi giao admin đánh dấu đã thanh toán (tự tạo/cập nhật bản ghi Payment).
 - **Mock**: mô phỏng cổng online — `POST /api/payments` với `method: 'mock'` trả `paid` ngay và xác nhận đơn. **Không phải tích hợp cổng thật.**
 
+## Tài khoản & phân quyền
+
+- Khách hàng đăng nhập tại `/login`, đăng ký tại `/register` (chỉ tạo role `customer`).
+- Admin đăng nhập tại `/admin-login` — cổng riêng; backend từ chối đăng nhập sai cổng.
+- API `/api/admin/*` yêu cầu role `admin`; API giỏ hàng/đơn/payment/wishlist/review/address yêu cầu role `customer`.
+
 ## Tài liệu liên quan
 
-- `API_DOCUMENTATION.md` — danh sách endpoint, request/response
-- `DATABASE_DESIGN.md` — schema collections, index, quan hệ
-- `TESTING_GUIDE.md` — kịch bản kiểm thử thủ công
+- [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md) — danh sách endpoint, request/response
+- [`docs/DATABASE_DESIGN.md`](docs/DATABASE_DESIGN.md) — schema collections, index, quan hệ
+- [`docs/TESTING_GUIDE.md`](docs/TESTING_GUIDE.md) — kịch bản kiểm thử thủ công
+- [`docs/PROJECT_GUIDELINES.md`](docs/PROJECT_GUIDELINES.md) — quy ước kiến trúc & code

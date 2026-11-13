@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import PageContainer from '../../components/layout/PageContainer';
 import Loading from '../../components/common/Loading';
@@ -13,20 +13,15 @@ import { formatCurrency } from '../../utils/formatCurrency';
 import { formatDate } from '../../utils/formatDate';
 import { getErrorMessage } from '../../utils/errorMessage';
 import { useToast } from '../../contexts/ToastContext';
+import { ORDER_STATUS_TRANSITIONS } from '../../constants/orderStatus';
 
-const NEXT_ACTIONS = {
-  pending: [
-    ['confirmed', 'Xác nhận đơn'],
-    ['cancelled', 'Hủy đơn'],
-  ],
-  confirmed: [
-    ['shipping', 'Chuyển sang đang giao'],
-    ['cancelled', 'Hủy đơn'],
-  ],
-  shipping: [['delivered', 'Đánh dấu đã giao']],
-  delivered: [],
-  cancelled: [],
-};
+const ACTION_LABELS = { confirmed: 'Xác nhận đơn', cancelled: 'Hủy đơn', shipping: 'Chuyển sang đang giao', delivered: 'Đánh dấu đã giao' };
+const NEXT_ACTIONS = Object.fromEntries(
+  Object.entries(ORDER_STATUS_TRANSITIONS).map(([from, targets]) => [
+    from,
+    targets.map((to) => [to, ACTION_LABELS[to] || to]),
+  ])
+);
 
 export default function OrderDetail() {
   const { id } = useParams();
@@ -36,15 +31,17 @@ export default function OrderDetail() {
   const [busy, setBusy] = useState(false);
   const [pendingStatus, setPendingStatus] = useState(null);
 
-  const load = () =>
+  const load = useCallback(() =>
     api
       .get(`/admin/orders/${id}`)
       .then((response) => setOrder(response.data.data))
-      .catch((requestError) => setError(getErrorMessage(requestError, 'Không thể tải đơn hàng.')));
+      .catch((requestError) => setError(getErrorMessage(requestError, 'Không thể tải đơn hàng.'))),
+    [id]
+  );
 
   useEffect(() => {
     load();
-  }, [id]);
+  }, [load]);
 
   const changeStatus = async () => {
     if (!pendingStatus) return;

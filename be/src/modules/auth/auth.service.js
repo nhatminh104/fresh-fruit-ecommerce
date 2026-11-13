@@ -77,6 +77,9 @@ export async function login(payload = {}, meta = {}) {
     throw new ApiError(401, 'Email hoặc mật khẩu không đúng');
   }
   if (user.status !== 'active') throw new ApiError(403, 'Tài khoản chưa được kích hoạt');
+  if (payload.role && payload.role !== user.role) {
+    throw new ApiError(403, 'Tài khoản không có quyền truy cập cổng này');
+  }
 
   const { session, refreshToken } = await createSession(user, meta);
   return authPayload(user, session, refreshToken);

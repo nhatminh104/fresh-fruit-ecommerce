@@ -7,7 +7,7 @@ import NotFound from './pages/NotFound';
 import Unauthorized from './pages/Unauthorized';
 import HomePage from './pages/user/Home';
 import ScrollToTop from './components/common/ScrollToTop';
-import { RequireAdmin, RequireAuth, adminRoutes, authRoutes, protectedRoutes, publicRoutes } from './routes';
+import { RequireAdmin, RequireAuth, RequireCustomer, adminRoutes, authRoutes, protectedRoutes, publicRoutes } from './routes';
 
 export default function App() {
   return (
@@ -25,9 +25,9 @@ export default function App() {
 
       <Route
         element={
-          <RequireAuth>
+          <RequireCustomer>
             <MainLayout />
-          </RequireAuth>
+          </RequireCustomer>
         }
       >
         {protectedRoutes.map(([path, Component]) => (

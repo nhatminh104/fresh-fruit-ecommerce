@@ -1,1 +1,27 @@
-import { Router } from 'express'; import { requireAuth } from '../../middlewares/authMiddleware.js'; import { listController, latestController, mineController, createController } from './review.controller.js'; const router = Router(); router.get('/latest', latestController); router.get('/product/:productId', listController); router.get('/mine', requireAuth, mineController); router.post('/', requireAuth, (req, res, next) => { const rating = Number(req.body?.rating); if (!Number.isInteger(rating) || rating < 1 || rating > 5) return res.status(400).json({ success: false, message: 'Điểm đánh giá phải là số nguyên từ 1 đến 5' }); if (req.body?.comment !== undefined && (typeof req.body.comment !== 'string' || req.body.comment.trim().length > 1000)) return res.status(400).json({ success: false, message: 'Nội dung đánh giá không hợp lệ' }); next(); }, createController); export default router;
+import { Router } from 'express';
+import { requireAuth, requireCustomer } from '../../middlewares/authMiddleware.js';
+import { listController, latestController, mineController, createController } from './review.controller.js';
+
+const router = Router();
+
+router.get('/latest', latestController);
+router.get('/product/:productId', listController);
+router.get('/mine', requireAuth, requireCustomer, mineController);
+router.post(
+  '/',
+  requireAuth,
+  requireCustomer,
+  (req, res, next) => {
+    const rating = Number(req.body?.rating);
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      return res.status(400).json({ success: false, message: 'Điểm đánh giá phải là số nguyên từ 1 đến 5' });
+    }
+    if (req.body?.comment !== undefined && (typeof req.body.comment !== 'string' || req.body.comment.trim().length > 1000)) {
+      return res.status(400).json({ success: false, message: 'Nội dung đánh giá không hợp lệ' });
+    }
+    next();
+  },
+  createController
+);
+
+export default router;

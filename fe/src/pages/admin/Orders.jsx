@@ -11,34 +11,18 @@ import { listAdmin, updateAdmin } from '../../services/adminService';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { formatDate } from '../../utils/formatDate';
 import { getErrorMessage } from '../../utils/errorMessage';
+import { ORDER_STATUS_TRANSITIONS, ORDER_STATUS_OPTIONS, ORDER_ACTION_STYLE } from '../../constants/orderStatus';
 
 const PAGE_SIZE = 10;
-const NEXT_ACTIONS = {
-  pending: [
-    ['confirmed', 'Xác nhận'],
-    ['cancelled', 'Hủy đơn'],
-  ],
-  confirmed: [
-    ['shipping', 'Đang giao'],
-    ['cancelled', 'Hủy đơn'],
-  ],
-  shipping: [['delivered', 'Đã giao']],
-  delivered: [],
-  cancelled: [],
-};
-const ACTION_STYLE = {
-  cancelled: 'danger',
-  confirmed: 'primary',
-  shipping: 'primary',
-  delivered: 'secondary',
-};
-const STATUS_OPTIONS = [
-  { value: 'pending', label: 'Chờ xử lý' },
-  { value: 'confirmed', label: 'Đã xác nhận' },
-  { value: 'shipping', label: 'Đang giao' },
-  { value: 'delivered', label: 'Đã giao' },
-  { value: 'cancelled', label: 'Đã hủy' },
-];
+const ACTION_LABELS = { confirmed: 'Xác nhận', cancelled: 'Hủy đơn', shipping: 'Đang giao', delivered: 'Đã giao' };
+const NEXT_ACTIONS = Object.fromEntries(
+  Object.entries(ORDER_STATUS_TRANSITIONS).map(([from, targets]) => [
+    from,
+    targets.map((to) => [to, ACTION_LABELS[to] || to]),
+  ])
+);
+const ACTION_STYLE = ORDER_ACTION_STYLE;
+const STATUS_OPTIONS = ORDER_STATUS_OPTIONS;
 const PAYMENT_OPTIONS = [
   { value: 'pending', label: 'Chờ thanh toán' },
   { value: 'paid', label: 'Đã thanh toán' },

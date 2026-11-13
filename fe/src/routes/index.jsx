@@ -2,6 +2,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import Loading from '../components/common/Loading';
 import { useAuth } from '../hooks/useAuth';
 import Login from '../pages/auth/Login';
+import AdminLogin from '../pages/auth/AdminLogin';
 import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
@@ -47,11 +48,20 @@ export function RequireAuth({ children }) {
   return children;
 }
 
-export function RequireAdmin({ children }) {
+export function RequireCustomer({ children }) {
   const { user, initializing } = useAuth();
   const location = useLocation();
   if (initializing) return <Loading />;
   if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
+  if (user.role !== 'customer') return <Navigate to="/admin" replace />;
+  return children;
+}
+
+export function RequireAdmin({ children }) {
+  const { user, initializing } = useAuth();
+  const location = useLocation();
+  if (initializing) return <Loading />;
+  if (!user) return <Navigate to="/admin-login" replace state={{ from: location }} />;
   if (user.role !== 'admin') return <Navigate to="/unauthorized" replace />;
   return children;
 }
@@ -85,6 +95,7 @@ export const protectedRoutes = [
 
 export const authRoutes = [
   ['/login', Login],
+  ['/admin-login', AdminLogin],
   ['/register', Register],
   ['/forgot-password', ForgotPassword],
   ['/reset-password', ResetPassword],

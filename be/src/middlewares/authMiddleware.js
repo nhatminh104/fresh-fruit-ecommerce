@@ -47,3 +47,4 @@ export function requireRole(...roles) {
 }
 
 export const requireAdmin = requireRole('admin');
+export const requireCustomer = requireRole('customer');

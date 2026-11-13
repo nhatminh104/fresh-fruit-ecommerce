@@ -8,7 +8,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { getErrorMessage } from '../../utils/errorMessage';
 import { isEmail, isRequired } from '../../utils/validators';
 
-export default function Login() {
+export default function Login({ portal = 'customer' }) {
+  const isAdminPortal = portal === 'admin';
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,7 +30,7 @@ export default function Login() {
     setError('');
     setSubmitting(true);
     try {
-      const currentUser = await login({ email: form.email.trim(), password: form.password });
+      const currentUser = await login({ email: form.email.trim(), password: form.password, role: portal });
       const from = location.state?.from;
       const destination = from ? `${from.pathname || ''}${from.search || ''}` : null;
       navigate(destination || (currentUser.role === 'admin' ? '/admin' : '/'), { replace: true });
@@ -43,8 +44,10 @@ export default function Login() {
   return (
     <div className="w-full max-w-md rounded-3xl border border-surface-border bg-white p-7 shadow-card sm:p-9">
       <p className="eyebrow">Fresh account</p>
-      <h1 className="mt-2 font-display text-4xl text-forest">Đăng nhập</h1>
-      <p className="mt-2 text-sm text-slate-500">Tiếp tục mua sắm và theo dõi đơn hàng của bạn.</p>
+      <h1 className="mt-2 font-display text-4xl text-forest">{isAdminPortal ? 'Đăng nhập Admin' : 'Đăng nhập'}</h1>
+      <p className="mt-2 text-sm text-slate-500">
+        {isAdminPortal ? 'Khu vực quản trị dành cho quản trị viên.' : 'Tiếp tục mua sắm và theo dõi đơn hàng của bạn.'}
+      </p>
 
       {error && (
         <div className="mt-5">
@@ -87,12 +90,14 @@ export default function Login() {
         <Link className="font-semibold text-forest hover:text-leaf" to="/forgot-password">
           Quên mật khẩu?
         </Link>
-        <span>
-          Chưa có tài khoản?{' '}
-          <Link className="font-semibold text-forest hover:text-leaf" to="/register">
-            Đăng ký
-          </Link>
-        </span>
+        {!isAdminPortal && (
+          <span>
+            Chưa có tài khoản?{' '}
+            <Link className="font-semibold text-forest hover:text-leaf" to="/register">
+              Đăng ký
+            </Link>
+          </span>
+        )}
       </div>
     </div>
   );
