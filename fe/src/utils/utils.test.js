@@ -41,3 +41,25 @@ describe('getErrorMessage', () => {
     expect(getErrorMessage(null, 'Lỗi dự phòng')).toBe('Lỗi dự phòng');
   });
 });
+
+describe('authStorage', () => {
+  it('stores, reads and clears tokens via sessionStorage', async () => {
+    const store = new Map();
+    globalThis.window = {
+      sessionStorage: {
+        getItem: (k) => store.get(k) ?? null,
+        setItem: (k, v) => store.set(k, String(v)),
+        removeItem: (k) => store.delete(k)
+      }
+    };
+    const { setAuthTokens, getAccessToken, getRefreshToken, clearAuthTokens } = await import('./authStorage');
+    expect(getAccessToken()).toBeNull();
+    setAuthTokens({ accessToken: 'a1', refreshToken: 'r1' });
+    expect(getAccessToken()).toBe('a1');
+    expect(getRefreshToken()).toBe('r1');
+    clearAuthTokens();
+    expect(getAccessToken()).toBeNull();
+    expect(getRefreshToken()).toBeNull();
+    delete globalThis.window;
+  });
+});

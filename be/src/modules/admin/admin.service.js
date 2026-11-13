@@ -30,16 +30,17 @@ export async function dashboard() {
     Order.aggregate([{ $match: { status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' }, $or: [{ status: 'delivered' }, { paymentStatus: 'paid' }] } }, { $group: { _id: null, total: { $sum: '$totalAmount' } } }]),
     Order.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
     Order.aggregate([
-      { $match: { status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' } } },
+      { $match: { status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' }, $or: [{ status: 'delivered' }, { paymentStatus: 'paid' }] } },
       { $group: { _id: '$paymentMethod', count: { $sum: 1 }, total: { $sum: '$totalAmount' } } }
     ]),
     Order.aggregate([
-      { $match: { createdAt: { $gte: sixMonthsAgo }, status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' } } },
+      // Cùng quy tắc doanh thu với KPI: loại cancelled/refunded và chỉ tính đơn đã giao hoặc đã thanh toán
+      { $match: { createdAt: { $gte: sixMonthsAgo }, status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' }, $or: [{ status: 'delivered' }, { paymentStatus: 'paid' }] } },
       { $group: { _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } }, total: { $sum: '$totalAmount' }, count: { $sum: 1 } } },
       { $sort: { _id: 1 } }
     ]),
     Order.aggregate([
-      { $match: { status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' } } },
+      { $match: { status: { $ne: 'cancelled' }, paymentStatus: { $ne: 'refunded' }, $or: [{ status: 'delivered' }, { paymentStatus: 'paid' }] } },
       { $unwind: '$items' },
       { $group: { _id: '$items.product', name: { $first: '$items.productName' }, quantity: { $sum: '$items.quantity' }, revenue: { $sum: { $multiply: ['$items.price', '$items.quantity'] } } } },
       { $sort: { quantity: -1 } },
@@ -64,11 +65,19 @@ export async function dashboard() {
 }
 
 export const listProducts = () => Product.find().populate('category', 'name slug').sort({ createdAt: -1 }).lean();
+async function assertCategoryExists(categoryId) {
+  if (categoryId === undefined || categoryId === null || categoryId === '') return;
+  if (!mongoose.isValidObjectId(categoryId)) throw new ApiError(400, 'Danh mục không hợp lệ');
+  const category = await Category.findById(categoryId).select('_id').lean();
+  if (!category) throw new ApiError(400, 'Danh mục không tồn tại');
+}
+
 export async function createProduct(payload) {
   if (payload.stock !== undefined) {
     const stock = Number(payload.stock);
     if (!Number.isInteger(stock) || stock < 0) throw new ApiError(400, 'Tồn kho phải là số nguyên không âm');
   }
+  await assertCategoryExists(payload.category);
   const product = await Product.create(pick(payload, ['name', 'slug', 'description', 'category', 'price', 'originalPrice', 'unit', 'origin', 'images', 'stock', 'soldCount', 'isFeatured', 'isActive']));
   const lowStockAt = payload.lowStockAt !== undefined ? Number(payload.lowStockAt) : 5;
   await Inventory.findOneAndUpdate(
@@ -83,6 +92,7 @@ export async function updateProduct(productId, payload) {
     const stock = Number(payload.stock);
     if (!Number.isInteger(stock) || stock < 0) throw new ApiError(400, 'Tồn kho phải là số nguyên không âm');
   }
+  await assertCategoryExists(payload.category);
   const product = await Product.findByIdAndUpdate(id(productId, 'Product id'), { $set: pick(payload, ['name', 'slug', 'description', 'category', 'price', 'originalPrice', 'unit', 'origin', 'images', 'stock', 'isFeatured', 'isActive']) }, { new: true, runValidators: true });
   if (!product) throw new ApiError(404, 'Product not found');
   if (payload.stock !== undefined) {
@@ -171,6 +181,13 @@ export async function deleteReview(reviewId) { const result = await Review.findB
 export const listVouchers = () => Voucher.find().sort({ createdAt: -1 }).lean();
 export async function createVoucher(payload) { return Voucher.create(pick(payload, ['code', 'description', 'discountType', 'discountValue', 'minOrderValue', 'maxDiscount', 'startDate', 'endDate', 'usageLimit', 'isActive'])); }
 export async function updateVoucher(voucherId, payload) {
+  const existing = await Voucher.findById(id(voucherId, 'Voucher id')).lean();
+  if (!existing) throw new ApiError(404, 'Voucher not found');
+  if (payload.usageLimit !== undefined && payload.usageLimit !== null) {
+    const limit = Number(payload.usageLimit);
+    if (!Number.isInteger(limit) || limit < 1) throw new ApiError(400, 'Giới hạn lượt dùng phải là số nguyên >= 1');
+    if (limit < (existing.usedCount || 0)) throw new ApiError(400, `Không thể giảm giới hạn xuống dưới số lượt đã dùng (${existing.usedCount})`);
+  }
   const voucher = await Voucher.findByIdAndUpdate(id(voucherId, 'Voucher id'), { $set: pick(payload, ['code', 'description', 'discountType', 'discountValue', 'minOrderValue', 'maxDiscount', 'startDate', 'endDate', 'usageLimit', 'isActive']) }, { new: true, runValidators: true });
   if (!voucher) throw new ApiError(404, 'Voucher not found');
   return voucher;

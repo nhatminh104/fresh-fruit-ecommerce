@@ -12,3 +12,5 @@ export const getCurrentUser = () => unwrap(api.get('/auth/me'));
 export const forgotPassword = (email) => unwrap(api.post('/auth/forgot-password', { email }));
 export const resetPassword = (payload) =>
   api.post('/auth/reset-password', payload).then((response) => response.data);
+export const logoutAll = () => unwrap(api.post('/auth/logout-all'));
+export const changePassword = (payload) => unwrap(api.post('/auth/change-password', payload));

@@ -177,3 +177,19 @@ export async function resetPassword(payload = {}) {
 
   return { message: 'Password has been reset. Please sign in again.' };
 }
+
+export async function logoutAll(userId) {
+  await AuthSession.updateMany({ user: userId, revokedAt: null }, { $set: { revokedAt: new Date() } });
+  return { loggedOut: true };
+}
+
+export async function changePassword(userId, { currentPassword, newPassword }) {
+  const user = await User.findById(userId).select('+password');
+  if (!user) throw new ApiError(404, 'User not found');
+  if (!(await verifyPassword(currentPassword, user.password))) {
+    throw new ApiError(400, 'Mật khẩu hiện tại không đúng');
+  }
+  await User.updateOne({ _id: user._id }, { $set: { password: await hashPassword(newPassword) } });
+  await AuthSession.updateMany({ user: user._id, revokedAt: null }, { $set: { revokedAt: new Date() } });
+  return { message: 'Đã đổi mật khẩu. Vui lòng đăng nhập lại.' };
+}

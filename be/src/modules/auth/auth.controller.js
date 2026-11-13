@@ -1,8 +1,10 @@
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { toPublicUser } from '../users/user.service.js';
 import {
+  changePassword,
   login,
   logout,
+  logoutAll,
   refreshSession,
   register,
   requestPasswordReset,
@@ -38,4 +40,12 @@ export const forgotPasswordController = asyncHandler(async (req, res) => {
 
 export const resetPasswordController = asyncHandler(async (req, res) => {
   res.json({ success: true, data: await resetPassword(req.body) });
+});
+
+export const logoutAllController = asyncHandler(async (req, res) => {
+  res.json({ success: true, data: await logoutAll(req.user._id) });
+});
+
+export const changePasswordController = asyncHandler(async (req, res) => {
+  res.json({ success: true, data: await changePassword(req.user._id, req.body) });
 });

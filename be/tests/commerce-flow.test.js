@@ -20,9 +20,11 @@ import { createOrder, cancelOrder } from '../src/modules/orders/order.service.js
 import { createReview } from '../src/modules/reviews/review.service.js';
 import { addItem, getCart, updateItem, removeItem } from '../src/modules/carts/cart.service.js';
 import { listAddresses, createAddress, updateAddress, deleteAddress } from '../src/modules/addresses/address.service.js';
-import { updateOrder, updateUser } from '../src/modules/admin/admin.service.js';
+import { updateOrder, updateUser, createProduct, updateProduct, updateVoucher, dashboard } from '../src/modules/admin/admin.service.js';
 import { createPayment } from '../src/modules/payments/payment.service.js';
 import { updateProfile } from '../src/modules/users/user.service.js';
+import { logoutAll, changePassword } from '../src/modules/auth/auth.service.js';
+import { hashPassword, verifyPassword } from '../src/utils/password.js';
 
 // Dùng database riêng để tránh xung đột khi node --test chạy song song nhiều file test.
 const baseUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/fresh-fruit-test';
@@ -320,4 +322,78 @@ test('payment pending same method returns existing (idempotent), different metho
     () => createPayment({ userId: user._id, orderId: order._id, method: 'mock' }),
     (error) => error.status === 400 // method không khớp order.paymentMethod
   );
+});
+
+// Admin product category guard
+test('createProduct/updateProduct reject missing or invalid category', async () => {
+  const fakeId = new mongoose.Types.ObjectId();
+  await assert.rejects(() => createProduct({ name: 'X', slug: `x-${Date.now()}`, category: fakeId, price: 1000, stock: 1, unit: 'kg', origin: 'Test' }), (e) => e.status === 400);
+  await assert.rejects(() => createProduct({ name: 'X', slug: `x2-${Date.now()}`, category: 'not-an-id', price: 1000, stock: 1, unit: 'kg', origin: 'Test' }), (e) => e.status === 400);
+  const { category, product } = await setupCatalog(5);
+  const created = await createProduct({ name: 'Bưởi', slug: `buoi-${Date.now()}`, category: category._id, price: 20000, stock: 3, unit: 'kg', origin: 'Test' });
+  assert.equal(String(created.category), String(category._id));
+  await assert.rejects(() => updateProduct(product._id, { category: fakeId }), (e) => e.status === 400);
+});
+
+// Voucher usageLimit cannot drop below usedCount
+test('updateVoucher rejects usageLimit below usedCount', async () => {
+  const voucher = await Voucher.create({
+    code: `LIM${Date.now()}`, discountType: 'fixed', discountValue: 1000,
+    startDate: new Date(Date.now() - 86400000), endDate: new Date(Date.now() + 86400000),
+    usageLimit: 5, usedCount: 3, isActive: true
+  });
+  await assert.rejects(() => updateVoucher(voucher._id, { usageLimit: 2 }), (e) => e.status === 400);
+  await assert.rejects(() => updateVoucher(voucher._id, { usageLimit: 0 }), (e) => e.status === 400);
+  const ok = await updateVoucher(voucher._id, { usageLimit: 4 });
+  assert.equal(ok.usageLimit, 4);
+});
+
+// Dashboard revenue rules: pending unpaid excluded, delivered/paid included, cancelled excluded
+test('dashboard revenue excludes pending unpaid and cancelled orders', async () => {
+  const user = await createUser();
+  const { product } = await setupCatalog(50, 100000);
+  const pendingOrder = await makeOrder(user, product, 1); // pending, cod, unpaid
+  const paidOrder = await makeOrder(user, product, 1, { paymentMethod: 'mock' });
+  await Payment.create({ order: paidOrder._id, method: 'mock', status: 'paid', amount: paidOrder.totalAmount });
+  await Order.updateOne({ _id: paidOrder._id }, { $set: { paymentStatus: 'paid', status: 'confirmed' } });
+  const cancelledOrder = await makeOrder(user, product, 1);
+  await cancelOrder({ orderId: cancelledOrder._id });
+
+  const stats = await dashboard();
+  // Chỉ paidOrder (đã paid) đủ điều kiện doanh thu; pending & cancelled bị loại
+  assert.equal(stats.revenue, paidOrder.totalAmount);
+  const monthly = stats.monthlyRevenue.find((m) => m._id === paidOrder.createdAt.toISOString().slice(0, 7));
+  assert.ok(monthly, 'tháng của đơn paid phải có trong monthlyRevenue');
+  assert.equal(monthly.total, paidOrder.totalAmount);
+});
+
+// Auth: logout-all revokes every session; change-password verifies current password and revokes sessions
+test('logoutAll revokes all active sessions of the user', async () => {
+  const user = await createUser();
+  await AuthSession.create([
+    { user: user._id, refreshTokenHash: 'h1', expiresAt: new Date(Date.now() + 86400000) },
+    { user: user._id, refreshTokenHash: 'h2', expiresAt: new Date(Date.now() + 86400000) }
+  ]);
+  const other = await createUser();
+  await AuthSession.create({ user: other._id, refreshTokenHash: 'h3', expiresAt: new Date(Date.now() + 86400000) });
+
+  await logoutAll(user._id);
+  assert.equal(await AuthSession.countDocuments({ user: user._id, revokedAt: null }), 0);
+  assert.equal(await AuthSession.countDocuments({ user: other._id, revokedAt: null }), 1); // user khác không bị ảnh hưởng
+});
+
+test('changePassword verifies current password, updates hash and revokes sessions', async () => {
+  const user = await createUser();
+  await User.updateOne({ _id: user._id }, { $set: { password: await hashPassword('OldPass123') } });
+  await AuthSession.create({ user: user._id, refreshTokenHash: 'h1', expiresAt: new Date(Date.now() + 86400000) });
+
+  // Sai mật khẩu hiện tại -> 400, session còn nguyên
+  await assert.rejects(() => changePassword(user._id, { currentPassword: 'Wrong123', newPassword: 'NewPass123' }), (e) => e.status === 400);
+  assert.equal(await AuthSession.countDocuments({ user: user._id, revokedAt: null }), 1);
+
+  const result = await changePassword(user._id, { currentPassword: 'OldPass123', newPassword: 'NewPass123' });
+  assert.ok(result.message);
+  const fresh = await User.findById(user._id).select('+password');
+  assert.equal(await verifyPassword('NewPass123', fresh.password), true);
+  assert.equal(await AuthSession.countDocuments({ user: user._id, revokedAt: null }), 0);
 });

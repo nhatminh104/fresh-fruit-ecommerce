@@ -65,3 +65,15 @@ export function resetPasswordValidator(req, res, next) {
   }
   next();
 }
+
+export function changePasswordValidator(req, res, next) {
+  const { currentPassword, newPassword, confirmPassword } = bodyOf(req);
+  if (typeof currentPassword !== 'string' || currentPassword.length === 0) {
+    throw new ApiError(400, 'Mật khẩu hiện tại là bắt buộc');
+  }
+  requirePassword(newPassword);
+  if (confirmPassword !== undefined && confirmPassword !== newPassword) {
+    throw new ApiError(400, 'Mật khẩu xác nhận không khớp');
+  }
+  next();
+}
